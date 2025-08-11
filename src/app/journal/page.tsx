@@ -2,184 +2,210 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { Plus, Search, Filter, Calendar, BookOpen, Target, TrendingUp } from 'lucide-react'
 
-// 임시 저널 데이터
-const mockJournalEntries = [
+interface JournalEntry {
+  id: number
+  title: string
+  content: string
+  category: string
+  date: string
+  tags: string[]
+  mentor?: string
+  actionItems: string[]
+  completed: boolean
+}
+
+const mockJournalEntries: JournalEntry[] = [
   {
-    id: '1',
-    title: '프로덕트 매니저 전환을 위한 액션 플랜',
-    content: '김성민 멘토님의 피드백을 바탕으로 프로덕트 매니저 전환을 위한 구체적인 액션 플랜을 수립했습니다.',
-    feedbackId: 'feedback-1',
-    actionItems: [
-      '프로덕트 관리 관련 온라인 강의 수강',
-      '현재 업무에서 프로덕트 관점으로 접근해보기',
-      '사이드 프로젝트로 작은 제품 기획해보기'
-    ],
-    tags: ['커리어 전환', '프로덕트 관리', '액션 플랜'],
-    createdAt: '2024-01-15'
+    id: 1,
+    title: "팀 리더십 향상을 위한 피드백",
+    content: "시니어 개발자로 승진 후 팀을 이끌면서 겪은 어려움과 해결 방법을 정리했습니다...",
+    category: "리더십",
+    date: "2024-01-15",
+    tags: ["팀리드", "승진", "관리"],
+    mentor: "김멘토",
+    actionItems: ["주간 1:1 미팅 정기화", "팀원 성과 피드백 시스템 구축"],
+    completed: false
   },
   {
-    id: '2',
-    title: '팀 갈등 해결 방법 정리',
-    content: '이지은 멘토님의 조직 갈등 해결 방법에 대한 피드백을 정리했습니다.',
-    feedbackId: 'feedback-2',
-    actionItems: [
-      '1:1 대화를 통한 상대방 입장 이해하기',
-      '객관적 데이터로 상황 분석하기',
-      'HR팀과의 상담 고려하기'
-    ],
-    tags: ['인간관계', '갈등 해결', '커뮤니케이션'],
-    createdAt: '2024-01-10'
+    id: 2,
+    title: "기술 아키텍처 개선 계획",
+    content: "현재 시스템의 기술적 부채를 정리하고 개선 방안을 도출했습니다...",
+    category: "기술",
+    date: "2024-01-10",
+    tags: ["아키텍처", "리팩토링", "기술부채"],
+    mentor: "박멘토",
+    actionItems: ["마이크로서비스 전환 계획 수립", "성능 모니터링 도구 도입"],
+    completed: true
+  },
+  {
+    id: 3,
+    title: "커리어 목표 재정립",
+    content: "5년차 개발자로서 앞으로의 커리어 방향성을 점검하고 목표를 재설정했습니다...",
+    category: "커리어",
+    date: "2024-01-05",
+    tags: ["커리어계획", "목표설정", "자기계발"],
+    mentor: "이멘토",
+    actionItems: ["연간 학습 계획 수립", "네트워킹 이벤트 참여"],
+    completed: false
   }
 ]
 
 export default function JournalPage() {
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [searchQuery, setSearchQuery] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('전체')
+  const [showCompleted, setShowCompleted] = useState(true)
 
-  const allTags = Array.from(new Set(mockJournalEntries.flatMap(entry => entry.tags)))
+  const categories = ['전체', '리더십', '기술', '커리어', '인간관계', '성과관리']
 
   const filteredEntries = mockJournalEntries.filter(entry => {
-    const matchesSearch = !searchQuery || 
-      entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      entry.content.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesTags = selectedTags.length === 0 || 
-      selectedTags.some(tag => entry.tags.includes(tag))
-
-    return matchesSearch && matchesTags
+    const matchesSearch = entry.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         entry.content.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = selectedCategory === '전체' || entry.category === selectedCategory
+    const matchesStatus = showCompleted ? true : !entry.completed
+    return matchesSearch && matchesCategory && matchesStatus
   })
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    )
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            커리어 저널
-          </h1>
-          <p className="text-lg text-gray-600">
-            받은 피드백과 멘토링 기록을 체계적으로 저장하고 후속 액션을 관리하여 커리어 성장을 추적하세요.
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* 헤더 */}
+      <div className="mobile-header">
+        <div className="flex items-center justify-between">
+          <h1 className="text-lg font-semibold text-gray-900">커리어 저널</h1>
+          <button className="text-violet-600">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </button>
         </div>
+      </div>
 
+      {/* 메인 콘텐츠 */}
+      <div className="mobile-content">
         {/* 검색 및 필터 */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                검색
-              </label>
+        <div className="space-y-4 mb-6">
+          {/* 검색바 */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="저널을 검색해보세요..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+            />
+          </div>
+
+          {/* 카테고리 필터 */}
+          <div className="flex space-x-2 overflow-x-auto pb-2">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-violet-600 text-white'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          {/* 상태 필터 */}
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center space-x-2">
               <input
-                type="text"
-                placeholder="제목이나 내용으로 검색"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                type="checkbox"
+                checked={showCompleted}
+                onChange={(e) => setShowCompleted(e.target.checked)}
+                className="w-4 h-4 text-violet-600 border-gray-300 rounded focus:ring-violet-500"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                태그 필터
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {allTags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                      selectedTags.includes(tag)
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
+              <span className="text-sm text-gray-600">완료된 항목 표시</span>
+            </label>
           </div>
         </div>
 
         {/* 저널 목록 */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           {filteredEntries.map((entry) => (
             <div key={entry.id} className="card">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {entry.title}
-                  </h3>
-                  <p className="text-gray-600 mb-3">
-                    {entry.content}
-                  </p>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <span>{entry.createdAt}</span>
-                    {entry.feedbackId && (
-                      <Link
-                        href={`/feedback/${entry.feedbackId}`}
-                        className="text-primary-600 hover:text-primary-700"
-                      >
-                        관련 피드백 보기
+              <div className="space-y-3">
+                {/* 저널 헤더 */}
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      <Link href={`/journal/${entry.id}`} className="hover:text-violet-600 transition-colors">
+                        {entry.title}
                       </Link>
-                    )}
+                    </h3>
+                    <p className="text-gray-600 text-sm line-clamp-2">
+                      {entry.content}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      entry.completed 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {entry.completed ? '완료' : '진행중'}
+                    </span>
                   </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button className="text-gray-400 hover:text-gray-600">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </button>
-                  <button className="text-gray-400 hover:text-gray-600">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
+
+                {/* 메타 정보 */}
+                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                  <span className="flex items-center space-x-1">
+                    <Calendar className="w-4 h-4" />
+                    <span>{entry.date}</span>
+                  </span>
+                  <span>{entry.category}</span>
+                  {entry.mentor && (
+                    <span className="flex items-center space-x-1">
+                      <BookOpen className="w-4 h-4" />
+                      <span>{entry.mentor}</span>
+                    </span>
+                  )}
                 </div>
-              </div>
 
-              <div className="mb-4">
-                <h4 className="font-medium text-gray-800 mb-2">액션 아이템</h4>
-                <ul className="space-y-2">
-                  {entry.actionItems.map((item, index) => (
-                    <li key={index} className="flex items-start space-x-2">
-                      <input
-                        type="checkbox"
-                        className="mt-1 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                      />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="flex items-center justify-between">
+                {/* 태그 */}
                 <div className="flex flex-wrap gap-2">
                   {entry.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                      className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
                     >
                       {tag}
                     </span>
                   ))}
                 </div>
-                <button className="btn-primary">
-                  액션 아이템 추가
-                </button>
+
+                {/* 액션 아이템 */}
+                {entry.actionItems.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium text-gray-700 flex items-center space-x-1">
+                      <Target className="w-4 h-4" />
+                      <span>액션 아이템</span>
+                    </h4>
+                    <ul className="space-y-1">
+                      {entry.actionItems.map((item, index) => (
+                        <li key={index} className="text-sm text-gray-600 flex items-center space-x-2">
+                          <span className="w-2 h-2 bg-violet-400 rounded-full"></span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
 
+        {/* 저널이 없을 때 */}
         {filteredEntries.length === 0 && (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -187,17 +213,45 @@ export default function JournalPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <p className="text-gray-500 text-lg mb-2">
-              아직 저널 항목이 없습니다
-            </p>
-            <p className="text-gray-400 text-sm">
-              질문을 작성하고 피드백을 받아보세요.
-            </p>
-            <Link href="/questions" className="btn-primary mt-4 inline-block">
-              질문하기
-            </Link>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">저널이 없습니다</h3>
+            <p className="text-gray-600">새로운 저널을 작성해보세요.</p>
           </div>
         )}
+      </div>
+
+      {/* Floating Action Button */}
+      <Link href="/journal/new" className="mobile-fab">
+        <Plus className="w-6 h-6" />
+      </Link>
+
+      {/* 하단 네비게이션 */}
+      <div className="mobile-bottom-nav">
+        <div className="flex justify-around">
+          <Link href="/questions" className="flex flex-col items-center py-2 text-gray-400">
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <span className="text-xs">질문</span>
+          </Link>
+          <Link href="/mentors" className="flex flex-col items-center py-2 text-gray-400">
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span className="text-xs">멘토</span>
+          </Link>
+          <Link href="/journal" className="flex flex-col items-center py-2 text-violet-600">
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span className="text-xs">저널</span>
+          </Link>
+          <Link href="/profile" className="flex flex-col items-center py-2 text-gray-400">
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span className="text-xs">프로필</span>
+          </Link>
+        </div>
       </div>
     </div>
   )

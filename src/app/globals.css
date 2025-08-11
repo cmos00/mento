@@ -4,29 +4,27 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-@layer base {
-  html {
-    font-family: 'Inter', system-ui, sans-serif;
-    /* 모바일 앱을 위한 설정 */
-    -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  body {
-    /* 모바일 앱을 위한 설정 */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overscroll-behavior: none;
-  }
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  /* 모바일 앱을 위한 설정 */
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  /* 모바일 앱을 위한 설정 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 text-base;
+    @apply bg-[#6A5ACD] hover:bg-[#5A4ABD] text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 text-base;
   }
 
   .btn-secondary {
-    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-xl transition-colors duration-200 text-base;
+    @apply bg-[#F5F5DC] hover:bg-[#E8E8D0] text-gray-700 font-medium py-3 px-6 rounded-xl transition-colors duration-200 text-base;
   }
   
   .card {
@@ -50,6 +48,6 @@
   }
 
   .mobile-fab {
-    @apply fixed bottom-20 right-4 w-14 h-14 bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center z-40;
+    @apply fixed bottom-20 right-4 w-14 h-14 bg-[#6A5ACD] text-white rounded-full shadow-lg flex items-center justify-center z-40;
   }
 }
