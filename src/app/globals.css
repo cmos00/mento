@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    /* 모바일 앱을 위한 설정 */
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    /* 모바일 앱을 위한 설정 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 text-base;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-xl transition-colors duration-200 text-base;
+  }
+  
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-4;
+  }
+
+  .mobile-container {
+    @apply max-w-md mx-auto px-4;
+  }
+
+  .mobile-header {
+    @apply fixed top-0 left-0 right-0 bg-white border-b border-gray-100 z-50 px-4 py-3;
+  }
+
+  .mobile-content {
+    @apply pt-16 pb-20;
+  }
+
+  .mobile-bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 px-4 py-2;
+  }
+
+  .mobile-fab {
+    @apply fixed bottom-20 right-4 w-14 h-14 bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center z-40;
+  }
+}
