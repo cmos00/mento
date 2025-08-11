@@ -10,9 +10,9 @@ export default function AuthError() {
   const getErrorMessage = (error: string | null) => {
     switch (error) {
       case 'Callback':
-        return 'LinkedIn 로그인 중 문제가 발생했습니다. 다시 시도해주세요.'
+        return '로그인 중 문제가 발생했습니다. 다시 시도해주세요.'
       case 'OAuthCallback':
-        return 'LinkedIn 인증 과정에서 오류가 발생했습니다. 권한 설정을 확인해주세요.'
+        return '인증 과정에서 오류가 발생했습니다. 다시 시도해주세요.'
       default:
         return '인증 과정에서 오류가 발생했습니다.'
     }
@@ -39,7 +39,7 @@ export default function AuthError() {
           <div className="space-y-3">
             <Link 
               href="/auth/login" 
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 block"
+              className="w-full bg-[#0077B5] hover:bg-[#006097] text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 block"
             >
               다시 로그인하기
             </Link>

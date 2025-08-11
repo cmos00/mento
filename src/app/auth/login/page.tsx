@@ -1,69 +1,68 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { mockAuth, defaultMockUser } from '@/lib/mockAuth'
 
-export default function LoginPage() {
+export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const handleLinkedInLogin = async () => {
     setIsLoading(true)
+    
+    // Mock LinkedIn 로그인 과정 시뮬레이션
     try {
-      const result = await signIn('linkedin', { 
-        callbackUrl: '/questions',
-        redirect: false 
-      })
+      // 1단계: LinkedIn 인증 요청 (1초)
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
-      if (result?.ok) {
-        router.push('/questions')
-      } else {
-        console.error('Login failed:', result?.error)
-      }
+      // 2단계: 사용자 정보 가져오기 (0.5초)
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // 3단계: 세션 생성 (0.5초)
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Mock 사용자 정보로 로그인
+      mockAuth.login(defaultMockUser)
+      
+      // 로그인 성공 후 질문 목록 페이지로 이동
+      router.push('/questions')
+      
     } catch (error) {
-      console.error('Login error:', error)
+      console.error('Mock login error:', error)
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* 헤더 */}
-      <div className="mobile-header">
-        <div className="flex items-center justify-center">
-          <h1 className="text-lg font-semibold text-gray-900">로그인</h1>
-        </div>
-      </div>
-
-      {/* 메인 콘텐츠 */}
-      <div className="mobile-content flex-1 flex items-center justify-center px-6">
-        <div className="w-full max-w-sm">
-          <div className="text-center mb-8">
-            <div className="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-10 h-10 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Career Mentor에 오신 것을 환영합니다
-            </h2>
-            <p className="text-gray-600">
-              LinkedIn 계정으로 간편하게 로그인하고<br />
-              커리어 고민을 해결해보세요
-            </p>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-[#F5F5DC] rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-[#6A5ACD]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
           </div>
-
-          {/* 로그인 버튼 */}
+          
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            로그인
+          </h1>
+          
+          <p className="text-gray-600 mb-6">
+            계속하려면 로그인해주세요
+          </p>
+          
           <button
             onClick={handleLinkedInLogin}
             disabled={isLoading}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-4 px-6 rounded-2xl transition-colors duration-200 flex items-center justify-center space-x-3 mb-6"
+            className="w-full bg-[#0077B5] hover:bg-[#006097] text-white font-medium py-4 px-6 rounded-2xl transition-colors duration-200 flex items-center justify-center space-x-3 mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>LinkedIn으로 로그인 중...</span>
+              </>
             ) : (
               <>
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -73,21 +72,10 @@ export default function LoginPage() {
               </>
             )}
           </button>
-
-          {/* 약관 동의 */}
-          <div className="text-center">
-            <p className="text-xs text-gray-500">
-              로그인 시{' '}
-              <Link href="/terms" className="text-primary-600 underline">
-                이용약관
-              </Link>
-              과{' '}
-              <Link href="/privacy" className="text-primary-600 underline">
-                개인정보처리방침
-              </Link>
-              에 동의하게 됩니다
-            </p>
-          </div>
+          
+          <p className="text-sm text-gray-500">
+            로그인하면 서비스 이용약관과 개인정보처리방침에 동의하는 것으로 간주됩니다.
+          </p>
         </div>
       </div>
     </div>
