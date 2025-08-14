@@ -6,7 +6,7 @@ import Providers from '@/components/Providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Career Feedback Platform',
+  title: 'CareerTalk - 커리어 멘토링 플랫폼',
   description: '경력 3~7년차 직장인들을 위한 맞춤형 커리어 피드백 플랫폼',
 }
 
@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={inter.className}>
         <Providers>
-          <div className="min-h-screen bg-gray-50">
+          <div className="min-h-screen bg-gray-50 mobile-safe">
             {children}
           </div>
         </Providers>
