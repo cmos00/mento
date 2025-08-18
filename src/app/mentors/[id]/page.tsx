@@ -241,10 +241,12 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
             <MessageCircle className="w-5 h-5 mr-2" />
             멘토링 신청
           </button>
-          <button className="flex-1 border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
-            <Coffee className="w-5 h-5 mr-2" />
-            커피 쿠폰 보내기
-          </button>
+          <Link href={`/coffee/send?mentorId=${mentor.id}&mentorName=${mentor.name}`}>
+            <button className="flex-1 border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
+              <Coffee className="w-5 h-5 mr-2" />
+              커피 쿠폰 보내기
+            </button>
+          </Link>
         </div>
 
         {/* Reviews */}
