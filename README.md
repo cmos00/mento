@@ -1,81 +1,165 @@
-# Career Feedback Platform
+# CareerTalk - 커리어 멘토링 플랫폼
 
 경력 3~7년차 직장인들을 위한 맞춤형 커리어 피드백 플랫폼입니다.
 
-## 주요 기능
+## 🚀 주요 기능
 
-- **커리어 질문**: 구조화된 템플릿을 통해 상황과 맥락을 명확하게 전달하고 전문적인 피드백을 받아보세요.
-- **멘토 매칭**: AI 기반 추천 시스템으로 직무 유사도와 경험을 고려한 최적의 멘토를 자동으로 매칭해드립니다.
-- **커리어 저널**: 받은 피드백과 멘토링 기록을 체계적으로 저장하고 후속 액션을 관리하여 커리어 성장을 추적하세요.
-- **커피 쿠폰 시스템**: 멘토에게 감사의 마음을 전달하고 실제 카페에서 사용할 수 있는 커피 쿠폰을 제공합니다.
+- **질문 & 답변**: 커리어 고민에 대한 전문가 조언
+- **멘토링 시스템**: 1:1 멘토링 신청 및 관리
+- **커피쿠폰**: 멘토링 후 감사 표현
+- **저널**: 개인 커리어 성장 기록
+- **프로필 관리**: 상세한 경력 및 스킬 정보
 
-## 기술 스택
+## 🛠️ 기술 스택
 
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Styling**: Tailwind CSS
-- **Authentication**: NextAuth.js (Mock 인증)
-- **Database**: Prisma + PostgreSQL
-- **Forms**: React Hook Form + Zod
-- **Icons**: Lucide React
-- **Utilities**: date-fns, clsx, tailwind-merge
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: NextAuth.js
+- **Deployment**: Vercel
 
-## 시작하기
+## 📱 모바일 최적화
 
-### 1. 저장소 클론
+- 반응형 디자인
+- 모바일 하단 탭바
+- 터치 친화적 UI
+- 모바일 특화 CSS 최적화
+
+## 🚀 배포 가이드
+
+### 1. Supabase 설정
+
+1. [Supabase](https://supabase.com)에서 새 프로젝트 생성
+2. SQL Editor에서 `supabase/schema.sql` 실행
+3. Settings > API에서 URL과 anon key 복사
+
+### 2. 환경 변수 설정
+
+`.env.local` 파일 생성:
+
 ```bash
-git clone https://github.com/cmos00/mento.git
-cd mento
-```
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-### 2. 의존성 설치
-```bash
-npm install
-```
-
-### 3. 환경 변수 설정
-`.env.local` 파일을 생성하고 다음 내용을 추가하세요:
-
-```env
-# NextAuth.js
-NEXTAUTH_SECRET=your-super-secret-key-here-make-it-long-and-random
+# NextAuth Configuration
 NEXTAUTH_URL=http://localhost:3000
-
-# App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_APP_NAME=Career Feedback Platform
+NEXTAUTH_SECRET=your_nextauth_secret_key
 ```
 
-### 4. 개발 서버 실행
+### 3. Vercel 배포
+
+1. [Vercel](https://vercel.com)에서 새 프로젝트 생성
+2. GitHub 저장소 연결
+3. 환경 변수 설정:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXTAUTH_URL`
+   - `NEXTAUTH_SECRET`
+4. 배포 실행
+
+### 4. Supabase RLS (Row Level Security) 설정
+
+```sql
+-- Enable RLS
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE answers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE mentors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE mentoring_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coffee_coupons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE journals ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Users can view public profiles" ON users FOR SELECT USING (true);
+CREATE POLICY "Users can update own profile" ON users FOR UPDATE USING (auth.uid() = id);
+
+CREATE POLICY "Questions are viewable by everyone" ON questions FOR SELECT USING (true);
+CREATE POLICY "Users can create questions" ON questions FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own questions" ON questions FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Answers are viewable by everyone" ON answers FOR SELECT USING (true);
+CREATE POLICY "Users can create answers" ON answers FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update own answers" ON answers FOR UPDATE USING (auth.uid() = user_id);
+```
+
+## 🏃‍♂️ 로컬 개발
+
 ```bash
+# 의존성 설치
+npm install
+
+# 개발 서버 실행
 npm run dev
+
+# 빌드
+npm run build
+
+# 프로덕션 서버 실행
+npm start
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
-
-## 프로젝트 구조
+## 📁 프로젝트 구조
 
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── api/auth/          # NextAuth.js API
 │   ├── auth/              # 인증 관련 페이지
-│   ├── questions/         # 질문 관련 페이지
-│   ├── splash/            # 스플래시 화면
-│   └── layout.tsx         # 루트 레이아웃
-├── components/            # React 컴포넌트
-├── lib/                   # 유틸리티 함수들
+│   ├── coffee/            # 커피쿠폰 시스템
+│   ├── journal/           # 저널 시스템
+│   ├── mentors/           # 멘토 시스템
+│   ├── profile/           # 프로필 관리
+│   ├── questions/         # 질문 & 답변
+│   └── search/            # 검색 기능
+├── components/             # 재사용 가능한 컴포넌트
+├── lib/                   # 유틸리티 및 설정
 └── types/                 # TypeScript 타입 정의
 ```
 
-## 개발 상태
+## 🔐 인증 시스템
 
-- ✅ **기본 프로젝트 구조** 완성
-- ✅ **모바일 퍼스트 UI/UX** 구현
-- ✅ **Mock 인증 시스템** 구현
-- ✅ **커리어 피드백 플랫폼** 핵심 페이지들
-- 🔄 **LinkedIn OAuth 연동** (향후 구현 예정)
-- 🔄 **데이터베이스 연결** (향후 구현 예정)
+- LinkedIn OAuth 연동
+- Mock 인증 (개발용)
+- 세션 관리
+- 프로필 인증
 
-## 라이선스
+## 💰 커피쿠폰 시스템
 
-MIT License
+- 멘토링 후 감사 표현
+- QR코드 기반 사용
+- 실제 카페 연동
+- 만료일 관리
+
+## 📊 데이터베이스 스키마
+
+- **users**: 사용자 정보
+- **questions**: 질문
+- **answers**: 답변
+- **mentors**: 멘토 정보
+- **mentoring_requests**: 멘토링 신청
+- **coffee_coupons**: 커피쿠폰
+- **journals**: 저널
+
+## 🌟 특징
+
+- **모바일 우선**: 모바일에서 최적화된 사용자 경험
+- **실시간**: 실시간 알림 및 업데이트
+- **보안**: RLS를 통한 데이터 보안
+- **확장성**: 마이크로서비스 아키텍처 준비
+- **성능**: Next.js 14의 최신 기능 활용
+
+## 🤝 기여하기
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+
+## 📞 문의
+
+프로젝트에 대한 문의사항이 있으시면 이슈를 생성해주세요.

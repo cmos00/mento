@@ -129,32 +129,59 @@ export default function ProfilePage() {
             </div>
 
             {/* Activity Stats */}
-            <div className="bg-white/90 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6">
-              <h3 className="text-lg text-purple-600 font-semibold mb-4 flex items-center">
-                <TrendingUp className="w-4 h-4 mr-2" />
-                활동 통계
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">질문 수</span>
-                  <span className="text-lg font-semibold text-gray-900">{userStats.questionsAsked}</span>
+            <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">활동 통계</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-purple-50 rounded-xl">
+                  <div className="text-2xl font-bold text-purple-600 mb-1">12</div>
+                  <div className="text-sm text-gray-600">질문</div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">답변 수</span>
-                  <span className="text-lg font-semibold text-gray-900">{userStats.answersGiven}</span>
+                <div className="text-center p-4 bg-green-50 rounded-xl">
+                  <div className="text-2xl font-bold text-green-600 mb-1">8</div>
+                  <div className="text-sm text-gray-600">답변</div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">도움받은 표</span>
-                  <span className="text-lg font-semibold text-gray-900">{userStats.helpfulVotes}</span>
+                <div className="text-center p-4 bg-blue-50 rounded-xl">
+                  <div className="text-2xl font-bold text-blue-600 mb-1">5</div>
+                  <div className="text-sm text-gray-600">멘토링</div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">받은 커피</span>
-                  <span className="text-lg font-semibold text-gray-900">{userStats.coffeeReceived}</span>
+                <div className="text-center p-4 bg-yellow-50 rounded-xl">
+                  <div className="text-2xl font-bold text-yellow-600 mb-1">3</div>
+                  <div className="text-sm text-gray-600">저널</div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">멘토링 세션</span>
-                  <span className="text-lg font-semibold text-gray-900">{userStats.mentoringSessions}</span>
-                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">빠른 액션</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Link href="/questions/new">
+                  <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center justify-center">
+                    <MessageSquare className="w-5 h-5 mr-2" />
+                    새 질문 작성
+                  </button>
+                </Link>
+                
+                <Link href="/coffee">
+                  <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
+                    <Coffee className="w-5 h-5 mr-2" />
+                    커피쿠폰 관리
+                  </button>
+                </Link>
+                
+                <Link href="/journal/new">
+                  <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 mr-2" />
+                    저널 작성
+                  </button>
+                </Link>
+                
+                <Link href="/profile/edit">
+                  <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
+                    <Settings className="w-5 h-5 mr-2" />
+                    프로필 편집
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
