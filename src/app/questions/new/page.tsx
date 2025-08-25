@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { MessageSquare, Plus, ArrowLeft, Send, Target, Tag, FileText, AlertCircle, User } from 'lucide-react'
-import { useSession, signIn } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { createQuestion } from '@/lib/questions'
 import MobileBottomNav from '@/components/MobileBottomNav'
 
@@ -16,9 +16,7 @@ export default function NewQuestionPage() {
   const [tags, setTags] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [demoEmail, setDemoEmail] = useState('demo@example.com')
-  const [demoName, setDemoName] = useState('데모 사용자')
-  const [isDemoLoading, setIsDemoLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const categories = [
     { name: "이직", description: "이직 관련 고민" },
@@ -45,29 +43,17 @@ export default function NewQuestionPage() {
   }
 
   const handleDemoLogin = async () => {
-    setIsDemoLoading(true)
-    setError('')
+    setIsLoading(true)
     
     try {
-      const result = await signIn('demo-login', {
-        email: demoEmail,
-        name: demoName,
-        callbackUrl: '/questions/new',
-        redirect: false
-      })
-      
-      if (result?.error) {
-        console.error('데모 로그인 오류:', result.error)
-        setError('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
-      } else if (result?.ok) {
-        // 로그인 성공 시 페이지 새로고침
-        window.location.reload()
-      }
+      // 간단한 지연 후 홈으로 리다이렉트
+      setTimeout(() => {
+        router.push('/')
+      }, 500)
     } catch (error) {
       console.error('데모 로그인 오류:', error)
       setError('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
-    } finally {
-      setIsDemoLoading(false)
+      setIsLoading(false)
     }
   }
 
@@ -135,40 +121,24 @@ export default function NewQuestionPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">로그인이 필요합니다</h1>
           <p className="text-gray-600 mb-6">질문을 작성하려면 먼저 로그인해주세요.</p>
           
-          {/* 데모 로그인 폼 */}
-          <div className="space-y-3 mb-4">
-            <input
-              type="email"
-              placeholder="이메일"
-              value={demoEmail}
-              onChange={(e) => setDemoEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
-            <input
-              type="text"
-              placeholder="이름"
-              value={demoName}
-              onChange={(e) => setDemoName(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
-            <button
-              onClick={handleDemoLogin}
-              disabled={isDemoLoading}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200"
-            >
-              {isDemoLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline mr-2"></div>
-                  로그인 중...
-                </>
-              ) : (
-                <>
-                  <User className="w-4 h-4 mr-2 inline" />
-                  데모로 로그인
-                </>
-              )}
-            </button>
-          </div>
+          {/* 데모 로그인 버튼만 */}
+          <button
+            onClick={handleDemoLogin}
+            disabled={isLoading}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-4 px-6 rounded-xl transition-colors duration-200 mb-4 text-lg"
+          >
+            {isLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline mr-2"></div>
+                로그인 중...
+              </>
+            ) : (
+              <>
+                <User className="w-5 h-5 mr-2 inline" />
+                데모로 로그인
+              </>
+            )}
+          </button>
 
           {/* 오류 메시지 */}
           {error && (
