@@ -3,37 +3,37 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { MessageCircle, Linkedin, Sparkles } from 'lucide-react'
-import { mockAuth, defaultMockUser } from '@/lib/mockAuth'
+import { MessageCircle, Sparkles, User } from 'lucide-react'
+import { signIn } from 'next-auth/react'
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isDemoLoading, setIsDemoLoading] = useState(false)
+  const [demoEmail, setDemoEmail] = useState('demo@example.com')
+  const [demoName, setDemoName] = useState('데모 사용자')
   const router = useRouter()
 
-  const handleLinkedInLogin = async () => {
-    setIsLoading(true)
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true)
     
-    // Mock LinkedIn 로그인 과정 시뮬레이션
     try {
-      // 1단계: LinkedIn 인증 요청 (1초)
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const result = await signIn('demo-login', {
+        email: demoEmail,
+        name: demoName,
+        callbackUrl: '/questions',
+        redirect: false
+      })
       
-      // 2단계: 사용자 정보 가져오기 (0.5초)
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      // 3단계: 세션 생성 (0.5초)
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
-      // Mock 사용자 정보로 로그인
-      mockAuth.login(defaultMockUser)
-      
-      // 로그인 성공 후 질문 목록 페이지로 이동
-      router.push('/questions')
-      
+      if (result?.error) {
+        console.error('데모 로그인 오류:', result.error)
+        alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+      } else if (result?.ok) {
+        router.push('/questions')
+      }
     } catch (error) {
-      console.error('Mock login error:', error)
+      console.error('데모 로그인 오류:', error)
+      alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
-      setIsLoading(false)
+      setIsDemoLoading(false)
     }
   }
 
@@ -63,24 +63,40 @@ export default function LoginPage() {
             </p>
           </div>
           <div className="space-y-6 px-6 pb-6">
-            {/* LinkedIn Login */}
-            <button
-              onClick={handleLinkedInLogin}
-              disabled={isLoading}
-              className="w-full bg-[#0077B5] hover:bg-[#006097] text-white py-3 rounded-2xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline mr-2"></div>
-                  로그인 중...
-                </>
-              ) : (
-                <>
-                  <Linkedin className="w-5 h-5 mr-2 inline" />
-                  LinkedIn으로 로그인
-                </>
-              )}
-            </button>
+            {/* 데모 로그인 */}
+            <div className="space-y-3">
+              <input
+                type="email"
+                placeholder="이메일"
+                value={demoEmail}
+                onChange={(e) => setDemoEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+              <input
+                type="text"
+                placeholder="이름"
+                value={demoName}
+                onChange={(e) => setDemoName(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              />
+              <button
+                onClick={handleDemoLogin}
+                disabled={isDemoLoading}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-2xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDemoLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline mr-2"></div>
+                    로그인 중...
+                  </>
+                ) : (
+                  <>
+                    <User className="w-5 h-5 mr-2 inline" />
+                    데모로 로그인
+                  </>
+                )}
+              </button>
+            </div>
 
             <div className="text-center text-sm text-gray-600">
               아직 계정이 없으신가요?{" "}

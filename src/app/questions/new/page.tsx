@@ -1,21 +1,24 @@
-"use client"
-
-import { useState } from 'react'
+'use client'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { MessageSquare, Plus, ArrowLeft, Send, Target, Tag, FileText, AlertCircle } from 'lucide-react'
-import { mockAuth, MockUser } from '@/lib/mockAuth'
+import { MessageSquare, Plus, ArrowLeft, Send, Target, Tag, FileText, AlertCircle, User } from 'lucide-react'
+import { useSession, signIn } from 'next-auth/react'
+import { createQuestion } from '@/lib/questions'
 import MobileBottomNav from '@/components/MobileBottomNav'
 
 export default function NewQuestionPage() {
-  const [mockUser] = useState<MockUser | null>(mockAuth.getUser())
+  const router = useRouter()
+  const { data: session, status } = useSession()
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [category, setCategory] = useState('')
   const [tags, setTags] = useState<string[]>([])
-  const [newTag, setNewTag] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
+  const [error, setError] = useState('')
+  const [demoEmail, setDemoEmail] = useState('demo@example.com')
+  const [demoName, setDemoName] = useState('데모 사용자')
+  const [isDemoLoading, setIsDemoLoading] = useState(false)
 
   const categories = [
     { name: "이직", description: "이직 관련 고민" },
@@ -31,10 +34,9 @@ export default function NewQuestionPage() {
     "개발자", "마케터", "디자이너", "기획자", "PM", "PO", "스타트업", "대기업", "중소기업", "신입", "주니어", "시니어", "팀장", "리더"
   ]
 
-  const addTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()])
-      setNewTag('')
+  const addTag = (tag: string) => {
+    if (!tags.includes(tag) && tag.trim()) {
+      setTags([...tags, tag.trim()])
     }
   }
 
@@ -42,32 +44,143 @@ export default function NewQuestionPage() {
     setTags(tags.filter((tag) => tag !== tagToRemove))
   }
 
-  const addSuggestedTag = (tag: string) => {
-    if (!tags.includes(tag)) {
-      setTags([...tags, tag])
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true)
+    setError('')
+    
+    try {
+      const result = await signIn('demo-login', {
+        email: demoEmail,
+        name: demoName,
+        callbackUrl: '/questions/new',
+        redirect: false
+      })
+      
+      if (result?.error) {
+        console.error('데모 로그인 오류:', result.error)
+        setError('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+      } else if (result?.ok) {
+        // 로그인 성공 시 페이지 새로고침
+        window.location.reload()
+      }
+    } catch (error) {
+      console.error('데모 로그인 오류:', error)
+      setError('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsDemoLoading(false)
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim() || !content.trim() || !category) {
-      alert('필수 항목을 모두 입력해주세요.')
+      setError('제목, 내용, 카테고리를 모두 입력해주세요.')
+      return
+    }
+    if (!session?.user?.id) {
+      setError('로그인이 필요합니다.')
       return
     }
 
     setIsSubmitting(true)
-    
-    // TODO: 실제 API 호출 로직 구현
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
-    
-    setIsSubmitting(false)
-    router.push('/questions')
+    setError('')
+
+    try {
+      const questionData = {
+        user_id: session.user.id,
+        title: title.trim(),
+        content: content.trim(),
+        category,
+        tags,
+        is_anonymous: false,
+        views: 0,
+        status: 'active'
+      }
+
+      const { data, error } = await createQuestion(questionData)
+
+      if (error) {
+        setError('질문 저장 중 오류가 발생했습니다: ' + error.message)
+        return
+      }
+
+      if (data) {
+        router.push('/questions')
+      }
+    } catch (err) {
+      setError('질문 저장 중 예상치 못한 오류가 발생했습니다.')
+      console.error('질문 저장 오류:', err)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
-  if (!mockUser) {
+  // 로딩 중
+  if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    )
+  }
+
+  // 로그인되지 않은 경우
+  if (status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MessageSquare className="w-8 h-8 text-purple-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">로그인이 필요합니다</h1>
+          <p className="text-gray-600 mb-6">질문을 작성하려면 먼저 로그인해주세요.</p>
+          
+          {/* 데모 로그인 폼 */}
+          <div className="space-y-3 mb-4">
+            <input
+              type="email"
+              placeholder="이메일"
+              value={demoEmail}
+              onChange={(e) => setDemoEmail(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+            <input
+              type="text"
+              placeholder="이름"
+              value={demoName}
+              onChange={(e) => setDemoName(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+            <button
+              onClick={handleDemoLogin}
+              disabled={isDemoLoading}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200"
+            >
+              {isDemoLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline mr-2"></div>
+                  로그인 중...
+                </>
+              ) : (
+                <>
+                  <User className="w-4 h-4 mr-2 inline" />
+                  데모로 로그인
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* 오류 메시지 */}
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
+          <Link href="/questions" className="text-purple-600 hover:text-purple-700">
+            질문 목록으로 돌아가기
+          </Link>
+        </div>
       </div>
     )
   }
@@ -94,6 +207,11 @@ export default function NewQuestionPage() {
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">새 질문 작성</h1>
             <p className="text-gray-600">커리어 고민을 솔직하게 나누고 전문가들의 조언을 받아보세요</p>
+            {session?.user && (
+              <p className="text-sm text-purple-600 mt-2">
+                👋 {session.user.name}님, 안녕하세요!
+              </p>
+            )}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -173,24 +291,6 @@ export default function NewQuestionPage() {
                 태그
               </label>
               <div className="space-y-3">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    placeholder="태그를 입력하고 Enter를 누르세요"
-                    className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                  />
-                  <button
-                    type="button"
-                    onClick={addTag}
-                    className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-                
                 {/* Suggested Tags */}
                 <div>
                   <p className="text-sm text-gray-600 mb-2">추천 태그:</p>
@@ -199,7 +299,7 @@ export default function NewQuestionPage() {
                       <button
                         key={tag}
                         type="button"
-                        onClick={() => addSuggestedTag(tag)}
+                        onClick={() => addTag(tag)}
                         disabled={tags.includes(tag)}
                         className={`px-3 py-1 text-sm rounded-full transition-colors ${
                           tags.includes(tag)
@@ -239,6 +339,14 @@ export default function NewQuestionPage() {
               </div>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="flex items-center p-4 bg-red-50 border border-red-200 rounded-xl">
+                <AlertCircle className="w-5 h-5 text-red-500 mr-3" />
+                <span className="text-red-700">{error}</span>
+              </div>
+            )}
+
             {/* Tips */}
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <div className="flex items-start space-x-3">
@@ -272,7 +380,7 @@ export default function NewQuestionPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    <div className="w-4 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     등록 중...
                   </>
                 ) : (
