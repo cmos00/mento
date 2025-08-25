@@ -13,9 +13,9 @@ export default function LoginPage() {
     setIsLoading(true)
     
     try {
-      // 간단한 지연 후 홈으로 리다이렉트
+      // 간단한 지연 후 질문 리스트 페이지로 리다이렉트
       setTimeout(() => {
-        router.push('/')
+        router.push('/questions')
       }, 500)
     } catch (error) {
       console.error('데모 로그인 오류:', error)
