@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { MessageSquare, Plus, ArrowLeft, Send, Target, Tag, FileText, AlertCircle, User } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
 import { createQuestion } from '@/lib/questions'
 import MobileBottomNav from '@/components/MobileBottomNav'
 
@@ -44,15 +44,28 @@ export default function NewQuestionPage() {
 
   const handleDemoLogin = async () => {
     setIsLoading(true)
+    setError('')
     
     try {
-      // 간단한 지연 후 질문 리스트 페이지로 리다이렉트
-      setTimeout(() => {
-        router.push('/questions')
-      }, 500)
+      // NextAuth.js를 사용한 실제 데모 로그인
+      const result = await signIn('demo-login', {
+        email: 'demo@example.com',
+        name: '데모 사용자',
+        callbackUrl: '/questions/new',
+        redirect: false
+      })
+      
+      if (result?.error) {
+        console.error('데모 로그인 오류:', result.error)
+        setError('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+      } else if (result?.ok) {
+        // 로그인 성공 시 페이지 새로고침하여 로그인 상태 반영
+        window.location.reload()
+      }
     } catch (error) {
       console.error('데모 로그인 오류:', error)
       setError('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+    } finally {
       setIsLoading(false)
     }
   }

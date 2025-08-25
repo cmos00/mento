@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { MessageCircle, Sparkles, User } from 'lucide-react'
+import { signIn } from 'next-auth/react'
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -13,13 +14,25 @@ export default function LoginPage() {
     setIsLoading(true)
     
     try {
-      // 간단한 지연 후 질문 리스트 페이지로 리다이렉트
-      setTimeout(() => {
+      // NextAuth.js를 사용한 실제 데모 로그인
+      const result = await signIn('demo-login', {
+        email: 'demo@example.com',
+        name: '데모 사용자',
+        callbackUrl: '/questions',
+        redirect: false
+      })
+      
+      if (result?.error) {
+        console.error('데모 로그인 오류:', result.error)
+        alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+      } else if (result?.ok) {
+        // 로그인 성공 시 질문 리스트 페이지로 이동
         router.push('/questions')
-      }, 500)
+      }
     } catch (error) {
       console.error('데모 로그인 오류:', error)
       alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+    } finally {
       setIsLoading(false)
     }
   }

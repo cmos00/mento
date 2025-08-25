@@ -18,52 +18,19 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // Supabase에 사용자 정보 저장/업데이트
-          const { data: existingUser } = await supabase
-            .from('users')
-            .select('id')
-            .eq('email', credentials.email)
-            .single()
-
-          if (!existingUser) {
-            // 새 사용자 생성
-            const { data: newUser, error } = await supabase
-              .from('users')
-              .insert({
-                email: credentials.email,
-                name: credentials.name,
-                avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.name}`,
-                linkedin_url: '',
-                company: '데모 회사',
-                position: '데모 직책',
-                experience: '3년',
-                bio: '데모 사용자입니다.',
-                skills: ['데모 스킬 1', '데모 스킬 2']
-              })
-              .select()
-              .single()
-
-            if (error) {
-              console.error('데모 사용자 생성 오류:', error)
-              return null
-            }
-
-            return {
-              id: newUser.id,
-              email: credentials.email,
-              name: credentials.name,
-              image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.name}`
-            }
-          } else {
-            return {
-              id: existingUser.id,
-              email: credentials.email,
-              name: credentials.name,
-              image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.name}`
-            }
+          // 데모 사용자용 임시 ID 생성
+          const demoUserId = `demo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+          
+          // 데모 사용자 정보 반환 (실제 DB 저장 없이)
+          return {
+            id: demoUserId,
+            email: credentials.email,
+            name: credentials.name,
+            image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.name}`,
+            isDemo: true // 데모 사용자 플래그
           }
         } catch (error) {
-          console.error('데모 사용자 정보 저장 오류:', error)
+          console.error('데모 사용자 생성 오류:', error)
           return null
         }
       }
@@ -76,12 +43,20 @@ export const authOptions: NextAuthOptions = {
     async session({ session, user, token }) {
       if (session.user) {
         session.user.id = token.id as string
+        // 데모 사용자 정보 추가
+        if (token.isDemo) {
+          session.user.isDemo = true
+        }
       }
       return session
     },
     async jwt({ token, user, account, profile }) {
       if (account && user) {
         token.id = user.id
+        // 데모 사용자 플래그 전달
+        if ((user as any).isDemo) {
+          token.isDemo = true
+        }
       }
       return token
     },
