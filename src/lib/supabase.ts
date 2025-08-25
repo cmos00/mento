@@ -1,7 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// 환경 변수에서 Supabase 설정 가져오기
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://tpfamzghtqjwqahsddml.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+
+if (!supabaseAnonKey) {
+  console.warn('NEXT_PUBLIC_SUPABASE_ANON_KEY가 설정되지 않았습니다. Supabase 기능이 제한될 수 있습니다.')
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 

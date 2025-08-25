@@ -1,6 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 
 export default function SignIn() {
@@ -17,6 +18,10 @@ export default function SignIn() {
       default:
         return '인증 과정에서 오류가 발생했습니다.'
     }
+  }
+
+  const handleLinkedInLogin = () => {
+    signIn('linkedin', { callbackUrl })
   }
 
   return (
@@ -58,12 +63,12 @@ export default function SignIn() {
           )}
           
           <div className="space-y-3">
-            <Link 
-              href="/auth/login" 
+            <button 
+              onClick={handleLinkedInLogin}
               className="w-full bg-[#0077B5] hover:bg-[#006097] text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 block"
             >
               LinkedIn으로 로그인
-            </Link>
+            </button>
             
             <Link 
               href="/" 

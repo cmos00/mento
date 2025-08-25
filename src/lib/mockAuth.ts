@@ -52,7 +52,7 @@ export const mockAuth = {
 
 // 기본 Mock 사용자 데이터
 export const defaultMockUser: MockUser = {
-  id: 'mock-user-123',
+  id: '550e8400-e29b-41d4-a716-446655440000',
   name: '김멘티',
   email: 'mentee@example.com',
   company: '테크컴퍼니',
