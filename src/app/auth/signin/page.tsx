@@ -1,10 +1,11 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 
-export default function SignIn() {
+function SignInContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
   const callbackUrl = searchParams.get('callbackUrl') || '/questions'
@@ -80,5 +81,17 @@ export default function SignIn() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <SignInContent />
+    </Suspense>
   )
 }

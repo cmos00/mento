@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { MessageSquare, Plus, Search, Filter, Eye, MessageCircle, Clock, User } from 'lucide-react'
 import { getAllQuestions, getQuestionsByCategory, Question } from '@/lib/questions'
@@ -26,16 +26,6 @@ export default function QuestionsPage() {
     '워라밸'
   ]
 
-  // 질문 데이터 로드
-  useEffect(() => {
-    loadQuestions()
-  }, [])
-
-  // 검색 및 필터링 적용
-  useEffect(() => {
-    filterQuestions()
-  }, [questions, searchTerm, selectedCategory])
-
   const loadQuestions = async () => {
     try {
       setLoading(true)
@@ -57,7 +47,7 @@ export default function QuestionsPage() {
     }
   }
 
-  const filterQuestions = () => {
+  const filterQuestions = useCallback(() => {
     let filtered = [...questions]
 
     // 카테고리 필터
@@ -76,7 +66,17 @@ export default function QuestionsPage() {
     }
 
     setFilteredQuestions(filtered)
-  }
+  }, [questions, selectedCategory, searchTerm])
+
+  // 질문 데이터 로드
+  useEffect(() => {
+    loadQuestions()
+  }, [])
+
+  // 검색 및 필터링 적용
+  useEffect(() => {
+    filterQuestions()
+  }, [filterQuestions])
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(selectedCategory === category ? '' : category)

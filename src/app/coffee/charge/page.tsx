@@ -287,7 +287,7 @@ export default function CoffeeChargePage() {
                   <p className="font-medium text-gray-900">{selectedPackageData?.name}</p>
                   <p className="text-sm text-gray-600">
                     {selectedPackageData?.amount.toLocaleString()}원
-                    {selectedPackageData?.bonus > 0 && ` + ${selectedPackageData.bonus.toLocaleString()}원 보너스`}
+                    {selectedPackageData?.bonus && selectedPackageData.bonus > 0 && ` + ${selectedPackageData.bonus.toLocaleString()}원 보너스`}
                   </p>
                 </div>
                 <div className="text-right">
@@ -400,7 +400,7 @@ export default function CoffeeChargePage() {
                   <span className="text-gray-600">충전 금액</span>
                   <span className="font-medium">{selectedPackageData?.amount.toLocaleString()}원</span>
                 </div>
-                {selectedPackageData?.bonus > 0 && (
+                {selectedPackageData?.bonus && selectedPackageData.bonus > 0 && (
                   <div className="flex justify-between">
                     <span className="text-green-600">보너스</span>
                     <span className="font-medium text-green-600">+{selectedPackageData.bonus.toLocaleString()}원</span>

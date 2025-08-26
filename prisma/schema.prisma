@@ -53,7 +53,7 @@ model MentorProfile {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  mentoringSessions MentoringSession[]
+  mentoringSessions MentoringSession[] @relation("MentorProfile")
 }
 
 model Question {
@@ -90,6 +90,7 @@ model Feedback {
   // Relations
   upvotes     Upvote[]
   bestAnswers BestAnswer[]
+  careerJournalEntries CareerJournalEntry[] @relation("CareerJournalFeedback")
 }
 
 model MentoringSession {
@@ -100,6 +101,8 @@ model MentoringSession {
   mentee      User     @relation("Mentee", fields: [menteeId], references: [id], onDelete: Cascade)
   mentorId    String
   mentor      User     @relation("Mentor", fields: [mentorId], references: [id], onDelete: Cascade)
+  mentorProfileId String?
+  mentorProfile   MentorProfile? @relation("MentorProfile", fields: [mentorProfileId], references: [id])
   status      String   @default("pending") // pending, active, completed, cancelled
   startTime   DateTime?
   endTime     DateTime?
@@ -116,7 +119,7 @@ model CareerJournalEntry {
   title       String
   content     String
   feedbackId  String?
-  feedback    Feedback? @relation(fields: [feedbackId], references: [id])
+  feedback    Feedback? @relation("CareerJournalFeedback", fields: [feedbackId], references: [id])
   actionItems String[] // 후속 액션 아이템
   tags        String[]
   createdAt   DateTime @default(now())

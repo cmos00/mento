@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Search, Filter, MessageSquare, Users, Clock, ThumbsUp, Star, Briefcase } from 'lucide-react'
@@ -85,7 +85,7 @@ const categories = [
   { name: "멘토", count: 67 }
 ]
 
-export default function SearchPage() {
+function SearchContent() {
   const [mockUser] = useState<MockUser | null>(mockAuth.getUser())
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('전체')
@@ -325,5 +325,17 @@ export default function SearchPage() {
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <SearchContent />
+    </Suspense>
   )
 }

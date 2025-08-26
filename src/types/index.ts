@@ -1,4 +1,4 @@
-import { User, Question, Feedback, MentoringSession, CareerJournalEntry, Reward } from '@prisma/client'
+import { User, Question, Feedback, MentoringSession, CareerJournalEntry, Reward, MentorProfile, Upvote, BestAnswer } from '@prisma/client'
 
 // LinkedIn 관련 타입 확장
 export interface LinkedInProfile {

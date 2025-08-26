@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Eye, MessageCircle, Clock, User, Tag, Share2, Bookmark } from 'lucide-react'
@@ -18,13 +18,7 @@ export default function QuestionDetailPage() {
 
   const questionId = params.id as string
 
-  useEffect(() => {
-    if (questionId) {
-      loadQuestion()
-    }
-  }, [questionId])
-
-  const loadQuestion = async () => {
+  const loadQuestion = useCallback(async () => {
     try {
       setLoading(true)
       const { data, error } = await getQuestionById(questionId)
@@ -45,7 +39,13 @@ export default function QuestionDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [questionId])
+
+  useEffect(() => {
+    if (questionId) {
+      loadQuestion()
+    }
+  }, [questionId, loadQuestion])
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
