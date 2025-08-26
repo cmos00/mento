@@ -1,5 +1,27 @@
 import { User, Question, Feedback, MentoringSession, CareerJournalEntry, Reward } from '@prisma/client'
 
+// LinkedIn 관련 타입 확장
+export interface LinkedInProfile {
+  sub: string
+  name: string
+  given_name: string
+  family_name: string
+  picture: string
+  email: string
+  email_verified: boolean
+  locale: string
+}
+
+export interface ExtendedUser {
+  id: string
+  name?: string | null
+  email?: string | null
+  image?: string | null
+  isDemo?: boolean
+  linkedinId?: string
+  linkedinProfile?: LinkedInProfile
+}
+
 export type UserWithProfile = User & {
   mentorProfile?: MentorProfile | null
 }
