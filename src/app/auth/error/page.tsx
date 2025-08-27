@@ -1,9 +1,10 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function AuthError() {
+function AuthErrorContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
 
@@ -54,5 +55,17 @@ export default function AuthError() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AuthError() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <AuthErrorContent />
+    </Suspense>
   )
 }

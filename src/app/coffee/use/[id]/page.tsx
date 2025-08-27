@@ -168,7 +168,7 @@ export default function CoffeeUsePage({ params }: { params: { id: string } }) {
 
           {/* Message */}
           <div className="bg-gray-50 rounded-xl p-4 mb-4">
-            <p className="text-gray-700 text-center italic">"{coupon.message}"</p>
+            <p className="text-gray-700 text-center italic">&ldquo;{coupon.message}&rdquo;</p>
           </div>
 
           {/* Mentoring Info */}
@@ -188,11 +188,9 @@ export default function CoffeeUsePage({ params }: { params: { id: string } }) {
               <div className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-8 max-w-sm mx-auto">
                 {showQR ? (
                   <div className="space-y-4">
-                    <img 
-                      src={coupon.qrCode} 
-                      alt="QR Code" 
-                      className="w-48 h-48 mx-auto border border-gray-200 rounded-lg"
-                    />
+                    <div className="w-48 h-48 mx-auto border border-gray-200 rounded-lg bg-white flex items-center justify-center">
+                      <span className="text-gray-500 text-sm">QR 코드</span>
+                    </div>
                     <p className="text-sm text-gray-600">
                       카페에서 이 QR코드를 스캔하여 커피쿠폰을 사용하세요
                     </p>
