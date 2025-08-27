@@ -2,16 +2,29 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import LinkedInProvider from 'next-auth/providers/linkedin'
 
+// 환경 변수 검증 (개발 환경에서는 경고만 출력)
+if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET) {
+  console.warn('⚠️  LinkedIn OAuth 환경 변수가 설정되지 않았습니다. LinkedIn 로그인 기능이 제한됩니다.')
+} else {
+  console.log('✅ LinkedIn OAuth 환경 변수 확인됨')
+  console.log('🔑 Client ID:', process.env.LINKEDIN_CLIENT_ID?.slice(0, 6) + '...')
+}
+
+if (!process.env.NEXTAUTH_SECRET) {
+  console.warn('⚠️  NEXTAUTH_SECRET 환경 변수가 설정되지 않았습니다. 프로덕션에서는 설정이 필요합니다.')
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
-    LinkedInProvider({
-      clientId: process.env.LINKEDIN_CLIENT_ID || '86uazq240kcie4',
-      clientSecret: process.env.LINKEDIN_CLIENT_SECRET || 'WPL_AP1.qFs6fUwTDvFw5siK.UQyA/w==',
-      authorization: {
-        params: {
-          scope: 'openid profile w_member_social email'
-        }
-      },
+    ...(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET ? [
+      LinkedInProvider({
+        clientId: process.env.LINKEDIN_CLIENT_ID,
+        clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
+        authorization: {
+          params: {
+            scope: 'openid profile email'
+          }
+        },
       profile(profile, tokens) {
         console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
         console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
@@ -24,7 +37,8 @@ export const authOptions: NextAuthOptions = {
           image: profile.picture || profile.profilePicture
         }
       }
-    }),
+    })
+    ] : []),
     
     CredentialsProvider({
       id: 'demo-login',
@@ -121,7 +135,7 @@ export const authOptions: NextAuthOptions = {
   },
   
   pages: {
-    signIn: '/auth/signin',
+    signIn: '/auth/login',
     signOut: '/auth/signout',
     error: '/auth/error'
   },

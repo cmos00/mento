@@ -5,6 +5,10 @@ export type Question = Database['public']['Tables']['questions']['Row']
 export type QuestionInsert = Database['public']['Tables']['questions']['Insert']
 export type QuestionUpdate = Database['public']['Tables']['questions']['Update']
 
+export type QuestionWithAuthor = Question & {
+  author: Database['public']['Tables']['users']['Row']
+}
+
 // 질문 생성
 export async function createQuestion(questionData: Omit<QuestionInsert, 'id' | 'created_at' | 'updated_at'>) {
   try {
@@ -41,7 +45,7 @@ export async function getAllQuestions() {
           position
         )
       `)
-      .eq('status', 'active')
+      .eq('status', 'open')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -72,7 +76,7 @@ export async function getQuestionById(id: string) {
         )
       `)
       .eq('id', id)
-      .eq('status', 'active')
+      .eq('status', 'open')
       .single()
 
     if (error) {
@@ -103,7 +107,7 @@ export async function getQuestionsByCategory(category: string) {
         )
       `)
       .eq('category', category)
-      .eq('status', 'active')
+      .eq('status', 'open')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -134,11 +138,11 @@ export async function getQuestionsByUser(userId: string) {
         )
       `)
       .eq('user_id', userId)
-      .eq('status', 'active')
+      .eq('status', 'open')
       .order('created_at', { ascending: false })
 
     if (error) {
-      console.error('사용자별 질문 조회 오류:', error)
+      console.error('사용자별 질문 조회 중 예외 발생:', error)
       throw new Error(error.message)
     }
 
@@ -149,23 +153,12 @@ export async function getQuestionsByUser(userId: string) {
   }
 }
 
-// 질문 조회수 증가
+// 질문 조회수 증가 (현재는 로그만 출력)
 export async function incrementQuestionViews(id: string) {
   try {
-    const { data, error } = await supabase
-      .from('questions')
-      .update({ views: supabase.rpc('increment', { row_id: id, table_name: 'questions', column_name: 'views' }) })
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) {
-      console.error('조회수 증가 오류:', error)
-      // 조회수 증가 실패해도 에러를 던지지 않음 (사용자 경험상)
-      return { data: null, error: null }
-    }
-
-    return { data, error: null }
+    // 조회수 증가 기능은 향후 구현 예정
+    console.log(`질문 ${id} 조회됨`)
+    return { data: null, error: null }
   } catch (error) {
     console.error('조회수 증가 중 예외 발생:', error)
     return { data: null, error: null }

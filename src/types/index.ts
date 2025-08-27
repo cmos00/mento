@@ -31,6 +31,14 @@ export type QuestionWithAuthor = Question & {
   feedbacks: Feedback[]
 }
 
+// Prisma 기반 타입 정의
+export type QuestionWithAuthorAndFeedbacks = Question & {
+  author: User
+  feedbacks: (Feedback & {
+    mentor: User
+  })[]
+}
+
 export type FeedbackWithMentor = Feedback & {
   mentor: User
   question: Question
