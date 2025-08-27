@@ -1,4 +1,9 @@
-import { User, Question, Feedback, MentoringSession, CareerJournalEntry, Reward, MentorProfile, Upvote, BestAnswer } from '@prisma/client'
+import { Database } from '@/lib/supabase'
+
+// Supabase 타입 별칭
+type User = Database['public']['Tables']['users']['Row']
+type Question = Database['public']['Tables']['questions']['Row']  
+type Feedback = Database['public']['Tables']['feedbacks']['Row']
 
 // LinkedIn 관련 타입 확장
 export interface LinkedInProfile {
@@ -22,16 +27,12 @@ export interface ExtendedUser {
   linkedinProfile?: LinkedInProfile
 }
 
-export type UserWithProfile = User & {
-  mentorProfile?: MentorProfile | null
-}
-
+// Supabase 기반 확장 타입 정의
 export type QuestionWithAuthor = Question & {
   author: User
   feedbacks: Feedback[]
 }
 
-// Prisma 기반 타입 정의
 export type QuestionWithAuthorAndFeedbacks = Question & {
   author: User
   feedbacks: (Feedback & {
@@ -42,22 +43,6 @@ export type QuestionWithAuthorAndFeedbacks = Question & {
 export type FeedbackWithMentor = Feedback & {
   mentor: User
   question: Question
-  upvotes: Upvote[]
-  bestAnswers: BestAnswer[]
-}
-
-export type MentoringSessionWithDetails = MentoringSession & {
-  question: Question
-  mentee: User
-  mentor: User
-}
-
-export type CareerJournalEntryWithFeedback = CareerJournalEntry & {
-  feedback?: Feedback | null
-}
-
-export type RewardWithUser = Reward & {
-  user: User
 }
 
 export interface QuestionTemplate {
@@ -79,7 +64,7 @@ export interface QuestionField {
 }
 
 export interface MentorRecommendation {
-  mentor: UserWithProfile
+  mentor: User
   score: number
   reasons: string[]
 }
