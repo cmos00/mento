@@ -15,6 +15,10 @@ build/
 .env.development.local
 .env.test.local
 .env.production.local
+.env*.backup
+.env*.bak
+*.env.backup
+*.env.bak
 
 # Vercel
 .vercel
