@@ -9,20 +9,27 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET || 'WPL_AP1.qFs6fUwTDvFw5siK.UQyA/w==',
       authorization: {
         params: {
-          scope: 'openid profile w_member_social email'
+          scope: 'openid profile email'
         }
       },
+      wellKnown: "https://www.linkedin.com/oauth/.well-known/openid_configuration",
       profile(profile, tokens) {
         console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
         console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
         console.log('🎫 Tokens:', JSON.stringify(tokens, null, 2))
         
-        return {
+        // LinkedIn OpenID Connect 응답 구조에 맞게 수정
+        const user = {
           id: profile.sub || profile.id || `linkedin_${Date.now()}`,
-          name: profile.name || profile.given_name + ' ' + profile.family_name,
+          name: profile.name || (profile.given_name && profile.family_name ? 
+            `${profile.given_name} ${profile.family_name}` : 
+            profile.given_name || profile.family_name || 'LinkedIn 사용자'),
           email: profile.email,
-          image: profile.picture || profile.profilePicture
+          image: profile.picture || profile.profilePicture || null
         }
+        
+        console.log('✅ [LinkedIn Debug] 변환된 사용자 정보:', JSON.stringify(user, null, 2))
+        return user
       }
     }),
     
@@ -85,19 +92,21 @@ export const authOptions: NextAuthOptions = {
       console.log('📋 Profile:', JSON.stringify(profile, null, 2))
       
       if (account && user) {
-        console.log('✅ [Auth Debug] Account와 User 모두 존재')
+        console.log(`✅ [Auth Debug] Account와 User 모두 존재 - Provider: ${account.provider}`)
         token.id = user.id
+        token.provider = account.provider
         
-        if (account.provider === 'linkedin' && profile) {
+        if (account.provider === 'linkedin') {
           console.log('✅ [LinkedIn] JWT에 LinkedIn 정보 추가')
-        }
-        
-        if ((user as any).isDemo) {
+          token.isDemo = false
+          token.linkedinId = user.id
+        } else if (account.provider === 'demo-login') {
+          console.log('✅ [Demo] JWT에 데모 로그인 정보 추가')
           token.isDemo = true
         }
       }
       
-      console.log('🎫 [Auth Debug] JWT 콜백 완료')
+      console.log('🎫 [Auth Debug] JWT 콜백 완료 - Final Token:', JSON.stringify(token, null, 2))
       return token
     },
     
@@ -107,15 +116,22 @@ export const authOptions: NextAuthOptions = {
       console.log('👤 User:', JSON.stringify(user, null, 2))
       console.log('🎫 Token:', JSON.stringify(token, null, 2))
       
-      if (session.user) {
+      if (session.user && token) {
         session.user.id = token.id as string
         
-        if (token.isDemo) {
+        if (token.provider === 'linkedin') {
+          console.log('✅ [LinkedIn] Session에 LinkedIn 정보 추가')
+          (session.user as any).isDemo = false
+          (session.user as any).provider = 'linkedin'
+          (session.user as any).linkedinId = token.linkedinId
+        } else if (token.provider === 'demo-login' || token.isDemo) {
+          console.log('✅ [Demo] Session에 데모 정보 추가')
           (session.user as any).isDemo = true
+          (session.user as any).provider = 'demo-login'
         }
       }
       
-      console.log('🔄 [Auth Debug] Session 콜백 완료')
+      console.log('🔄 [Auth Debug] Session 콜백 완료 - Final Session:', JSON.stringify(session, null, 2))
       return session
     }
   },
