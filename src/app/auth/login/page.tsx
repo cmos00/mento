@@ -13,11 +13,15 @@ export default function LoginPage() {
   const handleLinkedInLogin = async () => {
     setIsLoading(true)
     try {
-      await signIn('linkedin', { callbackUrl: '/questions' })
+      console.log('🔗 LinkedIn 로그인 시작...')
+      const result = await signIn('linkedin', { 
+        callbackUrl: '/questions',
+        redirect: true
+      })
+      console.log('🔗 LinkedIn 로그인 결과:', result)
     } catch (error) {
       console.error('LinkedIn 로그인 오류:', error)
       alert('LinkedIn 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
-    } finally {
       setIsLoading(false)
     }
   }
