@@ -1,6 +1,5 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import LinkedInProvider from 'next-auth/providers/linkedin'
 
 // 환경변수 검증
 if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET) {
@@ -9,34 +8,47 @@ if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET) {
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    LinkedInProvider({
+    {
+      id: "linkedin",
+      name: "LinkedIn",
+      type: "oauth",
       clientId: process.env.LINKEDIN_CLIENT_ID!,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
       authorization: {
         url: "https://www.linkedin.com/oauth/v2/authorization",
         params: {
-          scope: "r_liteprofile r_emailaddress",
+          scope: "r_liteprofile",
           response_type: "code"
         }
       },
-      token: "https://www.linkedin.com/oauth/v2/accessToken",
-      userinfo: {
-        url: "https://api.linkedin.com/v2/people/~",
+      token: {
+        url: "https://www.linkedin.com/oauth/v2/accessToken",
         params: {
-          projection: "(id,firstName,lastName,profilePicture(displayImage~:playableStreams))"
+          grant_type: "authorization_code"
         }
       },
+      userinfo: {
+        url: "https://api.linkedin.com/v2/people/~",
+      },
       profile(profile, tokens) {
-        const defaultName = `${profile.firstName?.localized?.ko_KR || profile.firstName?.localized?.en_US || 'LinkedIn'} ${profile.lastName?.localized?.ko_KR || profile.lastName?.localized?.en_US || 'User'}`
+        console.log('LinkedIn 프로필 데이터:', profile)
+        
+        const firstName = profile.firstName?.localized?.ko_KR || profile.firstName?.localized?.en_US || 'LinkedIn'
+        const lastName = profile.lastName?.localized?.ko_KR || profile.lastName?.localized?.en_US || 'User'
         
         return {
           id: profile.id,
-          name: defaultName,
-          email: tokens.email || `${profile.id}@linkedin.com`,
-          image: profile.profilePicture?.["displayImage~"]?.elements?.[0]?.identifiers?.[0]?.identifier || null
+          name: `${firstName} ${lastName}`,
+          email: `${profile.id}@linkedin.com`,
+          image: null
         }
+      },
+      style: {
+        logo: "/linkedin.svg",
+        bg: "#0077B5", 
+        text: "#fff"
       }
-    }),
+    },
     
     CredentialsProvider({
       id: 'demo-login',
@@ -70,26 +82,8 @@ export const authOptions: NextAuthOptions = {
   
   callbacks: {
     async signIn({ user, account, profile }) {
-      // LinkedIn 로그인 시 이메일 정보 추가 가져오기
-      if (account?.provider === 'linkedin' && account.access_token) {
-        try {
-          const emailResponse = await fetch('https://api.linkedin.com/v2/emailAddresses?q=members&projection=(elements*(handle~))', {
-            headers: {
-              Authorization: `Bearer ${account.access_token}`
-            }
-          })
-          
-          if (emailResponse.ok) {
-            const emailData = await emailResponse.json()
-            const email = emailData.elements?.[0]?.['handle~']?.emailAddress
-            if (email && user) {
-              user.email = email
-            }
-          }
-        } catch (error) {
-          console.warn('LinkedIn 이메일 가져오기 실패:', error)
-        }
-        
+      // LinkedIn 로그인 성공 로그
+      if (account?.provider === 'linkedin') {
         console.log('✅ LinkedIn 로그인 성공:', { userId: user.id, email: user.email })
       }
       return true
