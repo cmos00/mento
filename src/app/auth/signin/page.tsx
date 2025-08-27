@@ -21,8 +21,8 @@ function SignInContent() {
     }
   }
 
-  const handleLinkedInLogin = () => {
-    signIn('linkedin', { callbackUrl })
+  const handleDemoLogin = () => {
+    window.location.href = '/auth/login'
   }
 
   return (
@@ -65,10 +65,10 @@ function SignInContent() {
           
           <div className="space-y-3">
             <button 
-              onClick={handleLinkedInLogin}
-              className="w-full bg-[#0077B5] hover:bg-[#006097] text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 block"
+              onClick={handleDemoLogin}
+              className="w-full bg-[#6A5ACD] hover:bg-[#5A4ABD] text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 block"
             >
-              LinkedIn으로 로그인
+              데모 로그인으로 계속하기
             </button>
             
             <Link 

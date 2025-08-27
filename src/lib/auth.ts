@@ -4,27 +4,28 @@ import LinkedInProvider from 'next-auth/providers/linkedin'
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    LinkedInProvider({
-      clientId: process.env.LINKEDIN_CLIENT_ID || '86uazq240kcie4',
-      clientSecret: process.env.LINKEDIN_CLIENT_SECRET || 'WPL_AP1.qFs6fUwTDvFw5siK.UQyA/w==',
-      authorization: {
-        params: {
-          scope: 'openid profile w_member_social email'
-        }
-      },
-      profile(profile, tokens) {
-        console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
-        console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
-        console.log('🎫 Tokens:', JSON.stringify(tokens, null, 2))
-        
-        return {
-          id: profile.sub || profile.id || `linkedin_${Date.now()}`,
-          name: profile.name || profile.given_name + ' ' + profile.family_name,
-          email: profile.email,
-          image: profile.picture || profile.profilePicture
-        }
-      }
-    }),
+    // LinkedIn OAuth는 현재 비활성화됨 - 개발자 포털 설정 필요
+    // LinkedInProvider({
+    //   clientId: process.env.LINKEDIN_CLIENT_ID || '86uazq240kcie4',
+    //   clientSecret: process.env.LINKEDIN_CLIENT_SECRET || 'WPL_AP1.qFs6fUwTDvFw5siK.UQyA/w==',
+    //   authorization: {
+    //     params: {
+    //       scope: 'openid profile w_member_social email'
+    //     }
+    //   },
+    //   profile(profile, tokens) {
+    //     console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
+    //     console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
+    //     console.log('🎫 Tokens:', JSON.stringify(tokens, null, 2))
+    //     
+    //     return {
+    //       id: profile.sub || profile.id || `linkedin_${Date.now()}`,
+    //       name: profile.name || profile.given_name + ' ' + profile.family_name,
+    //       email: profile.email,
+    //       image: profile.picture || profile.profilePicture
+    //     }
+    //   }
+    // }),
     
     CredentialsProvider({
       id: 'demo-login',
