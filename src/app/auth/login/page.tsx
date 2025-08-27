@@ -10,6 +10,18 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
+  const handleLinkedInLogin = async () => {
+    setIsLoading(true)
+    try {
+      await signIn('linkedin', { callbackUrl: '/questions' })
+    } catch (error) {
+      console.error('LinkedIn 로그인 오류:', error)
+      alert('LinkedIn 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleDemoLogin = async () => {
     setIsLoading(true)
     
@@ -62,12 +74,12 @@ export default function LoginPage() {
               커리어 멘토링 커뮤니티에 오신 것을 환영합니다 ✨
             </p>
           </div>
-          <div className="space-y-6 px-6 pb-6">
-            {/* 데모 로그인 버튼만 */}
+          <div className="space-y-4 px-6 pb-6">
+            {/* LinkedIn 로그인 버튼 */}
             <button
-              onClick={handleDemoLogin}
+              onClick={handleLinkedInLogin}
               disabled={isLoading}
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-2xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+              className="w-full bg-[#0077B5] hover:bg-[#006097] text-white py-4 rounded-2xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center"
             >
               {isLoading ? (
                 <>
@@ -76,7 +88,35 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <User className="w-6 h-6 mr-2 inline" />
+                  <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                  LinkedIn으로 로그인
+                </>
+              )}
+            </button>
+
+            {/* 구분선 */}
+            <div className="flex items-center">
+              <div className="flex-1 border-t border-gray-200"></div>
+              <span className="px-3 text-sm text-gray-500">또는</span>
+              <div className="flex-1 border-t border-gray-200"></div>
+            </div>
+
+            {/* 데모 로그인 버튼 */}
+            <button
+              onClick={handleDemoLogin}
+              disabled={isLoading}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-2xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin inline mr-2"></div>
+                  로그인 중...
+                </>
+              ) : (
+                <>
+                  <User className="w-6 h-6 mr-2" />
                   데모로 로그인
                 </>
               )}
