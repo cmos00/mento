@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS questions (
   tags TEXT[],
   is_anonymous BOOLEAN DEFAULT true,
   status TEXT DEFAULT 'open',
+  views INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

@@ -71,6 +71,7 @@ export interface Database {
           tags: string[]
           is_anonymous: boolean
           status: string
+          views: number
           created_at: string
           updated_at: string
         }
@@ -83,6 +84,7 @@ export interface Database {
           tags?: string[]
           is_anonymous?: boolean
           status?: string
+          views?: number
           created_at?: string
           updated_at?: string
         }
@@ -95,6 +97,7 @@ export interface Database {
           tags?: string[]
           is_anonymous?: boolean
           status?: string
+          views?: number
           created_at?: string
           updated_at?: string
         }
