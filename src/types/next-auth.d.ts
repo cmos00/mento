@@ -8,6 +8,8 @@ declare module "next-auth" {
       email?: string | null
       image?: string | null
       isDemo?: boolean
+      provider?: string
+      linkedinId?: string
     }
   }
 
@@ -17,6 +19,8 @@ declare module "next-auth" {
     email?: string | null
     image?: string | null
     isDemo?: boolean
+    provider?: string
+    linkedinId?: string
   }
 }
 
@@ -24,5 +28,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string
     isDemo?: boolean
+    provider?: string
+    linkedinId?: string
   }
 }
