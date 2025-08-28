@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
         authorization: {
           params: {
-            scope: 'openid profile email'
+            scope: 'profile email'
           }
         },
       profile(profile, tokens) {
@@ -32,9 +32,9 @@ export const authOptions: NextAuthOptions = {
         
         return {
           id: profile.sub || profile.id || `linkedin_${Date.now()}`,
-          name: profile.name || profile.given_name + ' ' + profile.family_name,
+          name: profile.name || (profile.given_name && profile.family_name ? `${profile.given_name} ${profile.family_name}` : profile.given_name || profile.family_name),
           email: profile.email,
-          image: profile.picture || profile.profilePicture
+          image: profile.picture || profile.profilePicture || profile.avatar
         }
       }
     })
