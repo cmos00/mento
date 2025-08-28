@@ -26,15 +26,48 @@ export const authOptions: NextAuthOptions = {
           }
         },
       profile(profile, tokens) {
-        console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
-        console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
-        console.log('🎫 Tokens:', JSON.stringify(tokens, null, 2))
-        
-        return {
-          id: profile.sub || profile.id || `linkedin_${Date.now()}`,
-          name: profile.name || (profile.given_name && profile.family_name ? `${profile.given_name} ${profile.family_name}` : profile.given_name || profile.family_name),
-          email: profile.email,
-          image: profile.picture || profile.profilePicture || profile.avatar
+        try {
+          console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
+          console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
+          console.log('🎫 Tokens:', JSON.stringify(tokens, null, 2))
+          
+          // 안전한 프로필 데이터 추출
+          const id = profile.sub || profile.id || `linkedin_${Date.now()}`
+          let name = 'LinkedIn User'
+          
+          if (profile.name) {
+            name = profile.name
+          } else if (profile.given_name || profile.family_name) {
+            name = `${profile.given_name || ''} ${profile.family_name || ''}`.trim()
+          } else if (profile.localizedFirstName || profile.localizedLastName) {
+            name = `${profile.localizedFirstName || ''} ${profile.localizedLastName || ''}`.trim()
+          }
+          
+          const email = profile.email || profile.emailAddress || `${id}@linkedin.placeholder`
+          const image = profile.picture || profile.profilePicture || profile.avatar || 
+                       `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`
+          
+          const userProfile = {
+            id,
+            name,
+            email,
+            image
+          }
+          
+          console.log('✅ [LinkedIn Debug] 최종 프로필:', JSON.stringify(userProfile, null, 2))
+          return userProfile
+          
+        } catch (error) {
+          console.error('❌ [LinkedIn Debug] Profile 처리 오류:', error)
+          console.error('❌ [LinkedIn Debug] 원본 Profile:', profile)
+          
+          // 오류 시 최소한의 기본값 반환
+          return {
+            id: `linkedin_error_${Date.now()}`,
+            name: 'LinkedIn User',
+            email: `error_${Date.now()}@linkedin.placeholder`,
+            image: `https://api.dicebear.com/7.x/avataaars/svg?seed=error`
+          }
         }
       }
     })
