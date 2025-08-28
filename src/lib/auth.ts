@@ -17,56 +17,80 @@ if (!process.env.NEXTAUTH_SECRET) {
 export const authOptions: NextAuthOptions = {
   providers: [
     ...(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET ? [
-      LinkedInProvider({
+      {
+        id: "linkedin",
+        name: "LinkedIn",
+        type: "oauth",
+        authorization: "https://www.linkedin.com/oauth/v2/authorization",
+        token: "https://www.linkedin.com/oauth/v2/accessToken",
+        userinfo: "https://api.linkedin.com/v2/people/~:(id,localizedFirstName,localizedLastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))",
         clientId: process.env.LINKEDIN_CLIENT_ID,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
         authorization: {
           params: {
-            scope: 'openid profile email'
-          }
+            scope: "r_liteprofile r_emailaddress",
+            response_type: "code",
+          },
         },
-      profile(profile, tokens) {
-        try {
-          console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
-          console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
-          console.log('🎫 Tokens:', JSON.stringify(tokens, null, 2))
-          
-          // 안전한 프로필 데이터 추출
-          const id = profile.sub || profile.id || `linkedin_${Date.now()}`
-          let name = 'LinkedIn User'
-          
-          if (profile.name) {
-            name = profile.name
-          } else if (profile.given_name || profile.family_name) {
-            name = `${profile.given_name || ''} ${profile.family_name || ''}`.trim()
-          } else if (profile.localizedFirstName || profile.localizedLastName) {
-            name = `${profile.localizedFirstName || ''} ${profile.localizedLastName || ''}`.trim()
-          }
-          
-          const email = profile.email || profile.emailAddress || `${id}@linkedin.placeholder`
-          const image = profile.picture || profile.profilePicture || profile.avatar || 
-                       `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`
-          
-          const userProfile = {
-            id,
-            name,
-            email,
-            image
-          }
-          
-          console.log('✅ [LinkedIn Debug] 최종 프로필:', JSON.stringify(userProfile, null, 2))
-          return userProfile
-          
-        } catch (error) {
-          console.error('❌ [LinkedIn Debug] Profile 처리 오류:', error)
-          console.error('❌ [LinkedIn Debug] 원본 Profile:', profile)
-          
-          // 오류 시 최소한의 기본값 반환
-          return {
-            id: `linkedin_error_${Date.now()}`,
-            name: 'LinkedIn User',
-            email: `error_${Date.now()}@linkedin.placeholder`,
-            image: `https://api.dicebear.com/7.x/avataaars/svg?seed=error`
+        async profile(profile, tokens) {
+          try {
+            console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
+            console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
+            console.log('🎫 Tokens:', JSON.stringify(tokens, null, 2))
+            
+            // LinkedIn V2 API에서 이메일 정보 별도 요청
+            let email = null
+            try {
+              const emailResponse = await fetch('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))', {
+                headers: {
+                  'Authorization': `Bearer ${tokens.access_token}`,
+                  'Content-Type': 'application/json',
+                }
+              })
+              
+              if (emailResponse.ok) {
+                const emailData = await emailResponse.json()
+                console.log('📧 Email Response:', JSON.stringify(emailData, null, 2))
+                email = emailData?.elements?.[0]?.['handle~']?.emailAddress
+              }
+            } catch (emailError) {
+              console.warn('⚠️ 이메일 조회 실패:', emailError)
+            }
+            
+            // LinkedIn V2 프로필 데이터 처리
+            const id = profile.id || `linkedin_${Date.now()}`
+            const firstName = profile.localizedFirstName || ''
+            const lastName = profile.localizedLastName || ''
+            const name = `${firstName} ${lastName}`.trim() || 'LinkedIn User'
+            
+            // 프로필 이미지 처리
+            let image = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`
+            if (profile.profilePicture?.['displayImage~']?.elements?.length > 0) {
+              const imageElement = profile.profilePicture['displayImage~'].elements[0]
+              image = imageElement?.identifiers?.[0]?.identifier || image
+            }
+            
+            const userProfile = {
+              id,
+              name,
+              email: email || `${id}@linkedin.placeholder`,
+              image
+            }
+            
+            console.log('✅ [LinkedIn Debug] 최종 프로필:', JSON.stringify(userProfile, null, 2))
+            return userProfile
+            
+          } catch (error) {
+            console.error('❌ [LinkedIn Debug] Profile 처리 오류:', error)
+            console.error('❌ [LinkedIn Debug] 원본 Profile:', profile)
+            
+            // 오류 시 최소한의 기본값 반환
+            return {
+              id: `linkedin_error_${Date.now()}`,
+              name: 'LinkedIn User',
+              email: `error_${Date.now()}@linkedin.placeholder`,
+              image: `https://api.dicebear.com/7.x/avataaars/svg?seed=error`
+            }
           }
         }
       }
