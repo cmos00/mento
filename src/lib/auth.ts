@@ -17,29 +17,36 @@ if (!process.env.NEXTAUTH_SECRET) {
 export const authOptions: NextAuthOptions = {
   providers: [
     ...(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET ? [
-      LinkedInProvider({
+      {
+        id: "linkedin",
+        name: "LinkedIn",
+        type: "oauth",
+        issuer: "https://www.linkedin.com/oauth",
+        authorization: {
+          url: "https://www.linkedin.com/oauth/v2/authorization",
+          params: {
+            scope: "openid profile email",
+            response_type: "code",
+          },
+        },
+        token: "https://www.linkedin.com/oauth/v2/accessToken",
+        userinfo: "https://api.linkedin.com/v2/userinfo",
         clientId: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-        authorization: {
-          params: {
-            scope: 'openid profile email'
-          }
-        },
+        checks: ["state"],
         profile(profile) {
           console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
           console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
           
           return {
-            id: profile.id || `linkedin_${Date.now()}`,
-            name: profile.localizedFirstName && profile.localizedLastName 
-              ? `${profile.localizedFirstName} ${profile.localizedLastName}`
-              : 'LinkedIn User',
-            email: profile.emailAddress || `${profile.id || Date.now()}@linkedin.placeholder`,
-            image: profile.profilePicture?.displayImage || 
-                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.localizedFirstName || 'LinkedIn')}`
+            id: profile.sub || `linkedin_${Date.now()}`,
+            name: profile.name || 'LinkedIn User',
+            email: profile.email || `${profile.sub || Date.now()}@linkedin.placeholder`,
+            image: profile.picture || 
+                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.name || 'LinkedIn')}`
           }
         }
-      })
+      }
     ] : []),
     
     CredentialsProvider({
