@@ -21,17 +21,17 @@ export const authOptions: NextAuthOptions = {
         id: "linkedin",
         name: "LinkedIn",
         type: "oauth",
-        authorization: "https://www.linkedin.com/oauth/v2/authorization",
-        token: "https://www.linkedin.com/oauth/v2/accessToken",
-        userinfo: "https://api.linkedin.com/v2/people/~:(id,localizedFirstName,localizedLastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))",
-        clientId: process.env.LINKEDIN_CLIENT_ID,
-        clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
         authorization: {
+          url: "https://www.linkedin.com/oauth/v2/authorization",
           params: {
             scope: "r_liteprofile r_emailaddress",
             response_type: "code",
           },
         },
+        token: "https://www.linkedin.com/oauth/v2/accessToken",
+        userinfo: "https://api.linkedin.com/v2/people/~:(id,localizedFirstName,localizedLastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))",
+        clientId: process.env.LINKEDIN_CLIENT_ID,
+        clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
         async profile(profile, tokens) {
           try {
             console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
