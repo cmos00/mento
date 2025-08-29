@@ -42,6 +42,7 @@ export const authOptions: NextAuthOptions = {
           url: "https://api.linkedin.com/v2/userinfo",
           params: {},
         },
+        jwks_uri: "https://www.linkedin.com/oauth/openid/jwks",
         clientId: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
         client: {

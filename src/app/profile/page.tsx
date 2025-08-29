@@ -18,12 +18,13 @@ import {
   Settings,
   LogOut
 } from 'lucide-react'
-import { mockAuth, MockUser } from '@/lib/mockAuth'
+import { useSession, signOut } from 'next-auth/react'
 import MobileBottomNav from '@/components/MobileBottomNav'
 
 export default function ProfilePage() {
-  const [mockUser] = useState<MockUser | null>(mockAuth.getUser())
+  const { data: session, status } = useSession()
   const [activeTab, setActiveTab] = useState('overview')
+  const user = session?.user
 
   const userStats = {
     questionsAsked: 12,
@@ -73,10 +74,36 @@ export default function ProfilePage() {
     },
   ]
 
-  if (!mockUser) {
+  // 로딩 중
+  if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    )
+  }
+
+  // 로그인되지 않은 경우
+  if (status === 'unauthenticated' || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Users className="w-8 h-8 text-purple-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">로그인이 필요합니다</h1>
+          <p className="text-gray-600 mb-6">프로필을 보려면 먼저 로그인해주세요.</p>
+          
+          <Link href="/auth/login">
+            <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-4 px-6 rounded-xl transition-colors duration-200 mb-4 text-lg">
+              로그인하기
+            </button>
+          </Link>
+
+          <Link href="/questions" className="text-purple-600 hover:text-purple-700">
+            질문 목록으로 돌아가기
+          </Link>
+        </div>
       </div>
     )
   }
@@ -96,7 +123,10 @@ export default function ProfilePage() {
             <button className="p-2 text-gray-600 hover:text-purple-600 transition-colors">
               <Settings className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-600 hover:text-red-600 transition-colors">
+            <button 
+              onClick={() => signOut({ callbackUrl: '/auth/login' })}
+              className="p-2 text-gray-600 hover:text-red-600 transition-colors"
+            >
               <LogOut className="w-5 h-5" />
             </button>
           </div>
@@ -109,10 +139,13 @@ export default function ProfilePage() {
           <div className="lg:col-span-1">
             <div className="bg-white/90 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 text-center mb-6">
               <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 ring-4 ring-purple-200">
-                {mockUser.name.charAt(0)}
+                {user.name?.charAt(0) || 'U'}
               </div>
-              <h2 className="text-xl font-semibold mb-2 text-gray-800">{mockUser.name}</h2>
-              <p className="text-gray-600 mb-4">백엔드 개발자 • 5년차</p>
+              <h2 className="text-xl font-semibold mb-2 text-gray-800">{user.name || '사용자'}</h2>
+              <p className="text-gray-600 mb-4">{user.email}</p>
+              {(user as any).isDemo && (
+                <p className="text-sm text-purple-600 mb-4">🎭 데모 계정</p>
+              )}
               <div className="flex justify-center space-x-2 mb-4">
                 <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm flex items-center">
                   <Star className="w-3 h-3 mr-1" />
