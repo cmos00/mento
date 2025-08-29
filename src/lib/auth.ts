@@ -15,12 +15,39 @@ if (!process.env.NEXTAUTH_SECRET) {
 }
 
 export const authOptions: NextAuthOptions = {
+  pages: {
+    signIn: '/auth/login',
+  },
   providers: [
     ...(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET ? [
-      LinkedInProvider({
+      {
+        id: "linkedin",
+        name: "LinkedIn",
+        type: "oauth",
+        authorization: {
+          url: "https://www.linkedin.com/oauth/v2/authorization",
+          params: {
+            scope: "openid profile email",
+            response_type: "code",
+          },
+        },
+        token: "https://www.linkedin.com/oauth/v2/accessToken",
+        userinfo: "https://api.linkedin.com/v2/userinfo",
         clientId: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-      })
+        checks: ["state"],
+        profile(profile) {
+          console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
+          console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
+          
+          return {
+            id: profile.sub || profile.id || `linkedin_${Date.now()}`,
+            name: profile.name || `${profile.given_name || ''} ${profile.family_name || ''}`.trim() || 'LinkedIn User',
+            email: profile.email || `linkedin_${profile.sub || Date.now()}@example.com`,
+            image: profile.picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.name || 'LinkedIn User')}`
+          }
+        }
+      }
     ] : []),
     
     CredentialsProvider({
@@ -72,6 +99,22 @@ export const authOptions: NextAuthOptions = {
       
       console.log('🔐 [Auth Debug] signIn 콜백 완료')
       return true
+    },
+    
+    async redirect({ url, baseUrl }) {
+      console.log('🔄 [Auth Debug] Redirect 콜백 시작')
+      console.log('🔗 URL:', url)
+      console.log('🏠 Base URL:', baseUrl)
+      
+      // 로그인 성공 후 홈페이지(질문 리스트)로 리다이렉트
+      if (url === baseUrl || url.startsWith(baseUrl + '/auth/') || url.includes('/api/auth/')) {
+        const redirectUrl = baseUrl + '/questions'
+        console.log('✅ 홈페이지로 리다이렉트:', redirectUrl)
+        return redirectUrl
+      }
+      
+      console.log('✅ 기본 리다이렉트:', url)
+      return url
     },
     
     async jwt({ token, user, account, profile }) {

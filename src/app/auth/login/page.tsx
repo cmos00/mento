@@ -24,33 +24,14 @@ export default function LoginPage() {
     try {
       console.log('🔗 LinkedIn 로그인 시도 중...')
       
-      // LinkedIn OAuth를 통한 실제 로그인
-      const result = await signIn('linkedin', {
+      // LinkedIn OAuth를 통한 실제 로그인 (자동 리다이렉트)
+      await signIn('linkedin', {
         callbackUrl: '/questions',
-        redirect: false
+        redirect: true // 자동으로 LinkedIn 페이지와 성공 시 callbackUrl로 리다이렉트
       })
-      
-      console.log('🔗 LinkedIn signIn 결과:', result)
-      
-      if (result?.error) {
-        console.error('LinkedIn 로그인 오류:', result.error)
-        alert(`LinkedIn 로그인 오류: ${result.error}`)
-      } else if (result?.url) {
-        console.log('🔗 LinkedIn 인증 페이지로 리다이렉트:', result.url)
-        // LinkedIn 인증 페이지로 리다이렉트
-        window.location.href = result.url
-      } else if (result?.ok) {
-        console.log('🔗 로그인 성공, /questions로 이동')
-        router.push('/questions')
-      } else {
-        console.log('🔗 예상치 못한 응답:', result)
-        console.log('🔗 Response details:', JSON.stringify(result, null, 2))
-        alert(`LinkedIn 로그인에서 예상치 못한 응답을 받았습니다. 콘솔을 확인하세요.`)
-      }
     } catch (error) {
       console.error('LinkedIn 로그인 예외:', error)
       alert(`LinkedIn 로그인 중 오류가 발생했습니다: ${error}`)
-    } finally {
       setLinkedinLoading(false)
     }
   }
