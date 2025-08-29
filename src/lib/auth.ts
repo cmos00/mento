@@ -77,8 +77,12 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // UUID v4 형식으로 데모 사용자 ID 생성
+          // crypto를 사용하여 더 확실한 UUID v4 생성
           const generateUUID = () => {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+              return crypto.randomUUID()
+            }
+            // 백업 방법: 더 정확한 UUID v4 형식
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
               const r = Math.random() * 16 | 0;
               const v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -87,6 +91,7 @@ export const authOptions: NextAuthOptions = {
           }
           
           const demoUserId = generateUUID()
+          console.log('Generated demo user ID:', demoUserId) // 디버깅용
           
           return {
             id: demoUserId,

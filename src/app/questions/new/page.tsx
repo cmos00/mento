@@ -47,7 +47,10 @@ export default function NewQuestionPage() {
     setError('')
     
     try {
-      // NextAuth.js를 사용한 실제 데모 로그인
+      // 기존 세션 완전히 제거
+      await fetch('/api/auth/signout', { method: 'POST' })
+      
+      // 새로운 데모 로그인
       const result = await signIn('demo-login', {
         email: 'demo@example.com',
         name: '데모 사용자',
@@ -85,8 +88,18 @@ export default function NewQuestionPage() {
     setError('')
 
     try {
+      // UUID 형식 검증
+      const userId = session.user.id
+      const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)
+      
+      if (!isValidUUID) {
+        console.error('Invalid user ID format:', userId)
+        setError('사용자 ID 형식이 올바르지 않습니다. 다시 로그인해주세요.')
+        return
+      }
+
       const questionData = {
-        user_id: session.user.id,
+        user_id: userId,
         title: title.trim(),
         content: content.trim(),
         category,
@@ -95,6 +108,8 @@ export default function NewQuestionPage() {
         views: 0,
         status: 'active'
       }
+
+      console.log('Creating question with user ID:', userId) // 디버깅용
 
       const { data, error } = await createQuestion(questionData, {
         name: session.user.name || '사용자',
@@ -214,7 +229,7 @@ export default function NewQuestionPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="질문의 핵심을 간단하게 표현해주세요"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors duration-200"
                 required
                 maxLength={100}
               />
@@ -233,7 +248,7 @@ export default function NewQuestionPage() {
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors duration-200"
                 required
               >
                 <option value="">카테고리를 선택해주세요</option>
@@ -262,7 +277,7 @@ export default function NewQuestionPage() {
 
 더 자세할수록 좋은 답변을 받을 수 있어요!`}
                 rows={8}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200 resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors duration-200 resize-none"
                 required
                 maxLength={2000}
               />
