@@ -24,6 +24,7 @@ export const authOptions: NextAuthOptions = {
         id: "linkedin",
         name: "LinkedIn",
         type: "oauth",
+        issuer: "https://www.linkedin.com/oauth",
         authorization: {
           url: "https://www.linkedin.com/oauth/v2/authorization",
           params: {
@@ -47,6 +48,7 @@ export const authOptions: NextAuthOptions = {
           token_endpoint_auth_method: "client_secret_post",
         },
         checks: ["state"],
+        idToken: true,
         profile(profile) {
           console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
           console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))

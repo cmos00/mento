@@ -4,11 +4,12 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { MessageSquare, Plus, Search, Filter, Eye, MessageCircle, Clock, User } from 'lucide-react'
 import { getAllQuestions, getQuestionsByCategory, Question } from '@/lib/questions'
-import { mockAuth } from '@/lib/mockAuth'
+import { useSession } from 'next-auth/react'
 import MobileBottomNav from '@/components/MobileBottomNav'
 
 export default function QuestionsPage() {
-  const [user, setUser] = useState(mockAuth.getUser())
+  const { data: session, status } = useSession()
+  const user = session?.user
   const [questions, setQuestions] = useState<Question[]>([])
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
