@@ -10,8 +10,30 @@ export type QuestionWithAuthor = Question & {
 }
 
 // 질문 생성
-export async function createQuestion(questionData: Omit<QuestionInsert, 'id' | 'created_at' | 'updated_at'>) {
+export async function createQuestion(questionData: Omit<QuestionInsert, 'id' | 'created_at' | 'updated_at'>, userInfo?: { name: string; email: string; isDemo?: boolean }) {
   try {
+    // 사용자 정보가 제공된 경우, 먼저 users 테이블에 사용자를 생성하거나 업데이트
+    if (userInfo) {
+      const { error: userError } = await supabase
+        .from('users')
+        .upsert([{
+          id: questionData.user_id,
+          email: userInfo.email,
+          name: userInfo.name,
+          company: userInfo.isDemo ? '데모 회사' : undefined,
+          position: userInfo.isDemo ? '데모 직책' : undefined
+        }], { 
+          onConflict: 'id',
+          ignoreDuplicates: false 
+        })
+
+      if (userError) {
+        console.error('사용자 생성/업데이트 오류:', userError)
+        // 사용자 생성 실패해도 질문 생성은 시도
+      }
+    }
+
+    // 질문 생성
     const { data, error } = await supabase
       .from('questions')
       .insert([questionData])

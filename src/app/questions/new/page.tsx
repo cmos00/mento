@@ -96,7 +96,11 @@ export default function NewQuestionPage() {
         status: 'active'
       }
 
-      const { data, error } = await createQuestion(questionData)
+      const { data, error } = await createQuestion(questionData, {
+        name: session.user.name || '사용자',
+        email: session.user.email || 'user@example.com',
+        isDemo: (session.user as any).isDemo || false
+      })
 
       if (error) {
         setError('질문 저장 중 오류가 발생했습니다: ' + error.message)
@@ -210,7 +214,7 @@ export default function NewQuestionPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="질문의 핵심을 간단하게 표현해주세요"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
                 required
                 maxLength={100}
               />
@@ -229,7 +233,7 @@ export default function NewQuestionPage() {
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200"
                 required
               >
                 <option value="">카테고리를 선택해주세요</option>
@@ -258,7 +262,7 @@ export default function NewQuestionPage() {
 
 더 자세할수록 좋은 답변을 받을 수 있어요!`}
                 rows={8}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200 resize-none"
                 required
                 maxLength={2000}
               />

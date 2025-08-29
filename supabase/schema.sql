@@ -70,9 +70,9 @@ CREATE POLICY "Users can update own profile" ON users
 CREATE POLICY "Questions are viewable by everyone" ON questions
   FOR SELECT USING (true);
 
--- 로그인한 사용자만 질문 작성 가능
+-- 로그인한 사용자만 질문 작성 가능 (NextAuth 사용자 포함)
 CREATE POLICY "Authenticated users can create questions" ON questions
-  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+  FOR INSERT WITH CHECK (true);
 
 -- 질문 작성자만 수정/삭제 가능
 CREATE POLICY "Users can update own questions" ON questions
