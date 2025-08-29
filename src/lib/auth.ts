@@ -21,9 +21,9 @@ export const authOptions: NextAuthOptions = {
   providers: [
     ...(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET ? [
       {
-        id: "linkedin",
+        id: "linkedin" as const,
         name: "LinkedIn",
-        type: "oauth",
+        type: "oauth" as const,
         issuer: "https://www.linkedin.com/oauth",
         authorization: {
           url: "https://www.linkedin.com/oauth/v2/authorization",
@@ -42,15 +42,15 @@ export const authOptions: NextAuthOptions = {
           url: "https://api.linkedin.com/v2/userinfo",
           params: {},
         },
-        jwks_uri: "https://www.linkedin.com/oauth/openid/jwks",
+
         clientId: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
         client: {
-          token_endpoint_auth_method: "client_secret_post",
+          token_endpoint_auth_method: "client_secret_post" as const,
         },
-        checks: ["state"],
+        checks: ["state" as const],
         idToken: true,
-        profile(profile) {
+        profile(profile: any) {
           console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
           console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
           
@@ -174,11 +174,7 @@ export const authOptions: NextAuthOptions = {
     }
   },
   
-  pages: {
-    signIn: '/auth/login',
-    signOut: '/auth/signout',
-    error: '/auth/error'
-  },
+
   
   session: {
     strategy: 'jwt'
