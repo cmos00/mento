@@ -122,11 +122,18 @@ export default function QuestionsPage() {
       <header className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold text-gray-900">질문 & 답변</h1>
-          {user && (
+          {status === 'authenticated' ? (
             <Link href="/questions/new">
               <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center">
                 <Plus className="w-4 h-4 mr-2" />
                 질문 작성
+              </button>
+            </Link>
+          ) : (
+            <Link href="/auth/login">
+              <button className="bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-all flex items-center opacity-60">
+                <Plus className="w-4 h-4 mr-2" />
+                로그인 필요
               </button>
             </Link>
           )}
@@ -211,12 +218,20 @@ export default function QuestionsPage() {
                   : '첫 번째 질문을 작성해보세요!'
                 }
               </p>
-              {!searchTerm && !selectedCategory && user && (
-                <Link href="/questions/new">
-                  <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all">
-                    질문 작성하기
-                  </button>
-                </Link>
+              {!searchTerm && !selectedCategory && (
+                status === 'authenticated' ? (
+                  <Link href="/questions/new">
+                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all">
+                      질문 작성하기
+                    </button>
+                  </Link>
+                ) : (
+                  <Link href="/auth/login">
+                    <button className="bg-gray-400 text-white px-6 py-3 rounded-lg font-medium transition-all opacity-60">
+                      로그인 후 질문 작성
+                    </button>
+                  </Link>
+                )
               )}
             </div>
           ) : (

@@ -244,18 +244,25 @@ export default function NewQuestionPage() {
                 <Target className="w-4 h-4 mr-2" />
                 카테고리 *
               </label>
-              <select
-                id="category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors duration-200"
-                required
-              >
-                <option value="">카테고리를 선택해주세요</option>
-                {categories.map((cat) => (
-                  <option key={cat.name} value={cat.name}>{cat.name} - {cat.description}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  id="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors duration-200 appearance-none bg-white"
+                  required
+                >
+                  <option value="">카테고리를 선택해주세요</option>
+                  {categories.map((cat) => (
+                    <option key={cat.name} value={cat.name}>{cat.name} - {cat.description}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             {/* Content */}

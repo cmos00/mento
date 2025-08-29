@@ -40,24 +40,30 @@ export default function LoginPage() {
     setIsLoading(true)
     
     try {
-      console.log('🎭 데모 로그인 시도 중... (자동 리다이렉트)')
+      console.log('🎭 데모 로그인 시도 중...')
       
-      // NextAuth.js 자동 리다이렉트로 데모 로그인
-      await signIn('demo-login', {
+      // NextAuth.js를 사용한 데모 로그인
+      const result = await signIn('demo-login', {
         email: 'demo@example.com',
         name: '데모 사용자',
         callbackUrl: '/questions',
-        redirect: true // 자동 리다이렉트 활성화
+        redirect: false
       })
       
-      // signIn이 자동으로 리다이렉트하므로 이 코드는 실행되지 않음
+      if (result?.error) {
+        console.error('데모 로그인 오류:', result.error)
+        alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+      } else if (result?.ok) {
+        console.log('데모 로그인 성공, 리다이렉트...')
+        router.push('/questions')
+      }
       
     } catch (error) {
       console.error('데모 로그인 오류:', error)
       alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+    } finally {
       setIsLoading(false)
     }
-    // finally 블록은 제거 - 자동 리다이렉트되므로 필요 없음
   }
 
   return (

@@ -14,6 +14,8 @@ export async function createQuestion(questionData: Omit<QuestionInsert, 'id' | '
   try {
     // 사용자 정보가 제공된 경우, 먼저 users 테이블에 사용자를 생성하거나 업데이트
     if (userInfo) {
+      console.log('사용자 정보 생성/업데이트 중...', { userId: questionData.user_id, userInfo })
+      
       const { error: userError } = await supabase
         .from('users')
         .upsert([{
@@ -29,8 +31,10 @@ export async function createQuestion(questionData: Omit<QuestionInsert, 'id' | '
 
       if (userError) {
         console.error('사용자 생성/업데이트 오류:', userError)
-        // 사용자 생성 실패해도 질문 생성은 시도
+        throw new Error(`사용자 생성 실패: ${userError.message}`)
       }
+      
+      console.log('사용자 정보 생성/업데이트 성공')
     }
 
     // 질문 생성
