@@ -31,10 +31,21 @@ export const authOptions: NextAuthOptions = {
             response_type: "code",
           },
         },
-        token: "https://www.linkedin.com/oauth/v2/accessToken",
-        userinfo: "https://api.linkedin.com/v2/userinfo",
+        token: {
+          url: "https://www.linkedin.com/oauth/v2/accessToken",
+          params: {
+            grant_type: "authorization_code",
+          },
+        },
+        userinfo: {
+          url: "https://api.linkedin.com/v2/userinfo",
+          params: {},
+        },
         clientId: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
+        client: {
+          token_endpoint_auth_method: "client_secret_post",
+        },
         checks: ["state"],
         profile(profile) {
           console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
