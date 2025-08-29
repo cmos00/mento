@@ -17,43 +17,10 @@ if (!process.env.NEXTAUTH_SECRET) {
 export const authOptions: NextAuthOptions = {
   providers: [
     ...(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET ? [
-      {
-        id: "linkedin",
-        name: "LinkedIn",
-        type: "oauth",
-        issuer: "https://www.linkedin.com/oauth",
-        authorization: {
-          url: "https://www.linkedin.com/oauth/v2/authorization",
-          params: {
-            scope: "openid profile email",
-            response_type: "code",
-          },
-        },
-        token: "https://www.linkedin.com/oauth/v2/accessToken",
-        userinfo: "https://api.linkedin.com/v2/people/~",
+      LinkedInProvider({
         clientId: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-        checks: ["state"],
-        profile(profile) {
-          console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
-          console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
-          
-          const firstName = profile.localizedFirstName || profile.firstName || ''
-          const lastName = profile.localizedLastName || profile.lastName || ''
-          const name = `${firstName} ${lastName}`.trim() || 'LinkedIn User'
-          
-          const userProfile = {
-            id: profile.id || `linkedin_${Date.now()}`,
-            name,
-            email: profile.emailAddress || `linkedin_${profile.id || Date.now()}@example.com`,
-            image: profile.pictureUrl || profile.profilePicture || 
-                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`
-          }
-          
-          console.log('✅ [LinkedIn Debug] 최종 프로필:', JSON.stringify(userProfile, null, 2))
-          return userProfile
-        }
-      }
+      })
     ] : []),
     
     CredentialsProvider({
