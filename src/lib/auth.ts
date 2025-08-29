@@ -30,54 +30,24 @@ export const authOptions: NextAuthOptions = {
           },
         },
         token: "https://www.linkedin.com/oauth/v2/accessToken",
-        userinfo: {
-          url: "https://api.linkedin.com/v2/people/~:(id,localizedFirstName,localizedLastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))",
-          params: {
-            projection: "(id,localizedFirstName,localizedLastName,profilePicture(displayImage~digitalmediaAsset:playableStreams))"
-          }
-        },
+        userinfo: "https://api.linkedin.com/v2/people/~",
         clientId: process.env.LINKEDIN_CLIENT_ID!,
         clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
         checks: ["state"],
-        async profile(profile, tokens) {
+        profile(profile) {
           console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
           console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
-          console.log('🎫 Tokens:', JSON.stringify(tokens, null, 2))
           
-          // 이메일 정보 별도 요청
-          let email = `linkedin_${profile.id || Date.now()}@example.com`
-          
-          try {
-            const emailResponse = await fetch('https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))', {
-              headers: {
-                'Authorization': `Bearer ${tokens.access_token}`,
-              }
-            })
-            
-            if (emailResponse.ok) {
-              const emailData = await emailResponse.json()
-              console.log('📧 LinkedIn Email Response:', JSON.stringify(emailData, null, 2))
-              email = emailData?.elements?.[0]?.['handle~']?.emailAddress || email
-            }
-          } catch (emailError) {
-            console.warn('⚠️ LinkedIn 이메일 조회 실패:', emailError)
-          }
-          
-          const firstName = profile.localizedFirstName || ''
-          const lastName = profile.localizedLastName || ''
+          const firstName = profile.localizedFirstName || profile.firstName || ''
+          const lastName = profile.localizedLastName || profile.lastName || ''
           const name = `${firstName} ${lastName}`.trim() || 'LinkedIn User'
-          
-          let image = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`
-          if (profile.profilePicture?.['displayImage~']?.elements?.length > 0) {
-            const imageElement = profile.profilePicture['displayImage~'].elements[0]
-            image = imageElement?.identifiers?.[0]?.identifier || image
-          }
           
           const userProfile = {
             id: profile.id || `linkedin_${Date.now()}`,
             name,
-            email,
-            image
+            email: profile.emailAddress || `linkedin_${profile.id || Date.now()}@example.com`,
+            image: profile.pictureUrl || profile.profilePicture || 
+                   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`
           }
           
           console.log('✅ [LinkedIn Debug] 최종 프로필:', JSON.stringify(userProfile, null, 2))
