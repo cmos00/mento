@@ -3,7 +3,6 @@ import { Database } from '@/lib/supabase'
 // Supabase 타입 별칭
 type User = Database['public']['Tables']['users']['Row']
 type Question = Database['public']['Tables']['questions']['Row']  
-type Feedback = Database['public']['Tables']['feedbacks']['Row']
 
 // LinkedIn 관련 타입 확장
 export interface LinkedInProfile {
@@ -27,22 +26,9 @@ export interface ExtendedUser {
   linkedinProfile?: LinkedInProfile
 }
 
-// Supabase 기반 확장 타입 정의
+// Supabase 기반 확장 타입 정의 (실제 존재하는 테이블만 사용)
 export type QuestionWithAuthor = Question & {
   author: User
-  feedbacks: Feedback[]
-}
-
-export type QuestionWithAuthorAndFeedbacks = Question & {
-  author: User
-  feedbacks: (Feedback & {
-    mentor: User
-  })[]
-}
-
-export type FeedbackWithMentor = Feedback & {
-  mentor: User
-  question: Question
 }
 
 export interface QuestionTemplate {

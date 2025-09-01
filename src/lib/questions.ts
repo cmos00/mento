@@ -1,5 +1,4 @@
-import { supabase } from './supabase'
-import { Database } from './supabase'
+import { Database, supabase } from './supabase'
 
 export type Question = Database['public']['Tables']['questions']['Row']
 export type QuestionInsert = Database['public']['Tables']['questions']['Insert']
@@ -12,44 +11,24 @@ export type QuestionWithAuthor = Question & {
 // 질문 생성
 export async function createQuestion(questionData: Omit<QuestionInsert, 'id' | 'created_at' | 'updated_at'>, userInfo?: { name: string; email: string; isDemo?: boolean }) {
   try {
-    // 사용자 정보가 제공된 경우, 먼저 users 테이블에 사용자를 생성하거나 업데이트
-    if (userInfo) {
-      console.log('사용자 정보 생성/업데이트 중...', { userId: questionData.user_id, userInfo })
-      
-      const { error: userError } = await supabase
-        .from('users')
-        .upsert([{
-          id: questionData.user_id,
-          email: userInfo.email,
-          name: userInfo.name,
-          company: userInfo.isDemo ? '데모 회사' : undefined,
-          position: userInfo.isDemo ? '데모 직책' : undefined
-        }], { 
-          onConflict: 'id',
-          ignoreDuplicates: false 
-        })
+    console.log('API Route를 통한 질문 생성 시작...', { userId: questionData.user_id, userInfo })
+    
+    // API Route를 통해 서버 사이드에서 처리
+    const response = await fetch('/api/questions/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ questionData, userInfo }),
+    })
 
-      if (userError) {
-        console.error('사용자 생성/업데이트 오류:', userError)
-        throw new Error(`사용자 생성 실패: ${userError.message}`)
-      }
-      
-      console.log('사용자 정보 생성/업데이트 성공')
+    const result = await response.json()
+
+    if (!response.ok) {
+      throw new Error(result.error || '질문 생성 중 오류가 발생했습니다.')
     }
 
-    // 질문 생성
-    const { data, error } = await supabase
-      .from('questions')
-      .insert([questionData])
-      .select()
-      .single()
-
-    if (error) {
-      console.error('질문 생성 오류:', error)
-      throw new Error(error.message)
-    }
-
-    return { data, error: null }
+    return result
   } catch (error) {
     console.error('질문 생성 중 예외 발생:', error)
     return { data: null, error: error as Error }

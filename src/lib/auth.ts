@@ -1,15 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import LinkedInProvider from 'next-auth/providers/linkedin'
 
-// 환경 변수 검증 (개발 환경에서는 경고만 출력)
-if (!process.env.LINKEDIN_CLIENT_ID || !process.env.LINKEDIN_CLIENT_SECRET) {
-  console.warn('⚠️  LinkedIn OAuth 환경 변수가 설정되지 않았습니다. LinkedIn 로그인 기능이 제한됩니다.')
-} else {
-  console.log('✅ LinkedIn OAuth 환경 변수 확인됨')
-  console.log('🔑 Client ID:', process.env.LINKEDIN_CLIENT_ID?.slice(0, 6) + '...')
-}
-
+// 환경 변수 검증
 if (!process.env.NEXTAUTH_SECRET) {
   console.warn('⚠️  NEXTAUTH_SECRET 환경 변수가 설정되지 않았습니다. 프로덕션에서는 설정이 필요합니다.')
 }
@@ -18,52 +10,8 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/auth/login',
   },
+  
   providers: [
-    ...(process.env.LINKEDIN_CLIENT_ID && process.env.LINKEDIN_CLIENT_SECRET ? [
-      {
-        id: "linkedin" as const,
-        name: "LinkedIn",
-        type: "oauth" as const,
-        issuer: "https://www.linkedin.com/oauth",
-        authorization: {
-          url: "https://www.linkedin.com/oauth/v2/authorization",
-          params: {
-            scope: "openid profile email",
-            response_type: "code",
-          },
-        },
-        token: {
-          url: "https://www.linkedin.com/oauth/v2/accessToken",
-          params: {
-            grant_type: "authorization_code",
-          },
-        },
-        userinfo: {
-          url: "https://api.linkedin.com/v2/userinfo",
-          params: {},
-        },
-
-        clientId: process.env.LINKEDIN_CLIENT_ID!,
-        clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-        client: {
-          token_endpoint_auth_method: "client_secret_post" as const,
-        },
-        checks: ["state" as const],
-        idToken: true,
-        profile(profile: any) {
-          console.log('🔍 [LinkedIn Debug] Profile 함수 호출됨')
-          console.log('📋 Raw Profile:', JSON.stringify(profile, null, 2))
-          
-          return {
-            id: profile.sub || profile.id || `linkedin_${Date.now()}`,
-            name: profile.name || `${profile.given_name || ''} ${profile.family_name || ''}`.trim() || 'LinkedIn User',
-            email: profile.email || `linkedin_${profile.sub || Date.now()}@example.com`,
-            image: profile.picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.name || 'LinkedIn User')}`
-          }
-        }
-      }
-    ] : []),
-    
     CredentialsProvider({
       id: 'demo-login',
       name: 'Demo Login',
@@ -91,7 +39,7 @@ export const authOptions: NextAuthOptions = {
           }
           
           const demoUserId = generateUUID()
-          console.log('Generated demo user ID:', demoUserId) // 디버깅용
+          console.log('Generated demo user ID:', demoUserId)
           
           return {
             id: demoUserId,
@@ -115,14 +63,8 @@ export const authOptions: NextAuthOptions = {
       console.log('🔑 Account:', JSON.stringify(account, null, 2))
       console.log('📋 Profile:', JSON.stringify(profile, null, 2))
       
-      if (account?.provider === 'linkedin') {
-        console.log('✅ [LinkedIn] LinkedIn provider 확인됨')
-        
-        if (profile) {
-          console.log('✅ [LinkedIn] Profile 정보 존재')
-        } else {
-          console.log('⚠️ [LinkedIn] Profile 정보 없음')
-        }
+      if (account?.provider === 'demo-login') {
+        console.log('✅ [Demo] 데모 로그인 확인됨')
       }
       
       console.log('🔐 [Auth Debug] signIn 콜백 완료')
@@ -156,10 +98,6 @@ export const authOptions: NextAuthOptions = {
         console.log('✅ [Auth Debug] Account와 User 모두 존재')
         token.id = user.id
         
-        if (account.provider === 'linkedin' && profile) {
-          console.log('✅ [LinkedIn] JWT에 LinkedIn 정보 추가')
-        }
-        
         if ((user as any).isDemo) {
           token.isDemo = true
         }
@@ -188,10 +126,21 @@ export const authOptions: NextAuthOptions = {
     }
   },
   
-
-  
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
   },
   
   debug: process.env.NODE_ENV === 'development'

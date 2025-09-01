@@ -66,6 +66,10 @@ CREATE POLICY "Users can view own profile" ON users
 CREATE POLICY "Users can update own profile" ON users
   FOR UPDATE USING (auth.uid()::text = id::text);
 
+-- NextAuth 사용자를 위한 INSERT 정책 (RLS 우회)
+CREATE POLICY "Allow user creation for NextAuth users" ON users
+  FOR INSERT WITH CHECK (true);
+
 -- 질문은 모든 사용자가 볼 수 있음
 CREATE POLICY "Questions are viewable by everyone" ON questions
   FOR SELECT USING (true);

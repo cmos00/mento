@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { MessageCircle, Sparkles, User } from 'lucide-react'
 import { signIn } from 'next-auth/react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 // LinkedIn 아이콘 컴포넌트
 const LinkedInIcon = ({ className }: { className?: string }) => (
@@ -47,26 +47,31 @@ export default function LoginPage() {
     try {
       console.log('🎭 데모 로그인 시도 중...')
       
-      // NextAuth.js를 사용한 데모 로그인
+      // NextAuth.js 데모 로그인 (redirect: false로 결과 확인)
       const result = await signIn('demo-login', {
         email: 'demo@example.com',
         name: '데모 사용자',
-        callbackUrl: '/questions',
         redirect: false
       })
+      
+      console.log('🔍 데모 로그인 결과:', result)
       
       if (result?.error) {
         console.error('데모 로그인 오류:', result.error)
         alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
+        setIsLoading(false)
       } else if (result?.ok) {
-        console.log('데모 로그인 성공, 질문 목록으로 리다이렉트...')
+        console.log('✅ 데모 로그인 성공, 질문 목록으로 이동...')
+        // 수동으로 리다이렉트
         router.push('/questions')
+      } else {
+        console.log('❓ 예상치 못한 결과:', result)
+        setIsLoading(false)
       }
       
     } catch (error) {
-      console.error('데모 로그인 오류:', error)
-      alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
-    } finally {
+      console.error('데모 로그인 예외:', error)
+      alert('데모 로그인 중 예외가 발생했습니다. 다시 시도해주세요.')
       setIsLoading(false)
     }
   }

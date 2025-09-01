@@ -14,8 +14,9 @@ LINKEDIN_CLIENT_ID=your_linkedin_client_id_here
 LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret_here
 
 # Supabase 설정
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 ```
 
 ## 환경 변수 설명
