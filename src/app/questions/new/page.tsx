@@ -1,11 +1,11 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { MessageSquare, Plus, ArrowLeft, Send, Target, Tag, FileText, AlertCircle, User } from 'lucide-react'
-import { useSession, signIn } from 'next-auth/react'
-import { createQuestion } from '@/lib/questions'
 import MobileBottomNav from '@/components/MobileBottomNav'
+import { createQuestion } from '@/lib/questions'
+import { AlertCircle, ArrowLeft, FileText, MessageSquare, Plane, Send, Tag, Target, User } from 'lucide-react'
+import { signIn, useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export default function NewQuestionPage() {
   const router = useRouter()
@@ -389,7 +389,7 @@ export default function NewQuestionPage() {
               >
                 {isSubmitting ? (
                   <>
-                    <div className="w-4 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    <Plane className="w-4 h-4 mr-2 animate-bounce" />
                     등록 중...
                   </>
                 ) : (

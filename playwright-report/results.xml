@@ -1,0 +1,91 @@
+<testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="32.759971">
+<testsuite name="demo-login-flow.spec.ts" timestamp="2025-09-01T04:25:24.515Z" hostname="chromium" tests="1" failures="1" skipped="0" time="30.644" errors="0">
+<testcase name="데모 로그인 전체 플로우 테스트 › 3. 데모 로그인 상태에서 질문 작성 및 등록" classname="demo-login-flow.spec.ts" time="30.644">
+<failure message="demo-login-flow.spec.ts:71:7 3. 데모 로그인 상태에서 질문 작성 및 등록" type="FAILURE">
+<![CDATA[  [chromium] › demo-login-flow.spec.ts:71:7 › 데모 로그인 전체 플로우 테스트 › 3. 데모 로그인 상태에서 질문 작성 및 등록 ────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.screenshot: Target page, context or browser has been closed
+
+      132 |       console.error('테스트 실패:', error)
+      133 |       // 실패 시 스크린샷 저장
+    > 134 |       await page.screenshot({ path: 'test-failure.png' })
+          |                  ^
+      135 |       throw error
+      136 |     }
+      137 |   })
+        at /Users/kakaogames/mento/tests/demo-login-flow.spec.ts:134:18
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[🚀 질문 작성 및 등록 테스트 시작
+✅ 1. 로그인 페이지 접근 완료
+
+[[ATTACHMENT|../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/video.webm]]
+
+[[ATTACHMENT|../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/error-context.md]]
+]]>
+</system-out>
+<system-err>
+<![CDATA[테스트 실패: locator.click: Test timeout of 30000ms exceeded.
+Call log:
+[2m  - waiting for locator('text=데모로 로그인')[22m
+
+    at [90m/Users/kakaogames/mento/[39mtests/demo-login-flow.spec.ts:81:24 {
+  [32mSymbol(step)[39m: {
+    location: {
+      file: [32m'/Users/kakaogames/mento/tests/demo-login-flow.spec.ts'[39m,
+      line: [33m81[39m,
+      column: [33m24[39m
+    },
+    category: [32m'pw:api'[39m,
+    title: [32m"Click locator('text=데모로 로그인')"[39m,
+    apiName: [32m'locator.click'[39m,
+    params: { selector: [32m'text=데모로 로그인'[39m, strict: [33mtrue[39m, timeout: [33m0[39m },
+    group: [90mundefined[39m,
+    stepId: [32m'pw:api@35'[39m,
+    boxedStack: [90mundefined[39m,
+    steps: [],
+    attachmentIndices: [],
+    info: TestStepInfoImpl {
+      annotations: [],
+      _testInfo: [36m[TestInfoImpl][39m,
+      _stepId: [32m'pw:api@35'[39m,
+      _title: [32m"Click locator('text=데모로 로그인')"[39m,
+      _parentStep: [90mundefined[39m,
+      skip: [36m[Function (anonymous)][39m
+    },
+    recoverFromStepError: [36m[AsyncFunction: recoverFromStepError][39m,
+    complete: [36m[Function: complete][39m,
+    endWallTime: [33m1756700755612[39m,
+    error: {
+      message: [32m'Error: locator.click: Test timeout of 30000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=데모로 로그인')\x1B[22m\n"[39m,
+      stack: [32m'Error: locator.click: Test timeout of 30000ms exceeded.\n'[39m +
+        [32m'Call log:\n'[39m +
+        [32m"\x1B[2m  - waiting for locator('text=데모로 로그인')\x1B[22m\n"[39m +
+        [32m'\n'[39m +
+        [32m'    at /Users/kakaogames/mento/tests/demo-login-flow.spec.ts:81:24'[39m,
+      cause: [90mundefined[39m
+    }
+  }
+}
+]]>
+</system-err>
+</testcase>
+</testsuite>
+</testsuites>

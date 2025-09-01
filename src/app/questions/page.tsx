@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import Link from 'next/link'
-import { MessageSquare, Plus, Search, Filter, Eye, MessageCircle, Clock, User } from 'lucide-react'
-import { getAllQuestions, getQuestionsByCategory, Question } from '@/lib/questions'
-import { useSession } from 'next-auth/react'
 import MobileBottomNav from '@/components/MobileBottomNav'
+import { Question, getAllQuestions } from '@/lib/questions'
+import { Clock, Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Search, User } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
 
 export default function QuestionsPage() {
   const { data: session, status } = useSession()
@@ -24,12 +24,30 @@ export default function QuestionsPage() {
     '업무 스킬',
     '팀 관리',
     '네트워킹',
-    '워라밸'
+    '워라밸',
+    '인간관계',
+    '리더십'
   ]
+
+  // 카테고리 표시명 매핑
+  const getCategoryDisplayName = (category: string) => {
+    const categoryMap: { [key: string]: string } = {
+      'career-transition': '커리어 전환',
+      'interview-prep': '면접 준비',
+      'work-skills': '업무 스킬',
+      'team-management': '팀 관리',
+      'networking': '네트워킹',
+      'work-life-balance': '워라밸',
+      '인간관계': '인간관계',
+      '리더십': '리더십'
+    }
+    return categoryMap[category] || category
+  }
 
   const loadQuestions = async () => {
     try {
       setLoading(true)
+      setError('')
       const { data, error } = await getAllQuestions()
       
       if (error) {
@@ -38,7 +56,10 @@ export default function QuestionsPage() {
       }
 
       if (data) {
+        console.log('로드된 질문 개수:', data.length)
         setQuestions(data)
+      } else {
+        setQuestions([])
       }
     } catch (err) {
       setError('질문을 불러오는 중 예상치 못한 오류가 발생했습니다.')
@@ -105,6 +126,17 @@ export default function QuestionsPage() {
     return (question as any).users?.name || '사용자'
   }
 
+  const getUserCompanyInfo = (question: Question) => {
+    if (question.is_anonymous || !(question as any).users) {
+      return ''
+    }
+    const user = (question as any).users
+    if (user.company && user.position) {
+      return `${user.company} · ${user.position}`
+    }
+    return user.company || user.position || ''
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -121,7 +153,16 @@ export default function QuestionsPage() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-4 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">질문 & 답변</h1>
+          <div className="flex items-center space-x-3">
+            <h1 className="text-xl font-bold text-gray-900">질문 & 답변</h1>
+            <button
+              onClick={loadQuestions}
+              disabled={loading}
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
           {status === 'authenticated' ? (
             <Link href="/questions/new">
               <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center">
@@ -205,7 +246,7 @@ export default function QuestionsPage() {
         )}
 
         {/* 질문 목록 */}
-        <div className="space-y-4">
+        <div>
           {filteredQuestions.length === 0 ? (
             <div className="text-center py-12">
               <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -236,7 +277,7 @@ export default function QuestionsPage() {
             </div>
           ) : (
             filteredQuestions.map((question) => (
-              <Link key={question.id} href={`/questions/${question.id}`}>
+              <Link key={question.id} href={`/questions/${question.id}`} className="block mb-[10px] last:mb-0">
                 <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow cursor-pointer">
                   {/* 질문 헤더 */}
                   <div className="flex items-start justify-between mb-3">
@@ -249,12 +290,12 @@ export default function QuestionsPage() {
                           {getUserDisplayName(question)}
                         </p>
                         <p className="text-xs text-gray-500">
-                          {formatDate(question.created_at)}
+                          {getUserCompanyInfo(question) || formatDate(question.created_at)}
                         </p>
                       </div>
                     </div>
                     <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                      {question.category}
+                      {getCategoryDisplayName(question.category)}
                     </span>
                   </div>
 

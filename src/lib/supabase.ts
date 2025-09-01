@@ -1,4 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+// createClient 함수를 re-export (API 라우트에서 사용)
+export { createClient } from '@supabase/supabase-js'
 
 // 환경 변수에서 Supabase 설정 가져오기
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -14,7 +17,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Supabase 클라이언트 생성
-export const supabase = createClient(
+export const supabase = createSupabaseClient(
   supabaseUrl || '',
   supabaseAnonKey || ''
 )

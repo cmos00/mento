@@ -50,7 +50,7 @@ export async function getAllQuestions() {
           position
         )
       `)
-      .eq('status', 'open')
+      .eq('status', 'active')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -81,7 +81,7 @@ export async function getQuestionById(id: string) {
         )
       `)
       .eq('id', id)
-      .eq('status', 'open')
+      .eq('status', 'active')
       .single()
 
     if (error) {
@@ -112,7 +112,7 @@ export async function getQuestionsByCategory(category: string) {
         )
       `)
       .eq('category', category)
-      .eq('status', 'open')
+      .eq('status', 'active')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -143,7 +143,7 @@ export async function getQuestionsByUser(userId: string) {
         )
       `)
       .eq('user_id', userId)
-      .eq('status', 'open')
+      .eq('status', 'active')
       .order('created_at', { ascending: false })
 
     if (error) {

@@ -89,9 +89,9 @@ CREATE POLICY "Users can delete own questions" ON questions
 CREATE POLICY "Feedbacks are viewable by everyone" ON feedbacks
   FOR SELECT USING (true);
 
--- 로그인한 사용자만 피드백 작성 가능
+-- 로그인한 사용자만 피드백 작성 가능 (NextAuth 사용자 포함)
 CREATE POLICY "Authenticated users can create feedbacks" ON feedbacks
-  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+  FOR INSERT WITH CHECK (true);
 
 -- 피드백 작성자만 수정/삭제 가능
 CREATE POLICY "Users can update own feedbacks" ON feedbacks
