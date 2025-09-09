@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
         },
       },
       profile(profile) {
-        console.log('🔍 [LinkedIn Profile] LinkedIn 프로필 정보:', JSON.stringify(profile, null, 2))
+        console.log('🔍 [LinkedIn Profile] LinkedIn 프로필 정보 수신:', JSON.stringify(profile, null, 2))
         
         try {
           // LinkedIn OIDC에서 받아오는 사용자 정보 처리
@@ -53,26 +53,37 @@ export const authOptions: NextAuthOptions = {
           
           // 필수 필드 검증
           if (!userId || !userName || !userEmail) {
+            console.error('❌ [LinkedIn Profile] 필수 사용자 정보가 누락됨:', {
+              userId: !!userId,
+              userName: !!userName,
+              userEmail: !!userEmail
+            })
             throw new Error('필수 사용자 정보가 누락되었습니다')
           }
           
-          return {
+          const result = {
             id: userId,
             name: userName,
             email: userEmail,
             image: userImage,
           }
+          
+          console.log('✅ [LinkedIn Profile] 최종 결과:', result)
+          return result
         } catch (error) {
           console.error('❌ [LinkedIn Profile] 프로필 처리 오류:', error)
           
           // 더 안전한 기본값으로 폴백
           const fallbackId = `linkedin_${Date.now()}`
-          return {
+          const fallbackResult = {
             id: fallbackId,
             name: 'LinkedIn 사용자',
             email: `${fallbackId}@linkedin.local`,
             image: null,
           }
+          
+          console.log('🔄 [LinkedIn Profile] 폴백 결과:', fallbackResult)
+          return fallbackResult
         }
       },
     }),
