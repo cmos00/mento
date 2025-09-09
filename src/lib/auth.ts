@@ -30,19 +30,22 @@ export const authOptions: NextAuthOptions = {
           
           // 이름 처리 - 더 안전한 방식
           let userName = 'LinkedIn 사용자'
-          if (profile.name) {
-            userName = profile.name
+          if (profile.name && typeof profile.name === 'string') {
+            userName = profile.name.trim()
           } else if (profile.given_name || profile.family_name) {
-            userName = `${profile.given_name || ''} ${profile.family_name || ''}`.trim()
+            const givenName = profile.given_name || ''
+            const familyName = profile.family_name || ''
+            userName = `${givenName} ${familyName}`.trim()
           }
           
           // 이메일 처리 - 더 안전한 방식
           let userEmail = `${userId}@linkedin.local`
-          if (profile.email && typeof profile.email === 'string') {
-            userEmail = profile.email
+          if (profile.email && typeof profile.email === 'string' && profile.email.includes('@')) {
+            userEmail = profile.email.trim()
           }
           
-          const userImage = profile.picture || profile.picture_url || null
+          // 이미지 처리
+          const userImage = (profile.picture || profile.picture_url || null)
           
           console.log('✅ [LinkedIn Profile] 처리된 사용자 정보:', {
             id: userId,
@@ -51,15 +54,19 @@ export const authOptions: NextAuthOptions = {
             image: userImage
           })
           
-          // 필수 필드 검증
-          if (!userId || !userName || !userEmail) {
-            console.error('❌ [LinkedIn Profile] 필수 사용자 정보가 누락됨:', {
-              userId: !!userId,
-              userName: !!userName,
-              userEmail: !!userEmail
-            })
-            throw new Error('필수 사용자 정보가 누락되었습니다')
-          }
+          // 모든 필드가 존재하는지 확인 (하지만 오류를 발생시키지 않음)
+          const hasValidId = !!userId
+          const hasValidName = !!userName && userName !== ''
+          const hasValidEmail = !!userEmail && userEmail.includes('@')
+          
+          console.log('🔍 [LinkedIn Profile] 필드 검증:', {
+            hasValidId,
+            hasValidName,
+            hasValidEmail,
+            userId: userId,
+            userName: userName,
+            userEmail: userEmail
+          })
           
           const result = {
             id: userId,
@@ -68,10 +75,11 @@ export const authOptions: NextAuthOptions = {
             image: userImage,
           }
           
-          console.log('✅ [LinkedIn Profile] 최종 결과:', result)
+          console.log('✅ [LinkedIn Profile] 최종 결과 반환:', result)
           return result
         } catch (error) {
           console.error('❌ [LinkedIn Profile] 프로필 처리 오류:', error)
+          console.error('❌ [LinkedIn Profile] 오류 스택:', error instanceof Error ? error.stack : 'No stack')
           
           // 더 안전한 기본값으로 폴백
           const fallbackId = `linkedin_${Date.now()}`
@@ -82,7 +90,7 @@ export const authOptions: NextAuthOptions = {
             image: null,
           }
           
-          console.log('🔄 [LinkedIn Profile] 폴백 결과:', fallbackResult)
+          console.log('🔄 [LinkedIn Profile] 폴백 결과 반환:', fallbackResult)
           return fallbackResult
         }
       },
@@ -145,18 +153,28 @@ export const authOptions: NextAuthOptions = {
         } else if (account?.provider === 'linkedin') {
           console.log('✅ [LinkedIn] LinkedIn 로그인 확인됨')
           
-          // LinkedIn 사용자 정보 검증 - 더 관대한 검증
-          if (!user?.email || user.email.includes('@linkedin.local')) {
-            console.warn('⚠️ [LinkedIn] 사용자 이메일이 없거나 기본값입니다:', user?.email)
-            // 이메일이 없어도 로그인 허용 (프로필 함수에서 처리됨)
+          // LinkedIn 사용자 정보 검증 - 매우 관대한 검증
+          if (!user) {
+            console.error('❌ [LinkedIn] User 객체가 없습니다')
+            return false
           }
           
-          if (!user?.name || user.name === 'LinkedIn 사용자') {
-            console.warn('⚠️ [LinkedIn] 사용자 이름이 없거나 기본값입니다:', user?.name)
-            // 이름이 없어도 로그인 허용 (프로필 함수에서 처리됨)
+          // 이메일이 없어도 허용 (프로필 함수에서 처리됨)
+          if (!user.email) {
+            console.warn('⚠️ [LinkedIn] 사용자 이메일이 없습니다:', user.email)
           }
           
-          console.log('✅ [LinkedIn] 사용자 정보 검증 완료')
+          // 이름이 없어도 허용 (프로필 함수에서 처리됨)
+          if (!user.name) {
+            console.warn('⚠️ [LinkedIn] 사용자 이름이 없습니다:', user.name)
+          }
+          
+          // ID가 없어도 허용 (프로필 함수에서 처리됨)
+          if (!user.id) {
+            console.warn('⚠️ [LinkedIn] 사용자 ID가 없습니다:', user.id)
+          }
+          
+          console.log('✅ [LinkedIn] 사용자 정보 검증 완료 - 모든 경우 허용')
           return true
         }
         
@@ -164,6 +182,7 @@ export const authOptions: NextAuthOptions = {
         return true
       } catch (error) {
         console.error('❌ [Auth Debug] signIn 콜백 오류:', error)
+        console.error('❌ [Auth Debug] 오류 스택:', error instanceof Error ? error.stack : 'No stack')
         return false
       }
     },
@@ -203,7 +222,7 @@ export const authOptions: NextAuthOptions = {
           
           if (account.provider === 'linkedin') {
             token.provider = 'linkedin'
-            // LinkedIn 사용자 정보를 토큰에 저장
+            // LinkedIn 사용자 정보를 토큰에 저장 - 안전한 방식
             token.name = user.name || 'LinkedIn 사용자'
             token.email = user.email || `${user.id}@linkedin.local`
             token.image = user.image || null
@@ -215,12 +234,15 @@ export const authOptions: NextAuthOptions = {
           }
         } else {
           console.log('⚠️ [Auth Debug] Account 또는 User가 없음')
+          if (!account) console.log('❌ Account가 없음')
+          if (!user) console.log('❌ User가 없음')
         }
         
         console.log('🎫 [Auth Debug] JWT 콜백 완료 - 최종 토큰:', JSON.stringify(token, null, 2))
         return token
       } catch (error) {
         console.error('❌ [Auth Debug] JWT 콜백 오류:', error)
+        console.error('❌ [Auth Debug] 오류 스택:', error instanceof Error ? error.stack : 'No stack')
         return token
       }
     },
@@ -242,7 +264,7 @@ export const authOptions: NextAuthOptions = {
           
           if (token.provider === 'linkedin') {
             (session.user as any).provider = 'linkedin'
-            // LinkedIn 사용자 정보를 세션에 저장
+            // LinkedIn 사용자 정보를 세션에 저장 - 안전한 방식
             session.user.name = token.name as string || 'LinkedIn 사용자'
             session.user.email = token.email as string || `${token.id}@linkedin.local`
             session.user.image = token.image as string || null
@@ -260,6 +282,7 @@ export const authOptions: NextAuthOptions = {
         return session
       } catch (error) {
         console.error('❌ [Auth Debug] Session 콜백 오류:', error)
+        console.error('❌ [Auth Debug] 오류 스택:', error instanceof Error ? error.stack : 'No stack')
         return session
       }
     }
