@@ -23,8 +23,8 @@ export default function LoginPage() {
     try {
       console.log('🔗 LinkedIn 로그인 시도 중...')
       
-      // LinkedIn OAuth URL 생성
-      const linkedinAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_ID}&redirect_uri=${encodeURIComponent(`${window.location.origin}/api/auth/callback/linkedin`)}&scope=openid%20profile%20email&state=${Date.now()}`
+      // LinkedIn OAuth URL 생성 (Client ID 하드코딩)
+      const linkedinAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=869opboyzlkrhb&redirect_uri=${encodeURIComponent(`${window.location.origin}/api/auth/callback/linkedin`)}&scope=openid%20profile%20email&state=${Date.now()}`
       
       console.log('🔗 LinkedIn OAuth URL:', linkedinAuthUrl)
       
