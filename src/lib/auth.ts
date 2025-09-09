@@ -81,6 +81,7 @@ export const authOptions: NextAuthOptions = {
         } catch (error) {
           console.error('❌ [LinkedIn Profile] 프로필 처리 오류:', error)
           console.error('❌ [LinkedIn Profile] 오류 스택:', error instanceof Error ? error.stack : 'No stack')
+          console.error('❌ [LinkedIn Profile] 원본 프로필 데이터:', JSON.stringify(profile, null, 2))
           
           // 더 안전한 기본값으로 폴백
           const fallbackId = `linkedin_${Date.now()}`
