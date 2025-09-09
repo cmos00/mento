@@ -1,5 +1,6 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import LinkedInProvider from 'next-auth/providers/linkedin'
 
 // 환경 변수 검증
 if (!process.env.NEXTAUTH_SECRET) {
@@ -12,6 +13,15 @@ export const authOptions: NextAuthOptions = {
   },
   
   providers: [
+    LinkedInProvider({
+      clientId: process.env.LINKEDIN_CLIENT_ID!,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: 'openid profile email',
+        },
+      },
+    }),
     CredentialsProvider({
       id: 'demo-login',
       name: 'Demo Login',
@@ -65,6 +75,8 @@ export const authOptions: NextAuthOptions = {
       
       if (account?.provider === 'demo-login') {
         console.log('✅ [Demo] 데모 로그인 확인됨')
+      } else if (account?.provider === 'linkedin') {
+        console.log('✅ [LinkedIn] LinkedIn 로그인 확인됨')
       }
       
       console.log('🔐 [Auth Debug] signIn 콜백 완료')
@@ -101,6 +113,11 @@ export const authOptions: NextAuthOptions = {
         if ((user as any).isDemo) {
           token.isDemo = true
         }
+        
+        if (account.provider === 'linkedin') {
+          token.provider = 'linkedin'
+          console.log('✅ [LinkedIn] LinkedIn 사용자 토큰 설정')
+        }
       }
       
       console.log('🎫 [Auth Debug] JWT 콜백 완료')
@@ -118,6 +135,11 @@ export const authOptions: NextAuthOptions = {
         
         if (token.isDemo) {
           (session.user as any).isDemo = true
+        }
+        
+        if (token.provider === 'linkedin') {
+          (session.user as any).provider = 'linkedin'
+          console.log('✅ [LinkedIn] LinkedIn 사용자 세션 설정')
         }
       }
       

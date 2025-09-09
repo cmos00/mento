@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 1
+      "actualWorkers": 4
     },
     "preserveOutput": "always",
     "reporter": [
@@ -43,7 +43,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 1
+          "actualWorkers": 4
         },
         "id": "chromium",
         "name": "chromium",
@@ -69,21 +69,21 @@
   },
   "suites": [
     {
-      "title": "demo-login-flow.spec.ts",
-      "file": "demo-login-flow.spec.ts",
+      "title": "linkedin-login-test.spec.ts",
+      "file": "linkedin-login-test.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "데모 로그인 전체 플로우 테스트",
-          "file": "demo-login-flow.spec.ts",
+          "title": "LinkedIn 로그인 테스트",
+          "file": "linkedin-login-test.spec.ts",
           "line": 3,
           "column": 6,
           "specs": [
             {
-              "title": "3. 데모 로그인 상태에서 질문 작성 및 등록",
-              "ok": false,
+              "title": "LinkedIn 로그인 버튼이 존재하고 클릭 가능한지 확인",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -96,65 +96,172 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 30644,
+                      "status": "passed",
+                      "duration": 2909,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-09T04:56:32.921Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1fda6a3453ddd70adbf7-6d74075c6595d0392831",
+              "file": "linkedin-login-test.spec.ts",
+              "line": 4,
+              "column": 7
+            },
+            {
+              "title": "LinkedIn 로그인 버튼 클릭 시 로딩 상태 확인",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 3914,
                       "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /Users/kakaogames/mento/tests/linkedin-login-test.spec.ts:50:32",
+                        "location": {
+                          "file": "/Users/kakaogames/mento/tests/linkedin-login-test.spec.ts",
+                          "column": 32,
+                          "line": 50
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 48 |\u001b[39m     \n \u001b[90m 49 |\u001b[39m     \u001b[90m// LinkedIn 관련 로그가 있는지 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 50 |\u001b[39m     expect(consoleLogs\u001b[33m.\u001b[39mlength)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m0\u001b[39m)\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 51 |\u001b[39m   })\n \u001b[90m 52 |\u001b[39m\n \u001b[90m 53 |\u001b[39m   test(\u001b[32m'LinkedIn 로그인과 데모 로그인 버튼이 모두 존재하는지 확인'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
                       },
                       "errors": [
                         {
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                        },
-                        {
                           "location": {
-                            "file": "/Users/kakaogames/mento/tests/demo-login-flow.spec.ts",
-                            "column": 18,
-                            "line": 134
+                            "file": "/Users/kakaogames/mento/tests/linkedin-login-test.spec.ts",
+                            "column": 32,
+                            "line": 50
                           },
-                          "message": "Error: page.screenshot: Target page, context or browser has been closed\n\n\u001b[0m \u001b[90m 132 |\u001b[39m       console\u001b[33m.\u001b[39merror(\u001b[32m'테스트 실패:'\u001b[39m\u001b[33m,\u001b[39m error)\n \u001b[90m 133 |\u001b[39m       \u001b[90m// 실패 시 스크린샷 저장\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 134 |\u001b[39m       \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mscreenshot({ path\u001b[33m:\u001b[39m \u001b[32m'test-failure.png'\u001b[39m })\n \u001b[90m     |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 135 |\u001b[39m       \u001b[36mthrow\u001b[39m error\n \u001b[90m 136 |\u001b[39m     }\n \u001b[90m 137 |\u001b[39m   })\u001b[0m\n\u001b[2m    at /Users/kakaogames/mento/tests/demo-login-flow.spec.ts:134:18\u001b[22m"
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n\u001b[0m \u001b[90m 48 |\u001b[39m     \n \u001b[90m 49 |\u001b[39m     \u001b[90m// LinkedIn 관련 로그가 있는지 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 50 |\u001b[39m     expect(consoleLogs\u001b[33m.\u001b[39mlength)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m0\u001b[39m)\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 51 |\u001b[39m   })\n \u001b[90m 52 |\u001b[39m\n \u001b[90m 53 |\u001b[39m   test(\u001b[32m'LinkedIn 로그인과 데모 로그인 버튼이 모두 존재하는지 확인'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m\n\u001b[2m    at /Users/kakaogames/mento/tests/linkedin-login-test.spec.ts:50:32\u001b[22m"
                         }
                       ],
                       "stdout": [
                         {
-                          "text": "🚀 질문 작성 및 등록 테스트 시작\n"
-                        },
-                        {
-                          "text": "✅ 1. 로그인 페이지 접근 완료\n"
+                          "text": "현재 URL: https://www.linkedin.com/oauth/v2/authorization?client_id=869opboyzlkrhb&scope=openid%20profile%20email&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fcallback%2Flinkedin&state=-JHjeKuEBKHq6AtpkGavzh0z0y5nCS-z3XIk3NhHj0c\n"
                         }
                       ],
-                      "stderr": [
-                        {
-                          "text": "테스트 실패: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('text=데모로 로그인')\u001b[22m\n\n    at \u001b[90m/Users/kakaogames/mento/\u001b[39mtests/demo-login-flow.spec.ts:81:24 {\n  \u001b[32mSymbol(step)\u001b[39m: {\n    location: {\n      file: \u001b[32m'/Users/kakaogames/mento/tests/demo-login-flow.spec.ts'\u001b[39m,\n      line: \u001b[33m81\u001b[39m,\n      column: \u001b[33m24\u001b[39m\n    },\n    category: \u001b[32m'pw:api'\u001b[39m,\n    title: \u001b[32m\"Click locator('text=데모로 로그인')\"\u001b[39m,\n    apiName: \u001b[32m'locator.click'\u001b[39m,\n    params: { selector: \u001b[32m'text=데모로 로그인'\u001b[39m, strict: \u001b[33mtrue\u001b[39m, timeout: \u001b[33m0\u001b[39m },\n    group: \u001b[90mundefined\u001b[39m,\n    stepId: \u001b[32m'pw:api@35'\u001b[39m,\n    boxedStack: \u001b[90mundefined\u001b[39m,\n    steps: [],\n    attachmentIndices: [],\n    info: TestStepInfoImpl {\n      annotations: [],\n      _testInfo: \u001b[36m[TestInfoImpl]\u001b[39m,\n      _stepId: \u001b[32m'pw:api@35'\u001b[39m,\n      _title: \u001b[32m\"Click locator('text=데모로 로그인')\"\u001b[39m,\n      _parentStep: \u001b[90mundefined\u001b[39m,\n      skip: \u001b[36m[Function (anonymous)]\u001b[39m\n    },\n    recoverFromStepError: \u001b[36m[AsyncFunction: recoverFromStepError]\u001b[39m,\n    complete: \u001b[36m[Function: complete]\u001b[39m,\n    endWallTime: \u001b[33m1756700755612\u001b[39m,\n    error: {\n      message: \u001b[32m'Error: locator.click: Test timeout of 30000ms exceeded.\\n'\u001b[39m +\n        \u001b[32m'Call log:\\n'\u001b[39m +\n        \u001b[32m\"\\x1B[2m  - waiting for locator('text=데모로 로그인')\\x1B[22m\\n\"\u001b[39m,\n      stack: \u001b[32m'Error: locator.click: Test timeout of 30000ms exceeded.\\n'\u001b[39m +\n        \u001b[32m'Call log:\\n'\u001b[39m +\n        \u001b[32m\"\\x1B[2m  - waiting for locator('text=데모로 로그인')\\x1B[22m\\n\"\u001b[39m +\n        \u001b[32m'\\n'\u001b[39m +\n        \u001b[32m'    at /Users/kakaogames/mento/tests/demo-login-flow.spec.ts:81:24'\u001b[39m,\n      cause: \u001b[90mundefined\u001b[39m\n    }\n  }\n}\n"
-                        }
-                      ],
+                      "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-01T04:25:24.883Z",
+                      "startTime": "2025-09-09T04:56:32.922Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "/Users/kakaogames/mento/test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/test-failed-1.png"
+                          "path": "/Users/kakaogames/mento/test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/test-failed-1.png"
                         },
                         {
                           "name": "video",
                           "contentType": "video/webm",
-                          "path": "/Users/kakaogames/mento/test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/video.webm"
+                          "path": "/Users/kakaogames/mento/test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/video.webm"
                         },
                         {
                           "name": "error-context",
                           "contentType": "text/markdown",
-                          "path": "/Users/kakaogames/mento/test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/error-context.md"
+                          "path": "/Users/kakaogames/mento/test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/error-context.md"
                         }
-                      ]
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/kakaogames/mento/tests/linkedin-login-test.spec.ts",
+                        "column": 32,
+                        "line": 50
+                      }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "a109f057750b32b1de2d-a0632aceac411caf45f6",
-              "file": "demo-login-flow.spec.ts",
+              "id": "1fda6a3453ddd70adbf7-f4a1b2b852ff0340efce",
+              "file": "linkedin-login-test.spec.ts",
+              "line": 22,
+              "column": 7
+            },
+            {
+              "title": "LinkedIn 로그인과 데모 로그인 버튼이 모두 존재하는지 확인",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2914,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-09T04:56:32.922Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1fda6a3453ddd70adbf7-33a6c21d97294f4b4efa",
+              "file": "linkedin-login-test.spec.ts",
+              "line": 53,
+              "column": 7
+            },
+            {
+              "title": "LinkedIn 로그인 버튼 스타일 확인",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2913,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "LinkedIn 버튼 배경색: rgb(0, 119, 181)\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-09T04:56:32.932Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1fda6a3453ddd70adbf7-ee59f082955a43815e49",
+              "file": "linkedin-login-test.spec.ts",
               "line": 71,
               "column": 7
             }
@@ -165,9 +272,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-09-01T04:25:23.552Z",
-    "duration": 32759.971,
-    "expected": 0,
+    "startTime": "2025-09-09T04:56:30.194Z",
+    "duration": 7783.804,
+    "expected": 3,
     "skipped": 0,
     "unexpected": 1,
     "flaky": 0

@@ -1,91 +1,54 @@
-<testsuites id="" name="" tests="1" failures="1" skipped="0" errors="0" time="32.759971">
-<testsuite name="demo-login-flow.spec.ts" timestamp="2025-09-01T04:25:24.515Z" hostname="chromium" tests="1" failures="1" skipped="0" time="30.644" errors="0">
-<testcase name="데모 로그인 전체 플로우 테스트 › 3. 데모 로그인 상태에서 질문 작성 및 등록" classname="demo-login-flow.spec.ts" time="30.644">
-<failure message="demo-login-flow.spec.ts:71:7 3. 데모 로그인 상태에서 질문 작성 및 등록" type="FAILURE">
-<![CDATA[  [chromium] › demo-login-flow.spec.ts:71:7 › 데모 로그인 전체 플로우 테스트 › 3. 데모 로그인 상태에서 질문 작성 및 등록 ────────
+<testsuites id="" name="" tests="4" failures="1" skipped="0" errors="0" time="7.783804">
+<testsuite name="linkedin-login-test.spec.ts" timestamp="2025-09-09T04:56:32.630Z" hostname="chromium" tests="4" failures="1" skipped="0" time="12.65" errors="0">
+<testcase name="LinkedIn 로그인 테스트 › LinkedIn 로그인 버튼이 존재하고 클릭 가능한지 확인" classname="linkedin-login-test.spec.ts" time="2.909">
+</testcase>
+<testcase name="LinkedIn 로그인 테스트 › LinkedIn 로그인 버튼 클릭 시 로딩 상태 확인" classname="linkedin-login-test.spec.ts" time="3.914">
+<failure message="linkedin-login-test.spec.ts:22:7 LinkedIn 로그인 버튼 클릭 시 로딩 상태 확인" type="FAILURE">
+<![CDATA[  [chromium] › linkedin-login-test.spec.ts:22:7 › LinkedIn 로그인 테스트 › LinkedIn 로그인 버튼 클릭 시 로딩 상태 확인 ─
 
-    Test timeout of 30000ms exceeded.
+    Error: expect(received).toBeGreaterThan(expected)
 
-    Error: page.screenshot: Target page, context or browser has been closed
+    Expected: > 0
+    Received:   0
 
-      132 |       console.error('테스트 실패:', error)
-      133 |       // 실패 시 스크린샷 저장
-    > 134 |       await page.screenshot({ path: 'test-failure.png' })
-          |                  ^
-      135 |       throw error
-      136 |     }
-      137 |   })
-        at /Users/kakaogames/mento/tests/demo-login-flow.spec.ts:134:18
+      48 |     
+      49 |     // LinkedIn 관련 로그가 있는지 확인
+    > 50 |     expect(consoleLogs.length).toBeGreaterThan(0)
+         |                                ^
+      51 |   })
+      52 |
+      53 |   test('LinkedIn 로그인과 데모 로그인 버튼이 모두 존재하는지 확인', async ({ page }) => {
+        at /Users/kakaogames/mento/tests/linkedin-login-test.spec.ts:50:32
 
     attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    ../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/test-failed-1.png
+    ../test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/test-failed-1.png
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
     attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
-    ../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/video.webm
+    ../test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/video.webm
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-    Error Context: ../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/error-context.md
+    Error Context: ../test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/error-context.md
 ]]>
 </failure>
 <system-out>
-<![CDATA[🚀 질문 작성 및 등록 테스트 시작
-✅ 1. 로그인 페이지 접근 완료
+<![CDATA[현재 URL: https://www.linkedin.com/oauth/v2/authorization?client_id=869opboyzlkrhb&scope=openid%20profile%20email&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fcallback%2Flinkedin&state=-JHjeKuEBKHq6AtpkGavzh0z0y5nCS-z3XIk3NhHj0c
 
-[[ATTACHMENT|../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/test-failed-1.png]]
+[[ATTACHMENT|../test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/test-failed-1.png]]
 
-[[ATTACHMENT|../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/video.webm]]
+[[ATTACHMENT|../test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/video.webm]]
 
-[[ATTACHMENT|../test-results/demo-login-flow-데모-로그인-전체-플로우-테스트-3-데모-로그인-상태에서-질문-작성-및-등록-chromium/error-context.md]]
+[[ATTACHMENT|../test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/error-context.md]]
 ]]>
 </system-out>
-<system-err>
-<![CDATA[테스트 실패: locator.click: Test timeout of 30000ms exceeded.
-Call log:
-[2m  - waiting for locator('text=데모로 로그인')[22m
-
-    at [90m/Users/kakaogames/mento/[39mtests/demo-login-flow.spec.ts:81:24 {
-  [32mSymbol(step)[39m: {
-    location: {
-      file: [32m'/Users/kakaogames/mento/tests/demo-login-flow.spec.ts'[39m,
-      line: [33m81[39m,
-      column: [33m24[39m
-    },
-    category: [32m'pw:api'[39m,
-    title: [32m"Click locator('text=데모로 로그인')"[39m,
-    apiName: [32m'locator.click'[39m,
-    params: { selector: [32m'text=데모로 로그인'[39m, strict: [33mtrue[39m, timeout: [33m0[39m },
-    group: [90mundefined[39m,
-    stepId: [32m'pw:api@35'[39m,
-    boxedStack: [90mundefined[39m,
-    steps: [],
-    attachmentIndices: [],
-    info: TestStepInfoImpl {
-      annotations: [],
-      _testInfo: [36m[TestInfoImpl][39m,
-      _stepId: [32m'pw:api@35'[39m,
-      _title: [32m"Click locator('text=데모로 로그인')"[39m,
-      _parentStep: [90mundefined[39m,
-      skip: [36m[Function (anonymous)][39m
-    },
-    recoverFromStepError: [36m[AsyncFunction: recoverFromStepError][39m,
-    complete: [36m[Function: complete][39m,
-    endWallTime: [33m1756700755612[39m,
-    error: {
-      message: [32m'Error: locator.click: Test timeout of 30000ms exceeded.\n'[39m +
-        [32m'Call log:\n'[39m +
-        [32m"\x1B[2m  - waiting for locator('text=데모로 로그인')\x1B[22m\n"[39m,
-      stack: [32m'Error: locator.click: Test timeout of 30000ms exceeded.\n'[39m +
-        [32m'Call log:\n'[39m +
-        [32m"\x1B[2m  - waiting for locator('text=데모로 로그인')\x1B[22m\n"[39m +
-        [32m'\n'[39m +
-        [32m'    at /Users/kakaogames/mento/tests/demo-login-flow.spec.ts:81:24'[39m,
-      cause: [90mundefined[39m
-    }
-  }
-}
+</testcase>
+<testcase name="LinkedIn 로그인 테스트 › LinkedIn 로그인과 데모 로그인 버튼이 모두 존재하는지 확인" classname="linkedin-login-test.spec.ts" time="2.914">
+</testcase>
+<testcase name="LinkedIn 로그인 테스트 › LinkedIn 로그인 버튼 스타일 확인" classname="linkedin-login-test.spec.ts" time="2.913">
+<system-out>
+<![CDATA[LinkedIn 버튼 배경색: rgb(0, 119, 181)
 ]]>
-</system-err>
+</system-out>
 </testcase>
 </testsuite>
 </testsuites>
