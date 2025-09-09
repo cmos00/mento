@@ -1,0 +1,63 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - img [ref=e8]
+          - generic [ref=e10]: CareerTalk
+        - generic [ref=e11]:
+          - link "로그인" [ref=e12] [cursor=pointer]:
+            - /url: /auth/login
+            - button "로그인" [ref=e13] [cursor=pointer]
+          - link "시작하기" [ref=e14] [cursor=pointer]:
+            - /url: /auth/login
+            - button "시작하기" [ref=e15] [cursor=pointer]
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - img [ref=e19]
+        - generic [ref=e21]: 믿을 수 있는 커리어 멘토링
+      - heading "내 고민을 진지하게 들어주는 진짜 커리어 멘토" [level=1] [ref=e22]:
+        - text: 내 고민을 진지하게 들어주는
+        - generic [ref=e23]: 진짜 커리어 멘토
+      - paragraph [ref=e24]:
+        - text: 익명으로 안전하게, 하지만 신뢰할 수 있는 시니어들에게
+        - text: 커리어 고민에 대한 진정성 있는 조언을 받아보세요 ✨
+      - generic [ref=e25]:
+        - link "무료로 시작하기" [ref=e26] [cursor=pointer]:
+          - /url: /auth/login
+          - button "무료로 시작하기" [ref=e27] [cursor=pointer]:
+            - text: 무료로 시작하기
+            - img [ref=e28] [cursor=pointer]
+        - link "질문 둘러보기" [ref=e30] [cursor=pointer]:
+          - /url: /questions
+          - button "질문 둘러보기" [ref=e31] [cursor=pointer]
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - heading "왜 CareerTalk일까요?" [level=2] [ref=e34]
+        - paragraph [ref=e35]: 기존 커뮤니티와는 다른 차별화된 가치를 제공해요
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - img [ref=e39]
+          - heading "신뢰할 수 있는 멘토" [level=3] [ref=e41]
+          - paragraph [ref=e42]: LinkedIn 연동을 통한 검증된 경력과 후기 기반의 신뢰도 시스템
+        - generic [ref=e43]:
+          - img [ref=e45]
+          - heading "24시간 언제든" [level=3] [ref=e48]
+          - paragraph [ref=e49]: 비동기 방식으로 언제든 질문하고 답변받을 수 있어요
+        - generic [ref=e50]:
+          - img [ref=e52]
+          - heading "익명으로 안전하게" [level=3] [ref=e54]
+          - paragraph [ref=e55]: 개인정보 노출 없이 솔직한 고민을 나눌 수 있어요
+    - generic [ref=e57]:
+      - heading "지금 바로 시작해보세요" [level=2] [ref=e58]
+      - paragraph [ref=e59]: 수많은 멘토들이 여러분의 커리어 성장을 기다리고 있어요
+      - link "무료로 가입하기" [ref=e60] [cursor=pointer]:
+        - /url: /auth/login
+        - button "무료로 가입하기" [ref=e61] [cursor=pointer]:
+          - text: 무료로 가입하기
+          - img [ref=e62] [cursor=pointer]
+  - alert [ref=e64]
+```

@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 4
+      "actualWorkers": 5
     },
     "preserveOutput": "always",
     "reporter": [
@@ -43,7 +43,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 4
+          "actualWorkers": 5
         },
         "id": "chromium",
         "name": "chromium",
@@ -69,20 +69,20 @@
   },
   "suites": [
     {
-      "title": "linkedin-login-test.spec.ts",
-      "file": "linkedin-login-test.spec.ts",
+      "title": "linkedin-production-test.spec.ts",
+      "file": "linkedin-production-test.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "LinkedIn 로그인 테스트",
-          "file": "linkedin-login-test.spec.ts",
+          "title": "LinkedIn 로그인 프로덕션 환경 테스트",
+          "file": "linkedin-production-test.spec.ts",
           "line": 3,
           "column": 6,
           "specs": [
             {
-              "title": "LinkedIn 로그인 버튼이 존재하고 클릭 가능한지 확인",
+              "title": "실제 서버에서 LinkedIn 로그인 버튼 확인",
               "ok": true,
               "tags": [],
               "tests": [
@@ -97,12 +97,16 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2909,
+                      "duration": 4732,
                       "errors": [],
-                      "stdout": [],
+                      "stdout": [
+                        {
+                          "text": "✅ 실제 서버에서 LinkedIn 로그인 버튼 확인됨\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-09T04:56:32.921Z",
+                      "startTime": "2025-09-09T10:33:22.059Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -110,14 +114,14 @@
                   "status": "expected"
                 }
               ],
-              "id": "1fda6a3453ddd70adbf7-6d74075c6595d0392831",
-              "file": "linkedin-login-test.spec.ts",
+              "id": "6138fa778e4078b214d3-f2c105fa5186224fbd12",
+              "file": "linkedin-production-test.spec.ts",
               "line": 4,
               "column": 7
             },
             {
-              "title": "LinkedIn 로그인 버튼 클릭 시 로딩 상태 확인",
-              "ok": false,
+              "title": "실제 서버에서 LinkedIn OAuth 플로우 테스트",
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -130,72 +134,38 @@
                     {
                       "workerIndex": 1,
                       "parallelIndex": 1,
-                      "status": "failed",
-                      "duration": 3914,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at /Users/kakaogames/mento/tests/linkedin-login-test.spec.ts:50:32",
-                        "location": {
-                          "file": "/Users/kakaogames/mento/tests/linkedin-login-test.spec.ts",
-                          "column": 32,
-                          "line": 50
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 48 |\u001b[39m     \n \u001b[90m 49 |\u001b[39m     \u001b[90m// LinkedIn 관련 로그가 있는지 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 50 |\u001b[39m     expect(consoleLogs\u001b[33m.\u001b[39mlength)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m0\u001b[39m)\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 51 |\u001b[39m   })\n \u001b[90m 52 |\u001b[39m\n \u001b[90m 53 |\u001b[39m   test(\u001b[32m'LinkedIn 로그인과 데모 로그인 버튼이 모두 존재하는지 확인'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/kakaogames/mento/tests/linkedin-login-test.spec.ts",
-                            "column": 32,
-                            "line": 50
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n\u001b[0m \u001b[90m 48 |\u001b[39m     \n \u001b[90m 49 |\u001b[39m     \u001b[90m// LinkedIn 관련 로그가 있는지 확인\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 50 |\u001b[39m     expect(consoleLogs\u001b[33m.\u001b[39mlength)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m0\u001b[39m)\n \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 51 |\u001b[39m   })\n \u001b[90m 52 |\u001b[39m\n \u001b[90m 53 |\u001b[39m   test(\u001b[32m'LinkedIn 로그인과 데모 로그인 버튼이 모두 존재하는지 확인'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\u001b[0m\n\u001b[2m    at /Users/kakaogames/mento/tests/linkedin-login-test.spec.ts:50:32\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 7778,
+                      "errors": [],
                       "stdout": [
                         {
-                          "text": "현재 URL: https://www.linkedin.com/oauth/v2/authorization?client_id=869opboyzlkrhb&scope=openid%20profile%20email&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fcallback%2Flinkedin&state=-JHjeKuEBKHq6AtpkGavzh0z0y5nCS-z3XIk3NhHj0c\n"
+                          "text": "현재 URL: https://www.linkedin.com/uas/login?session_redirect=%2Foauth%2Fv2%2Flogin-success%3Fapp_id%3D225094268%26auth_type%3DAC%26flow%3D%257B%2522state%2522%253A%25224gfshvVA086BUkbQRFDiqEM80VrwupdSjLEMy1gHk1g%2522%252C%2522creationTime%2522%253A1757414008154%252C%2522appId%2522%253A225094268%252C%2522scope%2522%253A%2522openid%2Bprofile%2Bemail%2522%252C%2522authorizationType%2522%253A%2522OAUTH2_AUTHORIZATION_CODE%2522%252C%2522redirectUri%2522%253A%2522https%253A%252F%252Fmento-five.vercel.app%252Fapi%252Fauth%252Fcallback%252Flinkedin%2522%252C%2522currentStage%2522%253A%2522LOGIN_SUCCESS%2522%252C%2522currentSubStage%2522%253A0%252C%2522authFlowName%2522%253A%2522generic-permission-list%2522%257D&fromSignIn=1&trk=oauth&cancel_redirect=%2Foauth%2Fv2%2Flogin-cancel%3Fapp_id%3D225094268%26auth_type%3DAC%26flow%3D%257B%2522state%2522%253A%25224gfshvVA086BUkbQRFDiqEM80VrwupdSjLEMy1gHk1g%2522%252C%2522creationTime%2522%253A1757414008154%252C%2522appId%2522%253A225094268%252C%2522scope%2522%253A%2522openid%2Bprofile%2Bemail%2522%252C%2522authorizationType%2522%253A%2522OAUTH2_AUTHORIZATION_CODE%2522%252C%2522redirectUri%2522%253A%2522https%253A%252F%252Fmento-five.vercel.app%252Fapi%252Fauth%252Fcallback%252Flinkedin%2522%252C%2522currentStage%2522%253A%2522LOGIN_SUCCESS%2522%252C%2522currentSubStage%2522%253A0%252C%2522authFlowName%2522%253A%2522generic-permission-list%2522%257D\n"
+                        },
+                        {
+                          "text": "❌ LinkedIn OAuth 페이지로 리다이렉트되지 않음\n"
+                        },
+                        {
+                          "text": "현재 URL: https://www.linkedin.com/uas/login?session_redirect=%2Foauth%2Fv2%2Flogin-success%3Fapp_id%3D225094268%26auth_type%3DAC%26flow%3D%257B%2522state%2522%253A%25224gfshvVA086BUkbQRFDiqEM80VrwupdSjLEMy1gHk1g%2522%252C%2522creationTime%2522%253A1757414008154%252C%2522appId%2522%253A225094268%252C%2522scope%2522%253A%2522openid%2Bprofile%2Bemail%2522%252C%2522authorizationType%2522%253A%2522OAUTH2_AUTHORIZATION_CODE%2522%252C%2522redirectUri%2522%253A%2522https%253A%252F%252Fmento-five.vercel.app%252Fapi%252Fauth%252Fcallback%252Flinkedin%2522%252C%2522currentStage%2522%253A%2522LOGIN_SUCCESS%2522%252C%2522currentSubStage%2522%253A0%252C%2522authFlowName%2522%253A%2522generic-permission-list%2522%257D&fromSignIn=1&trk=oauth&cancel_redirect=%2Foauth%2Fv2%2Flogin-cancel%3Fapp_id%3D225094268%26auth_type%3DAC%26flow%3D%257B%2522state%2522%253A%25224gfshvVA086BUkbQRFDiqEM80VrwupdSjLEMy1gHk1g%2522%252C%2522creationTime%2522%253A1757414008154%252C%2522appId%2522%253A225094268%252C%2522scope%2522%253A%2522openid%2Bprofile%2Bemail%2522%252C%2522authorizationType%2522%253A%2522OAUTH2_AUTHORIZATION_CODE%2522%252C%2522redirectUri%2522%253A%2522https%253A%252F%252Fmento-five.vercel.app%252Fapi%252Fauth%252Fcallback%252Flinkedin%2522%252C%2522currentStage%2522%253A%2522LOGIN_SUCCESS%2522%252C%2522currentSubStage%2522%253A0%252C%2522authFlowName%2522%253A%2522generic-permission-list%2522%257D\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-09T04:56:32.922Z",
+                      "startTime": "2025-09-09T10:33:22.056Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/Users/kakaogames/mento/test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/Users/kakaogames/mento/test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/kakaogames/mento/test-results/linkedin-login-test-Linked-fd46f-nkedIn-로그인-버튼-클릭-시-로딩-상태-확인-chromium/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/kakaogames/mento/tests/linkedin-login-test.spec.ts",
-                        "column": 32,
-                        "line": 50
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
-              "id": "1fda6a3453ddd70adbf7-f4a1b2b852ff0340efce",
-              "file": "linkedin-login-test.spec.ts",
-              "line": 22,
+              "id": "6138fa778e4078b214d3-23538ef066e267ea9ac0",
+              "file": "linkedin-production-test.spec.ts",
+              "line": 17,
               "column": 7
             },
             {
-              "title": "LinkedIn 로그인과 데모 로그인 버튼이 모두 존재하는지 확인",
-              "ok": true,
+              "title": "실제 서버에서 홈페이지 로그인/로그아웃 버튼 확인",
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -208,27 +178,71 @@
                     {
                       "workerIndex": 2,
                       "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 2914,
-                      "errors": [],
-                      "stdout": [],
+                      "status": "failed",
+                      "duration": 1949,
+                      "error": {
+                        "message": "Error: expect.toBeVisible: Error: strict mode violation: locator('button:has-text(\"시작하기\")') resolved to 2 elements:\n    1) <button class=\"bg-white text-purple-600 hover:bg-white/90 rounded-full px-6 py-2 font-medium transition-colors\">시작하기</button> aka getByRole('button', { name: '시작하기', exact: true })\n    2) <button class=\"bg-white text-purple-600 hover:bg-white/90 rounded-full px-8 py-4 text-lg font-semibold shadow-lg transition-colors\">…</button> aka getByRole('button', { name: '무료로 시작하기' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"시작하기\")')\u001b[22m\n",
+                        "stack": "Error: expect.toBeVisible: Error: strict mode violation: locator('button:has-text(\"시작하기\")') resolved to 2 elements:\n    1) <button class=\"bg-white text-purple-600 hover:bg-white/90 rounded-full px-6 py-2 font-medium transition-colors\">시작하기</button> aka getByRole('button', { name: '시작하기', exact: true })\n    2) <button class=\"bg-white text-purple-600 hover:bg-white/90 rounded-full px-8 py-4 text-lg font-semibold shadow-lg transition-colors\">…</button> aka getByRole('button', { name: '무료로 시작하기' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"시작하기\")')\u001b[22m\n\n    at /Users/kakaogames/mento/tests/linkedin-production-test.spec.ts:81:31",
+                        "location": {
+                          "file": "/Users/kakaogames/mento/tests/linkedin-production-test.spec.ts",
+                          "column": 31,
+                          "line": 81
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 79 |\u001b[39m     \u001b[90m// 시작하기 버튼도 확인\u001b[39m\n \u001b[90m 80 |\u001b[39m     \u001b[36mconst\u001b[39m startButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"시작하기\")'\u001b[39m)\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 81 |\u001b[39m     \u001b[36mawait\u001b[39m expect(startButton)\u001b[33m.\u001b[39mtoBeVisible()\n \u001b[90m    |\u001b[39m                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 82 |\u001b[39m     \n \u001b[90m 83 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m'✅ 실제 서버 홈페이지에서 시작하기 버튼 확인됨'\u001b[39m)\n \u001b[90m 84 |\u001b[39m   })\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/kakaogames/mento/tests/linkedin-production-test.spec.ts",
+                            "column": 31,
+                            "line": 81
+                          },
+                          "message": "Error: expect.toBeVisible: Error: strict mode violation: locator('button:has-text(\"시작하기\")') resolved to 2 elements:\n    1) <button class=\"bg-white text-purple-600 hover:bg-white/90 rounded-full px-6 py-2 font-medium transition-colors\">시작하기</button> aka getByRole('button', { name: '시작하기', exact: true })\n    2) <button class=\"bg-white text-purple-600 hover:bg-white/90 rounded-full px-8 py-4 text-lg font-semibold shadow-lg transition-colors\">…</button> aka getByRole('button', { name: '무료로 시작하기' })\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('button:has-text(\"시작하기\")')\u001b[22m\n\n\n\u001b[0m \u001b[90m 79 |\u001b[39m     \u001b[90m// 시작하기 버튼도 확인\u001b[39m\n \u001b[90m 80 |\u001b[39m     \u001b[36mconst\u001b[39m startButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'button:has-text(\"시작하기\")'\u001b[39m)\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 81 |\u001b[39m     \u001b[36mawait\u001b[39m expect(startButton)\u001b[33m.\u001b[39mtoBeVisible()\n \u001b[90m    |\u001b[39m                               \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 82 |\u001b[39m     \n \u001b[90m 83 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m'✅ 실제 서버 홈페이지에서 시작하기 버튼 확인됨'\u001b[39m)\n \u001b[90m 84 |\u001b[39m   })\u001b[0m\n\u001b[2m    at /Users/kakaogames/mento/tests/linkedin-production-test.spec.ts:81:31\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "✅ 실제 서버 홈페이지에서 로그인 버튼 확인됨\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-09T04:56:32.922Z",
+                      "startTime": "2025-09-09T10:33:22.056Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/kakaogames/mento/test-results/linkedin-production-test-L-4a5dc-실제-서버에서-홈페이지-로그인-로그아웃-버튼-확인-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/kakaogames/mento/test-results/linkedin-production-test-L-4a5dc-실제-서버에서-홈페이지-로그인-로그아웃-버튼-확인-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/kakaogames/mento/test-results/linkedin-production-test-L-4a5dc-실제-서버에서-홈페이지-로그인-로그아웃-버튼-확인-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/kakaogames/mento/tests/linkedin-production-test.spec.ts",
+                        "column": 31,
+                        "line": 81
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
-              "id": "1fda6a3453ddd70adbf7-33a6c21d97294f4b4efa",
-              "file": "linkedin-login-test.spec.ts",
-              "line": 53,
+              "id": "6138fa778e4078b214d3-b66b6f55ee0159e94824",
+              "file": "linkedin-production-test.spec.ts",
+              "line": 68,
               "column": 7
             },
             {
-              "title": "LinkedIn 로그인 버튼 스타일 확인",
+              "title": "실제 서버에서 데모 로그인 테스트",
               "ok": true,
               "tags": [],
               "tests": [
@@ -243,16 +257,19 @@
                       "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 2913,
+                      "duration": 3388,
                       "errors": [],
                       "stdout": [
                         {
-                          "text": "LinkedIn 버튼 배경색: rgb(0, 119, 181)\n"
+                          "text": "데모 로그인 후 URL: https://mento-five.vercel.app/questions\n"
+                        },
+                        {
+                          "text": "✅ 실제 서버에서 데모 로그인 성공 및 질문 페이지 리다이렉트 확인됨\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-09-09T04:56:32.932Z",
+                      "startTime": "2025-09-09T10:33:22.052Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -260,9 +277,88 @@
                   "status": "expected"
                 }
               ],
-              "id": "1fda6a3453ddd70adbf7-ee59f082955a43815e49",
-              "file": "linkedin-login-test.spec.ts",
-              "line": 71,
+              "id": "6138fa778e4078b214d3-b7544b0c8b4f60b127ce",
+              "file": "linkedin-production-test.spec.ts",
+              "line": 86,
+              "column": 7
+            },
+            {
+              "title": "실제 서버에서 LinkedIn 로그인 버튼 스타일링 확인",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 4728,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "실제 서버 LinkedIn 버튼 배경색: rgb(0, 119, 181)\n"
+                        },
+                        {
+                          "text": "✅ 실제 서버에서 LinkedIn 버튼 스타일링 확인됨\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-09T10:33:22.054Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6138fa778e4078b214d3-a7506a6484bdf50cf0b8",
+              "file": "linkedin-production-test.spec.ts",
+              "line": 109,
+              "column": 7
+            },
+            {
+              "title": "실제 서버에서 환경 변수 설정 확인",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 4384,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "❌ LinkedIn OAuth 페이지로 리다이렉트되지 않음\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-09T10:33:24.970Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "6138fa778e4078b214d3-5dfb83d1c6b83f1d1bfd",
+              "file": "linkedin-production-test.spec.ts",
+              "line": 134,
               "column": 7
             }
           ]
@@ -272,9 +368,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-09-09T04:56:30.194Z",
-    "duration": 7783.804,
-    "expected": 3,
+    "startTime": "2025-09-09T10:33:21.580Z",
+    "duration": 8939.715,
+    "expected": 5,
     "skipped": 0,
     "unexpected": 1,
     "flaky": 0

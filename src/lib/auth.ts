@@ -116,6 +116,10 @@ export const authOptions: NextAuthOptions = {
         
         if (account.provider === 'linkedin') {
           token.provider = 'linkedin'
+          // LinkedIn 사용자 정보를 토큰에 저장
+          token.name = user.name
+          token.email = user.email
+          token.image = user.image
           console.log('✅ [LinkedIn] LinkedIn 사용자 토큰 설정')
         }
       }
@@ -139,6 +143,10 @@ export const authOptions: NextAuthOptions = {
         
         if (token.provider === 'linkedin') {
           (session.user as any).provider = 'linkedin'
+          // LinkedIn 사용자 정보를 세션에 저장
+          session.user.name = token.name as string
+          session.user.email = token.email as string
+          session.user.image = token.image as string
           console.log('✅ [LinkedIn] LinkedIn 사용자 세션 설정')
         }
       }
