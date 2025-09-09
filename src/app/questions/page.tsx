@@ -155,6 +155,11 @@ export default function QuestionsPage() {
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <h1 className="text-xl font-bold text-gray-900">질문 & 답변</h1>
+            {status === 'authenticated' && (
+              <div className="text-sm text-gray-600">
+                {session?.user?.name || session?.user?.email || '사용자'}님
+              </div>
+            )}
             <button
               onClick={loadQuestions}
               disabled={loading}

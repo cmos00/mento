@@ -146,10 +146,10 @@ export const authOptions: NextAuthOptions = {
       console.log('🔗 URL:', url)
       console.log('🏠 Base URL:', baseUrl)
       
-      // 로그인 성공 후 질문 목록 페이지로 리다이렉트
+      // 로그인 성공 후 메인페이지로 리다이렉트
       if (url === baseUrl || url.startsWith(baseUrl + '/auth/') || url.includes('/api/auth/')) {
-        const redirectUrl = baseUrl + '/questions'
-        console.log('✅ 질문 목록 페이지로 리다이렉트:', redirectUrl)
+        const redirectUrl = baseUrl + '/'
+        console.log('✅ 메인페이지로 리다이렉트:', redirectUrl)
         return redirectUrl
       }
       

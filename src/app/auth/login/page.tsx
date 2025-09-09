@@ -27,7 +27,7 @@ export default function LoginPage() {
       // LinkedIn OAuth를 통한 실제 로그인
       // OAuth 플로우이므로 redirect: true로 설정
       await signIn('linkedin', {
-        callbackUrl: '/questions',
+        callbackUrl: '/',
         redirect: true
       })
       
@@ -61,9 +61,9 @@ export default function LoginPage() {
         alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
         setIsLoading(false)
       } else if (result?.ok) {
-        console.log('✅ 데모 로그인 성공, 질문 목록으로 이동...')
+        console.log('✅ 데모 로그인 성공, 메인페이지로 이동...')
         // 수동으로 리다이렉트
-        router.push('/questions')
+        router.push('/')
       } else {
         console.log('❓ 예상치 못한 결과:', result)
         setIsLoading(false)

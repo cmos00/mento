@@ -25,6 +25,10 @@ export default function HomePage() {
           <div className="flex items-center space-x-3">
             {status === 'authenticated' ? (
               <>
+                {/* 사용자 정보 표시 */}
+                <div className="text-white text-sm">
+                  안녕하세요, {session?.user?.name || session?.user?.email || '사용자'}님!
+                </div>
                 <button 
                   onClick={handleLogout}
                   className="text-white hover:bg-white/20 px-4 py-2 rounded-lg transition-colors"
