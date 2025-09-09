@@ -1,8 +1,8 @@
 'use client'
 
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 function AuthErrorContent() {
   const searchParams = useSearchParams()
@@ -14,6 +14,7 @@ function AuthErrorContent() {
       case 'Callback':
         return '로그인 중 문제가 발생했습니다. 다시 시도해주세요.'
       case 'OAuthCallback':
+        alert('ddd');
         return 'LinkedIn 인증 과정에서 오류가 발생했습니다. 브라우저 콘솔을 확인하거나 다시 시도해주세요.'
       default:
         return '인증 과정에서 오류가 발생했습니다.'
