@@ -149,13 +149,6 @@ export default function LoginPage() {
                 </>
               )}
             </button>
-
-            <div className="text-center text-sm text-gray-600">
-              아직 계정이 없으신가요?{" "}
-              <Link href="/auth/signup" className="text-purple-600 hover:underline font-medium">
-                회원가입
-              </Link>
-            </div>
           </div>
         </div>
       </div>
