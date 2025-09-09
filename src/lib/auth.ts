@@ -180,26 +180,38 @@ export const authOptions: NextAuthOptions = {
       console.log('🔑 Account:', JSON.stringify(account, null, 2))
       console.log('📋 Profile:', JSON.stringify(profile, null, 2))
       
-      if (account && user) {
-        console.log('✅ [Auth Debug] Account와 User 모두 존재')
-        token.id = user.id
-        
-        if ((user as any).isDemo) {
-          token.isDemo = true
+      try {
+        if (account && user) {
+          console.log('✅ [Auth Debug] Account와 User 모두 존재')
+          token.id = user.id
+          
+          if ((user as any).isDemo) {
+            token.isDemo = true
+            console.log('✅ [Demo] 데모 사용자 토큰 설정')
+          }
+          
+          if (account.provider === 'linkedin') {
+            token.provider = 'linkedin'
+            // LinkedIn 사용자 정보를 토큰에 저장
+            token.name = user.name || 'LinkedIn 사용자'
+            token.email = user.email || `${user.id}@linkedin.local`
+            token.image = user.image || null
+            console.log('✅ [LinkedIn] LinkedIn 사용자 토큰 설정:', {
+              name: token.name,
+              email: token.email,
+              image: token.image
+            })
+          }
+        } else {
+          console.log('⚠️ [Auth Debug] Account 또는 User가 없음')
         }
         
-        if (account.provider === 'linkedin') {
-          token.provider = 'linkedin'
-          // LinkedIn 사용자 정보를 토큰에 저장
-          token.name = user.name
-          token.email = user.email
-          token.image = user.image
-          console.log('✅ [LinkedIn] LinkedIn 사용자 토큰 설정')
-        }
+        console.log('🎫 [Auth Debug] JWT 콜백 완료 - 최종 토큰:', JSON.stringify(token, null, 2))
+        return token
+      } catch (error) {
+        console.error('❌ [Auth Debug] JWT 콜백 오류:', error)
+        return token
       }
-      
-      console.log('🎫 [Auth Debug] JWT 콜백 완료')
-      return token
     },
     
     async session({ session, user, token }) {
@@ -208,25 +220,37 @@ export const authOptions: NextAuthOptions = {
       console.log('👤 User:', JSON.stringify(user, null, 2))
       console.log('🎫 Token:', JSON.stringify(token, null, 2))
       
-      if (session.user) {
-        session.user.id = token.id as string
-        
-        if (token.isDemo) {
-          (session.user as any).isDemo = true
+      try {
+        if (session.user) {
+          session.user.id = token.id as string
+          
+          if (token.isDemo) {
+            (session.user as any).isDemo = true
+            console.log('✅ [Demo] 데모 사용자 세션 설정')
+          }
+          
+          if (token.provider === 'linkedin') {
+            (session.user as any).provider = 'linkedin'
+            // LinkedIn 사용자 정보를 세션에 저장
+            session.user.name = token.name as string || 'LinkedIn 사용자'
+            session.user.email = token.email as string || `${token.id}@linkedin.local`
+            session.user.image = token.image as string || null
+            console.log('✅ [LinkedIn] LinkedIn 사용자 세션 설정:', {
+              name: session.user.name,
+              email: session.user.email,
+              image: session.user.image
+            })
+          }
+        } else {
+          console.log('⚠️ [Auth Debug] Session.user가 없음')
         }
         
-        if (token.provider === 'linkedin') {
-          (session.user as any).provider = 'linkedin'
-          // LinkedIn 사용자 정보를 세션에 저장
-          session.user.name = token.name as string
-          session.user.email = token.email as string
-          session.user.image = token.image as string
-          console.log('✅ [LinkedIn] LinkedIn 사용자 세션 설정')
-        }
+        console.log('🔄 [Auth Debug] Session 콜백 완료 - 최종 세션:', JSON.stringify(session, null, 2))
+        return session
+      } catch (error) {
+        console.error('❌ [Auth Debug] Session 콜백 오류:', error)
+        return session
       }
-      
-      console.log('🔄 [Auth Debug] Session 콜백 완료')
-      return session
     }
   },
   
