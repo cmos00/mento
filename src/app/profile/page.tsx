@@ -25,6 +25,10 @@ export default function ProfilePage() {
   const { data: session, status } = useSession()
   const [activeTab, setActiveTab] = useState('overview')
   const user = session?.user
+  
+  // LinkedIn 사용자와 데모 사용자 구분
+  const isLinkedInUser = (user as any)?.provider === 'linkedin'
+  const isDemoUser = (user as any)?.isDemo === true
 
   const userStats = {
     questionsAsked: 12,
@@ -138,12 +142,35 @@ export default function ProfilePage() {
           {/* Profile Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white/90 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 text-center mb-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 ring-4 ring-purple-200">
-                {user.name?.charAt(0) || 'U'}
-              </div>
+              {/* 프로필 이미지 */}
+              {isLinkedInUser && user.image ? (
+                <div className="w-20 h-20 rounded-full mx-auto mb-4 ring-4 ring-purple-200 overflow-hidden">
+                  <img 
+                    src={user.image} 
+                    alt={user.name || '프로필'} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 ring-4 ring-purple-200">
+                  {user.name?.charAt(0) || 'U'}
+                </div>
+              )}
+              
+              {/* 사용자 이름 */}
               <h2 className="text-xl font-semibold mb-2 text-gray-800">{user.name || '사용자'}</h2>
+              
+              {/* 이메일 */}
               <p className="text-gray-600 mb-4">{user.email}</p>
-              {(user as any).isDemo && (
+              
+              {/* 계정 타입 표시 */}
+              {isLinkedInUser && (
+                <div className="flex items-center justify-center mb-4">
+                  <div className="w-4 h-4 bg-[#0077b5] rounded mr-2"></div>
+                  <p className="text-sm text-[#0077b5] font-medium">LinkedIn 계정</p>
+                </div>
+              )}
+              {isDemoUser && (
                 <p className="text-sm text-purple-600 mb-4">🎭 데모 계정</p>
               )}
               <div className="flex justify-center space-x-2 mb-4">
@@ -156,8 +183,15 @@ export default function ProfilePage() {
                   도움왕
                 </span>
               </div>
-              <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all">
-                프로필 편집
+              <button 
+                className={`w-full py-2 px-4 rounded-lg font-medium transition-all ${
+                  isLinkedInUser 
+                    ? 'bg-gray-100 text-gray-500 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600'
+                }`}
+                disabled={isLinkedInUser}
+              >
+                {isLinkedInUser ? 'LinkedIn 프로필 연동됨' : '프로필 편집'}
               </button>
             </div>
 
