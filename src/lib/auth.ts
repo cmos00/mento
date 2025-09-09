@@ -21,6 +21,44 @@ export const authOptions: NextAuthOptions = {
           scope: 'openid profile email',
         },
       },
+      profile(profile) {
+        console.log('🔍 [LinkedIn Profile] LinkedIn 프로필 정보:', JSON.stringify(profile, null, 2))
+        
+        try {
+          // LinkedIn OIDC에서 받아오는 사용자 정보 처리
+          const userId = profile.sub || profile.id || `linkedin_${Date.now()}`
+          const userName = profile.name || 
+                          (profile.given_name && profile.family_name ? 
+                            `${profile.given_name} ${profile.family_name}` : 
+                            'LinkedIn 사용자')
+          const userEmail = profile.email || `${userId}@linkedin.local`
+          const userImage = profile.picture || profile.picture_url || null
+          
+          console.log('✅ [LinkedIn Profile] 처리된 사용자 정보:', {
+            id: userId,
+            name: userName,
+            email: userEmail,
+            image: userImage
+          })
+          
+          return {
+            id: userId,
+            name: userName,
+            email: userEmail,
+            image: userImage,
+          }
+        } catch (error) {
+          console.error('❌ [LinkedIn Profile] 프로필 처리 오류:', error)
+          
+          // 기본값으로 폴백
+          return {
+            id: `linkedin_${Date.now()}`,
+            name: 'LinkedIn 사용자',
+            email: `linkedin_${Date.now()}@linkedin.local`,
+            image: null,
+          }
+        }
+      },
     }),
     CredentialsProvider({
       id: 'demo-login',
@@ -73,14 +111,34 @@ export const authOptions: NextAuthOptions = {
       console.log('🔑 Account:', JSON.stringify(account, null, 2))
       console.log('📋 Profile:', JSON.stringify(profile, null, 2))
       
-      if (account?.provider === 'demo-login') {
-        console.log('✅ [Demo] 데모 로그인 확인됨')
-      } else if (account?.provider === 'linkedin') {
-        console.log('✅ [LinkedIn] LinkedIn 로그인 확인됨')
+      try {
+        if (account?.provider === 'demo-login') {
+          console.log('✅ [Demo] 데모 로그인 확인됨')
+          return true
+        } else if (account?.provider === 'linkedin') {
+          console.log('✅ [LinkedIn] LinkedIn 로그인 확인됨')
+          
+          // LinkedIn 사용자 정보 검증
+          if (!user?.email) {
+            console.error('❌ [LinkedIn] 사용자 이메일이 없습니다')
+            return false
+          }
+          
+          if (!user?.name) {
+            console.error('❌ [LinkedIn] 사용자 이름이 없습니다')
+            return false
+          }
+          
+          console.log('✅ [LinkedIn] 사용자 정보 검증 완료')
+          return true
+        }
+        
+        console.log('🔐 [Auth Debug] signIn 콜백 완료')
+        return true
+      } catch (error) {
+        console.error('❌ [Auth Debug] signIn 콜백 오류:', error)
+        return false
       }
-      
-      console.log('🔐 [Auth Debug] signIn 콜백 완료')
-      return true
     },
     
     async redirect({ url, baseUrl }) {
