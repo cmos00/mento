@@ -2,8 +2,15 @@
 
 import Link from "next/link"
 import { MessageCircle, ArrowRight, Shield, Clock, Sparkles, Heart } from "lucide-react"
+import { useSession, signOut } from "next-auth/react"
 
 export default function HomePage() {
+  const { data: session, status } = useSession()
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' })
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-500 via-purple-600 to-pink-500">
       {/* Header */}
@@ -16,16 +23,34 @@ export default function HomePage() {
             <span className="text-2xl font-bold text-white">CareerTalk</span>
           </div>
           <div className="flex items-center space-x-3">
-            <Link href="/auth/login">
-              <button className="text-white hover:bg-white/20 px-4 py-2 rounded-lg transition-colors">
-                로그인
-              </button>
-            </Link>
-            <Link href="/auth/login">
-              <button className="bg-white text-purple-600 hover:bg-white/90 rounded-full px-6 py-2 font-medium transition-colors">
-                시작하기
-              </button>
-            </Link>
+            {status === 'authenticated' ? (
+              <>
+                <button 
+                  onClick={handleLogout}
+                  className="text-white hover:bg-white/20 px-4 py-2 rounded-lg transition-colors"
+                >
+                  로그아웃
+                </button>
+                <Link href="/questions">
+                  <button className="bg-white text-purple-600 hover:bg-white/90 rounded-full px-6 py-2 font-medium transition-colors">
+                    질문하기
+                  </button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/login">
+                  <button className="text-white hover:bg-white/20 px-4 py-2 rounded-lg transition-colors">
+                    로그인
+                  </button>
+                </Link>
+                <Link href="/auth/login">
+                  <button className="bg-white text-purple-600 hover:bg-white/90 rounded-full px-6 py-2 font-medium transition-colors">
+                    시작하기
+                  </button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
