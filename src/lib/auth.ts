@@ -10,6 +10,7 @@ if (!process.env.NEXTAUTH_SECRET) {
 export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/auth/login',
+    error: '/auth/error',
   },
   
   providers: [
@@ -175,6 +176,7 @@ export const authOptions: NextAuthOptions = {
           }
           
           console.log('✅ [LinkedIn] 사용자 정보 검증 완료 - 모든 경우 허용')
+          console.log('✅ [LinkedIn] signIn 콜백에서 true 반환')
           return true
         }
         
@@ -183,6 +185,7 @@ export const authOptions: NextAuthOptions = {
       } catch (error) {
         console.error('❌ [Auth Debug] signIn 콜백 오류:', error)
         console.error('❌ [Auth Debug] 오류 스택:', error instanceof Error ? error.stack : 'No stack')
+        console.error('❌ [Auth Debug] signIn 콜백에서 false 반환')
         return false
       }
     },
