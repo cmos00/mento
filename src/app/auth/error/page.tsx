@@ -7,16 +7,24 @@ import Link from 'next/link'
 function AuthErrorContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
+  const callbackUrl = searchParams.get('callbackUrl')
 
   const getErrorMessage = (error: string | null) => {
     switch (error) {
       case 'Callback':
         return '로그인 중 문제가 발생했습니다. 다시 시도해주세요.'
       case 'OAuthCallback':
-        return '인증 과정에서 오류가 발생했습니다. 다시 시도해주세요.'
+        return 'LinkedIn 인증 과정에서 오류가 발생했습니다. 브라우저 콘솔을 확인하거나 다시 시도해주세요.'
       default:
         return '인증 과정에서 오류가 발생했습니다.'
     }
+  }
+
+  const getErrorDetails = (error: string | null) => {
+    if (error === 'OAuthCallback') {
+      return 'LinkedIn에서 사용자 정보를 가져오는 과정에서 문제가 발생했습니다. 이는 LinkedIn API 응답이나 사용자 정보 처리 중 오류일 수 있습니다.'
+    }
+    return null
   }
 
   return (
@@ -33,9 +41,27 @@ function AuthErrorContent() {
             인증 오류
           </h1>
           
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-4">
             {getErrorMessage(error)}
           </p>
+          
+          {getErrorDetails(error) && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-yellow-800">
+                {getErrorDetails(error)}
+              </p>
+            </div>
+          )}
+          
+          {/* 디버깅 정보 */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">디버깅 정보:</h3>
+            <div className="text-xs text-gray-600 space-y-1">
+              <div>오류 코드: {error || 'N/A'}</div>
+              <div>콜백 URL: {callbackUrl || 'N/A'}</div>
+              <div>타임스탬프: {new Date().toLocaleString()}</div>
+            </div>
+          </div>
           
           <div className="space-y-3">
             <Link 

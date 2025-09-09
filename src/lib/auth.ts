@@ -27,11 +27,21 @@ export const authOptions: NextAuthOptions = {
         try {
           // LinkedIn OIDC에서 받아오는 사용자 정보 처리
           const userId = profile.sub || profile.id || `linkedin_${Date.now()}`
-          const userName = profile.name || 
-                          (profile.given_name && profile.family_name ? 
-                            `${profile.given_name} ${profile.family_name}` : 
-                            'LinkedIn 사용자')
-          const userEmail = profile.email || `${userId}@linkedin.local`
+          
+          // 이름 처리 - 더 안전한 방식
+          let userName = 'LinkedIn 사용자'
+          if (profile.name) {
+            userName = profile.name
+          } else if (profile.given_name || profile.family_name) {
+            userName = `${profile.given_name || ''} ${profile.family_name || ''}`.trim()
+          }
+          
+          // 이메일 처리 - 더 안전한 방식
+          let userEmail = `${userId}@linkedin.local`
+          if (profile.email && typeof profile.email === 'string') {
+            userEmail = profile.email
+          }
+          
           const userImage = profile.picture || profile.picture_url || null
           
           console.log('✅ [LinkedIn Profile] 처리된 사용자 정보:', {
@@ -40,6 +50,11 @@ export const authOptions: NextAuthOptions = {
             email: userEmail,
             image: userImage
           })
+          
+          // 필수 필드 검증
+          if (!userId || !userName || !userEmail) {
+            throw new Error('필수 사용자 정보가 누락되었습니다')
+          }
           
           return {
             id: userId,
@@ -50,11 +65,12 @@ export const authOptions: NextAuthOptions = {
         } catch (error) {
           console.error('❌ [LinkedIn Profile] 프로필 처리 오류:', error)
           
-          // 기본값으로 폴백
+          // 더 안전한 기본값으로 폴백
+          const fallbackId = `linkedin_${Date.now()}`
           return {
-            id: `linkedin_${Date.now()}`,
+            id: fallbackId,
             name: 'LinkedIn 사용자',
-            email: `linkedin_${Date.now()}@linkedin.local`,
+            email: `${fallbackId}@linkedin.local`,
             image: null,
           }
         }
@@ -118,15 +134,15 @@ export const authOptions: NextAuthOptions = {
         } else if (account?.provider === 'linkedin') {
           console.log('✅ [LinkedIn] LinkedIn 로그인 확인됨')
           
-          // LinkedIn 사용자 정보 검증
-          if (!user?.email) {
-            console.error('❌ [LinkedIn] 사용자 이메일이 없습니다')
-            return false
+          // LinkedIn 사용자 정보 검증 - 더 관대한 검증
+          if (!user?.email || user.email.includes('@linkedin.local')) {
+            console.warn('⚠️ [LinkedIn] 사용자 이메일이 없거나 기본값입니다:', user?.email)
+            // 이메일이 없어도 로그인 허용 (프로필 함수에서 처리됨)
           }
           
-          if (!user?.name) {
-            console.error('❌ [LinkedIn] 사용자 이름이 없습니다')
-            return false
+          if (!user?.name || user.name === 'LinkedIn 사용자') {
+            console.warn('⚠️ [LinkedIn] 사용자 이름이 없거나 기본값입니다:', user?.name)
+            // 이름이 없어도 로그인 허용 (프로필 함수에서 처리됨)
           }
           
           console.log('✅ [LinkedIn] 사용자 정보 검증 완료')
