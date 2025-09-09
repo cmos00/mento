@@ -6,7 +6,6 @@ import { Clock, Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Sear
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { signOut } from 'next-auth/react'
 
 export default function QuestionsPage() {
   const { data: session, status } = useSession()
@@ -164,31 +163,21 @@ export default function QuestionsPage() {
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
           </div>
-          <div className="flex items-center space-x-3">
-            {status === 'authenticated' ? (
-              <>
-                <button 
-                  onClick={() => signOut({ callbackUrl: '/' })}
-                  className="text-gray-600 hover:text-red-600 px-3 py-2 rounded-lg transition-colors text-sm"
-                >
-                  로그아웃
-                </button>
-                <Link href="/questions/new">
-                  <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center">
-                    <Plus className="w-4 h-4 mr-2" />
-                    질문 작성
-                  </button>
-                </Link>
-              </>
-            ) : (
-              <Link href="/auth/login">
-                <button className="bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-all flex items-center opacity-60">
-                  <Plus className="w-4 h-4 mr-2" />
-                  로그인 필요
-                </button>
-              </Link>
-            )}
-          </div>
+          {status === 'authenticated' ? (
+            <Link href="/questions/new">
+              <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center">
+                <Plus className="w-4 h-4 mr-2" />
+                질문 작성
+              </button>
+            </Link>
+          ) : (
+            <Link href="/auth/login">
+              <button className="bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-all flex items-center opacity-60">
+                <Plus className="w-4 h-4 mr-2" />
+                로그인 필요
+              </button>
+            </Link>
+          )}
         </div>
       </header>
 
