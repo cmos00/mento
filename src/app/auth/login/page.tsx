@@ -1,7 +1,6 @@
 "use client"
 
 import { MessageCircle, Sparkles, User } from 'lucide-react'
-import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -24,15 +23,13 @@ export default function LoginPage() {
     try {
       console.log('🔗 LinkedIn 로그인 시도 중...')
       
-      // LinkedIn OAuth를 통한 실제 로그인
-      // OAuth 플로우이므로 redirect: true로 설정
-      await signIn('linkedin', {
-        callbackUrl: '/',
-        redirect: true
-      })
+      // LinkedIn OAuth URL 생성
+      const linkedinAuthUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.NEXT_PUBLIC_LINKEDIN_CLIENT_ID}&redirect_uri=${encodeURIComponent(`${window.location.origin}/api/auth/callback/linkedin`)}&scope=openid%20profile%20email&state=${Date.now()}`
       
-      // OAuth 플로우에서는 이 코드가 실행되지 않음 (리다이렉트됨)
-      // 에러는 OAuth 콜백에서 처리됨
+      console.log('🔗 LinkedIn OAuth URL:', linkedinAuthUrl)
+      
+      // LinkedIn OAuth 페이지로 리다이렉트
+      window.location.href = linkedinAuthUrl
       
     } catch (error) {
       console.error('LinkedIn 로그인 예외:', error)
@@ -47,27 +44,24 @@ export default function LoginPage() {
     try {
       console.log('🎭 데모 로그인 시도 중...')
       
-      // NextAuth.js 데모 로그인 (redirect: false로 결과 확인)
-      const result = await signIn('demo-login', {
-        email: 'demo@example.com',
-        name: '데모 사용자',
-        redirect: false
-      })
-      
-      console.log('🔍 데모 로그인 결과:', result)
-      
-      if (result?.error) {
-        console.error('데모 로그인 오류:', result.error)
-        alert('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
-        setIsLoading(false)
-      } else if (result?.ok) {
-        console.log('✅ 데모 로그인 성공, 메인페이지로 이동...')
-        // 수동으로 리다이렉트
-        router.push('/')
-      } else {
-        console.log('❓ 예상치 못한 결과:', result)
-        setIsLoading(false)
+      // 데모 세션 생성
+      const demoSession = {
+        user: {
+          id: 'demo_user_123',
+          name: '김멘티',
+          email: 'demo@example.com',
+          image: null,
+          provider: 'demo'
+        },
+        accessToken: 'demo_token',
+        expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24시간
       }
+      
+      // 세션을 쿠키에 저장
+      document.cookie = `linkedin_session=${JSON.stringify(demoSession)}; path=/; max-age=${24 * 60 * 60}`
+      
+      console.log('✅ 데모 로그인 성공, 메인페이지로 이동...')
+      router.push('/')
       
     } catch (error) {
       console.error('데모 로그인 예외:', error)

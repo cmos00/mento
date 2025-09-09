@@ -2,13 +2,58 @@
 
 import Link from "next/link"
 import { MessageCircle, ArrowRight, Shield, Clock, Sparkles, Heart } from "lucide-react"
-import { useSession, signOut } from "next-auth/react"
+import { useEffect, useState } from "react"
+
+interface User {
+  id: string
+  name: string
+  email: string
+  image?: string
+  provider: string
+}
+
+interface Session {
+  user: User
+  isAuthenticated: boolean
+}
 
 export default function HomePage() {
-  const { data: session, status } = useSession()
+  const [session, setSession] = useState<Session | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    checkSession()
+  }, [])
+
+  const checkSession = async () => {
+    try {
+      const response = await fetch('/api/auth/session')
+      const data = await response.json()
+      
+      if (data.success && data.isAuthenticated) {
+        setSession({
+          user: data.user,
+          isAuthenticated: true
+        })
+      } else {
+        setSession(null)
+      }
+    } catch (error) {
+      console.error('세션 확인 오류:', error)
+      setSession(null)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleLogout = async () => {
-    await signOut({ callbackUrl: '/' })
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      setSession(null)
+      window.location.href = '/'
+    } catch (error) {
+      console.error('로그아웃 오류:', error)
+    }
   }
 
   return (
@@ -23,11 +68,13 @@ export default function HomePage() {
             <span className="text-2xl font-bold text-white">CareerTalk</span>
           </div>
           <div className="flex items-center space-x-3">
-            {status === 'authenticated' ? (
+            {loading ? (
+              <div className="text-white text-sm">로딩 중...</div>
+            ) : session?.isAuthenticated ? (
               <>
                 {/* 사용자 정보 표시 */}
                 <div className="text-white text-sm">
-                  안녕하세요, {session?.user?.name || session?.user?.email || '사용자'}님!
+                  안녕하세요, {session.user.name || session.user.email || '사용자'}님!
                 </div>
                 <button 
                   onClick={handleLogout}
