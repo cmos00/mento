@@ -52,61 +52,42 @@ export default function QuestionsPage() {
     return categoryMap[category] || category
   }
 
-  const loadQuestions = async () => {
+  const loadQuestions = useCallback(async () => {
     try {
       setLoading(true)
       setError('')
-      const { data, error } = await getAllQuestions()
-      
-      if (error) {
-        setError('질문을 불러오는 중 오류가 발생했습니다: ' + error.message)
-        return
-      }
-
-      if (data) {
-        console.log('로드된 질문 개수:', data.length)
-        setQuestions(data)
-      } else {
-        setQuestions([])
-      }
+      const data = await getAllQuestions()
+      setQuestions(data)
+      setFilteredQuestions(data)
     } catch (err) {
-      setError('질문을 불러오는 중 예상치 못한 오류가 발생했습니다.')
-      console.error('질문 로드 오류:', err)
+      console.error('질문 로딩 실패:', err)
+      setError('질문을 불러오는데 실패했습니다.')
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const filterQuestions = useCallback(() => {
-    let filtered = [...questions]
+  useEffect(() => {
+    loadQuestions()
+  }, [loadQuestions])
 
-    // 카테고리 필터
-    if (selectedCategory) {
-      filtered = filtered.filter(q => q.category === selectedCategory)
-    }
+  // 검색 및 필터링
+  useEffect(() => {
+    let filtered = questions
 
-    // 검색어 필터
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase()
-      filtered = filtered.filter(q => 
-        q.title.toLowerCase().includes(term) ||
-        q.content.toLowerCase().includes(term) ||
-        q.tags?.some(tag => tag.toLowerCase().includes(term))
+    if (searchTerm) {
+      filtered = filtered.filter(question =>
+        question.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        question.content.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
+    if (selectedCategory) {
+      filtered = filtered.filter(question => question.category === selectedCategory)
+    }
+
     setFilteredQuestions(filtered)
-  }, [questions, selectedCategory, searchTerm])
-
-  // 질문 데이터 로드
-  useEffect(() => {
-    loadQuestions()
-  }, [])
-
-  // 검색 및 필터링 적용
-  useEffect(() => {
-    filterQuestions()
-  }, [filterQuestions])
+  }, [questions, searchTerm, selectedCategory])
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(selectedCategory === category ? '' : category)
@@ -117,13 +98,11 @@ export default function QuestionsPage() {
     const now = new Date()
     const diffTime = Math.abs(now.getTime() - date.getTime())
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-    if (diffDays === 1) return '오늘'
-    if (diffDays === 2) return '어제'
-    if (diffDays <= 7) return `${diffDays - 1}일 전`
-    if (diffDays <= 30) return `${Math.floor(diffDays / 7)}주 전`
-    if (diffDays <= 365) return `${Math.floor(diffDays / 30)}개월 전`
-    return `${Math.floor(diffDays / 365)}년 전`
+    
+    if (diffDays === 1) return '어제'
+    if (diffDays < 7) return `${diffDays}일 전`
+    if (diffDays < 30) return `${Math.ceil(diffDays / 7)}주 전`
+    return date.toLocaleDateString('ko-KR')
   }
 
   const getUserDisplayName = (question: Question) => {
@@ -264,7 +243,7 @@ export default function QuestionsPage() {
                     <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
                       인기
                     </span>
-                    <span className="text-xs text-gray-500">{question.createdAt}</span>
+                    <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors">
                     {question.title}
@@ -275,16 +254,16 @@ export default function QuestionsPage() {
                   <div className="flex items-center justify-between text-sm text-gray-500">
                     <span className="flex items-center">
                       <User className="w-4 h-4 mr-1" />
-                      {question.author}
+                      {getUserDisplayName(question)}
                     </span>
                     <div className="flex items-center space-x-3">
                       <span className="flex items-center">
                         <MessageCircle className="w-4 h-4 mr-1" />
-                        {question.answers}
+                        {question.answers || 0}
                       </span>
                       <span className="flex items-center">
                         <Eye className="w-4 h-4 mr-1" />
-                        {question.views}
+                        {question.views || 0}
                       </span>
                     </div>
                   </div>
@@ -392,7 +371,6 @@ export default function QuestionsPage() {
               {filteredQuestions.map((question) => (
                 <Link key={question.id} href={`/questions/${question.id}`} className="block group">
                   <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1">
-
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
@@ -448,9 +426,10 @@ export default function QuestionsPage() {
                         </button>
                       </div>
                     </div>
-                </div>
-              </Link>
-            ))
+                  </div>
+                </Link>
+              ))}
+            </div>
           )}
         </div>
       </div>
