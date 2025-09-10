@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Bell, MessageCircle, Coffee, Star, Calendar, ArrowRight, Check, X, User, Heart, BookOpen } from 'lucide-react'
-import { mockAuth, MockUser } from '@/lib/mockAuth'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 
@@ -28,7 +27,6 @@ interface Notification {
 }
 
 export default function NotificationsPage() {
-  const [mockUser] = useState<MockUser | null>(mockAuth.getUser())
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 1,
@@ -220,14 +218,6 @@ export default function NotificationsPage() {
   }
 
   const unreadCount = notifications.filter(n => !n.isRead).length
-
-  if (!mockUser) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">

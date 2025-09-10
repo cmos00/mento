@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { BookOpen, Plus, Calendar, Clock, MessageSquare, ThumbsUp, TrendingUp, Filter, Eye, User, Star, Award } from 'lucide-react'
-import { mockAuth, MockUser } from '@/lib/mockAuth'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 
@@ -149,7 +148,6 @@ const categories = [
 ]
 
 export default function JournalPage() {
-  const [mockUser] = useState<MockUser | null>(mockAuth.getUser())
   const [selectedCategory, setSelectedCategory] = useState<string>('전체')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'latest' | 'trending' | 'popular'>('latest')
@@ -184,14 +182,6 @@ export default function JournalPage() {
     if (diffDays <= 7) return `${diffDays - 1}일 전`
     if (diffDays <= 30) return `${Math.floor(diffDays / 7)}주 전`
     return `${Math.floor(diffDays / 30)}개월 전`
-  }
-
-  if (!mockUser) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    )
   }
 
   return (
