@@ -56,9 +56,12 @@ export default function QuestionsPage() {
     try {
       setLoading(true)
       setError('')
-      const data = await getAllQuestions()
-      setQuestions(data)
-      setFilteredQuestions(data)
+      const result = await getAllQuestions()
+      if (result.error) {
+        throw new Error(result.error.message)
+      }
+      setQuestions(result.data || [])
+      setFilteredQuestions(result.data || [])
     } catch (err) {
       console.error('질문 로딩 실패:', err)
       setError('질문을 불러오는데 실패했습니다.')
