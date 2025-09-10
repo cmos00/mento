@@ -166,90 +166,97 @@ export default function MentorsPage() {
               </div>
             </div>
 
-            {/* Mentors */}
-            <div className="space-y-4">
+            {/* Mentors Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {filteredMentors.map((mentor) => (
-                <div key={mentor.id} className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all p-6">
-                  <div className="flex items-start space-x-4">
-                    {/* Avatar */}
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                      {mentor.name.charAt(0)}
+                <Link key={mentor.id} href={`/mentors/${mentor.id}`} className="block group">
+                  <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1">
+                    {/* Mentor Header */}
+                    <div className="flex items-start space-x-4 mb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xl font-bold ring-4 ring-purple-100">
+                        {mentor.name.charAt(0)}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <h3 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">{mentor.name}</h3>
+                          {mentor.badges.includes("인기 멘토") && (
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 font-medium">{mentor.title}</p>
+                        <p className="text-xs text-gray-500">{mentor.company} • {mentor.experience}</p>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center space-x-1">
+                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                          <span className="text-sm font-semibold text-gray-900">{mentor.rating}</span>
+                        </div>
+                        <p className="text-xs text-gray-500">{mentor.reviews}개 리뷰</p>
+                      </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="flex-1 space-y-3">
-                      {/* Header */}
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-1">
-                            <Link href={`/mentors/${mentor.id}`} className="hover:text-purple-600 transition-colors">
-                              {mentor.name}
-                            </Link>
-                          </h3>
-                          <p className="text-gray-600 mb-1">{mentor.title} • {mentor.company}</p>
-                          <p className="text-sm text-gray-500">{mentor.experience}</p>
-                        </div>
-                        <div className="text-right">
-                          <div className="flex items-center space-x-1 mb-1">
-                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="text-sm font-medium">{mentor.rating}</span>
-                          </div>
-                          <span className="text-xs text-gray-500">({mentor.reviews}개 리뷰)</span>
-                        </div>
+                    {/* Bio */}
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{mentor.bio}</p>
+
+                    {/* Specialties */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {mentor.specialties.slice(0, 3).map((specialty) => (
+                        <span
+                          key={specialty}
+                          className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium hover:bg-purple-200 transition-colors"
+                        >
+                          {specialty}
+                        </span>
+                      ))}
+                      {mentor.specialties.length > 3 && (
+                        <span className="px-3 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
+                          +{mentor.specialties.length - 3}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Stats */}
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <div className="flex items-center space-x-4">
+                        <span className="flex items-center">
+                          <MessageCircle className="w-4 h-4 mr-1 text-green-600" />
+                          <span className="font-medium">{mentor.responseRate}%</span>
+                        </span>
+                        <span className="flex items-center">
+                          <Clock className="w-4 h-4 mr-1 text-blue-600" />
+                          <span className="font-medium">{mentor.avgResponseTime}</span>
+                        </span>
                       </div>
+                    </div>
 
-                      {/* Bio */}
-                      <p className="text-gray-600 text-sm leading-relaxed">{mentor.bio}</p>
+                    {/* Action Button */}
+                    <div className="pt-4 border-t border-gray-100">
+                      <button 
+                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          // Handle 1:1 request
+                        }}
+                      >
+                        1:1 상담 요청
+                      </button>
+                    </div>
 
-                      {/* Specialties */}
-                      <div className="flex flex-wrap gap-2">
-                        {mentor.specialties.map((specialty) => (
-                          <span
-                            key={specialty}
-                            className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-md"
-                          >
-                            {specialty}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Badges */}
-                      <div className="flex flex-wrap gap-2">
+                    {/* Badges */}
+                    {mentor.badges.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-1">
                         {mentor.badges.map((badge) => (
                           <span
                             key={badge}
-                            className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-md flex items-center"
+                            className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium"
                           >
-                            <Award className="w-3 h-3 mr-1" />
                             {badge}
                           </span>
                         ))}
                       </div>
-
-                      {/* Stats */}
-                      <div className="flex items-center space-x-6 text-sm text-gray-500">
-                        <span className="flex items-center">
-                          <MessageCircle className="w-4 h-4 mr-1" />
-                          응답률 {mentor.responseRate}%
-                        </span>
-                        <span className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          평균 {mentor.avgResponseTime}
-                        </span>
-                      </div>
-
-                      {/* Action */}
-                      <div className="flex space-x-2 pt-2">
-                        <button className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all">
-                          멘토링 신청
-                        </button>
-                        <button className="py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-                          <MessageCircle className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
+                    )}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 

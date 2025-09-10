@@ -3,7 +3,7 @@
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 import { Question, getAllQuestions } from '@/lib/questions'
-import { Clock, Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Search, User } from 'lucide-react'
+import { Clock, Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Search, User, TrendingUp, ThumbsUp, Star } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
@@ -18,6 +18,13 @@ export default function QuestionsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [showFilters, setShowFilters] = useState(false)
+
+  // Mock user stats for authenticated users
+  const userStats = {
+    questionsAsked: 12,
+    answersGiven: 28,
+    mentoringSessions: 15,
+  }
 
   const categories = [
     '커리어 전환',
@@ -185,24 +192,106 @@ export default function QuestionsPage() {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* 질문하기 버튼 (PC) */}
-        <div className="hidden md:flex justify-end mb-6">
-          {status === 'authenticated' ? (
-            <Link href="/questions/new">
-              <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg">
-                <Plus className="w-5 h-5 mr-2" />
-                질문하기
-              </button>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Hero Section */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  {status === 'authenticated' ? `안녕하세요, ${user?.name || '사용자'}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
+                </h1>
+                <p className="text-lg text-gray-600 mb-4">
+                  {status === 'authenticated' 
+                    ? '오늘도 멘토들과 함께 성장해보세요' 
+                    : '멘토들과 함께 커리어 성장의 여정을 시작하세요'
+                  }
+                </p>
+                {status === 'authenticated' && (
+                  <div className="flex items-center space-x-6 text-sm text-gray-500">
+                    <span className="flex items-center">
+                      <MessageCircle className="w-4 h-4 mr-1 text-purple-600" />
+                      질문 {userStats.questionsAsked}개
+                    </span>
+                    <span className="flex items-center">
+                      <ThumbsUp className="w-4 h-4 mr-1 text-green-600" />
+                      답변 {userStats.answersGiven}개
+                    </span>
+                    <span className="flex items-center">
+                      <Star className="w-4 h-4 mr-1 text-yellow-600" />
+                      멘토링 {userStats.mentoringSessions}회
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="hidden md:block">
+                {status === 'authenticated' ? (
+                  <Link href="/questions/new">
+                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                      <Plus className="w-5 h-5 mr-2" />
+                      질문하기
+                    </button>
+                  </Link>
+                ) : (
+                  <Link href="/auth/login">
+                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                      <Plus className="w-5 h-5 mr-2" />
+                      시작하기
+                    </button>
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Trending Questions Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              <TrendingUp className="w-5 h-5 text-orange-500 mr-2" />
+              인기 질문
+            </h2>
+            <Link href="/questions?sort=trending" className="text-purple-600 hover:text-purple-700 font-medium">
+              더보기 →
             </Link>
-          ) : (
-            <Link href="/auth/login">
-              <button className="bg-gray-400 text-white px-6 py-3 rounded-xl font-medium transition-all flex items-center opacity-60 shadow-lg">
-                <Plus className="w-5 h-5 mr-2" />
-                로그인 필요
-              </button>
-            </Link>
-          )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {questions.slice(0, 3).map((question) => (
+              <Link key={question.id} href={`/questions/${question.id}`} className="group">
+                <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
+                      인기
+                    </span>
+                    <span className="text-xs text-gray-500">{question.createdAt}</span>
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors">
+                    {question.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    {question.content}
+                  </p>
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <span className="flex items-center">
+                      <User className="w-4 h-4 mr-1" />
+                      {question.author}
+                    </span>
+                    <div className="flex items-center space-x-3">
+                      <span className="flex items-center">
+                        <MessageCircle className="w-4 h-4 mr-1" />
+                        {question.answers}
+                      </span>
+                      <span className="flex items-center">
+                        <Eye className="w-4 h-4 mr-1" />
+                        {question.views}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* 검색 및 필터 */}
@@ -299,73 +388,66 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            filteredQuestions.map((question) => (
-              <Link key={question.id} href={`/questions/${question.id}`} className="block mb-[10px] last:mb-0">
-                <div className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow cursor-pointer">
-                  {/* 질문 헤더 */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                        <User className="w-4 h-4 text-purple-600" />
+            <div className="space-y-6">
+              {filteredQuestions.map((question) => (
+                <Link key={question.id} href={`/questions/${question.id}`} className="block group">
+                  <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1">
+
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          {question.category && (
+                            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                              {getCategoryDisplayName(question.category)}
+                            </span>
+                          )}
+                          <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-700 transition-colors">
+                          {question.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                          {question.content}
+                        </p>
                       </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <span className="flex items-center">
+                          <User className="w-4 h-4 mr-1" />
                           {getUserDisplayName(question)}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {getUserCompanyInfo(question) || formatDate(question.created_at)}
-                        </p>
+                        </span>
+                        <span className="flex items-center">
+                          <MessageCircle className="w-4 h-4 mr-1" />
+                          {question.answers || 0}개 답변
+                        </span>
+                        <span className="flex items-center">
+                          <Eye className="w-4 h-4 mr-1" />
+                          {question.views || 0}회 조회
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            // Handle like action
+                          }}
+                        >
+                          <ThumbsUp className="w-4 h-4" />
+                        </button>
+                        <button 
+                          className="p-2 text-gray-400 hover:text-yellow-500 transition-colors"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            // Handle bookmark action
+                          }}
+                        >
+                          <Star className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
-                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
-                      {getCategoryDisplayName(question.category)}
-                    </span>
-                  </div>
-
-                  {/* 질문 제목 */}
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                    {question.title}
-                  </h3>
-
-                  {/* 질문 내용 미리보기 */}
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {question.content}
-                  </p>
-
-                  {/* 태그 */}
-                  {question.tags && question.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {question.tags.slice(0, 3).map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                      {question.tags.length > 3 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-md">
-                          +{question.tags.length - 3}
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* 질문 통계 */}
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <Eye className="w-4 h-4 mr-1" />
-                      {question.views || 0}
-                    </div>
-                    <div className="flex items-center">
-                      <MessageCircle className="w-4 h-4 mr-1" />
-                      0 답변
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" />
-                      {formatDate(question.created_at)}
-                    </div>
-                  </div>
                 </div>
               </Link>
             ))
