@@ -27,6 +27,7 @@ interface JournalArticle {
   tags: string[]
   isFeatured: boolean
   isTrending: boolean
+  image?: string
 }
 
 const mockJournalArticles: JournalArticle[] = [
@@ -49,7 +50,8 @@ const mockJournalArticles: JournalArticle[] = [
     comments: 23,
     tags: ["이직", "개발자", "커리어"],
     isFeatured: true,
-    isTrending: true
+    isTrending: true,
+    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop&crop=center"
   },
   {
     id: 2,
@@ -70,7 +72,8 @@ const mockJournalArticles: JournalArticle[] = [
     comments: 18,
     tags: ["리더십", "팀관리", "성장"],
     isFeatured: false,
-    isTrending: true
+    isTrending: true,
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=400&fit=crop&crop=center"
   },
   {
     id: 3,
@@ -91,7 +94,8 @@ const mockJournalArticles: JournalArticle[] = [
     comments: 15,
     tags: ["디자인", "UX", "커리어"],
     isFeatured: true,
-    isTrending: false
+    isTrending: false,
+    image: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&h=400&fit=crop&crop=center"
   },
   {
     id: 4,
@@ -112,7 +116,8 @@ const mockJournalArticles: JournalArticle[] = [
     comments: 12,
     tags: ["스타트업", "성장", "경험"],
     isFeatured: false,
-    isTrending: false
+    isTrending: false,
+    image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&h=400&fit=crop&crop=center"
   },
   {
     id: 5,
@@ -133,7 +138,8 @@ const mockJournalArticles: JournalArticle[] = [
     comments: 9,
     tags: ["원격근무", "커뮤니케이션", "워크라이프"],
     isFeatured: false,
-    isTrending: false
+    isTrending: false,
+    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&h=400&fit=crop&crop=center"
   }
 ]
 
@@ -294,17 +300,29 @@ export default function JournalPage() {
                 <div className="grid md:grid-cols-2 gap-6">
                   {mockJournalArticles.filter(article => article.isFeatured).map((article) => (
                     <Link key={article.id} href={`/journal/${article.id}`} className="block">
-                      <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all p-6">
-                        <div className="flex items-start space-x-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold">
-                            {article.author.name.charAt(0)}
+                      <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden">
+                        {/* 이미지 */}
+                        {article.image && (
+                          <div className="h-48 w-full overflow-hidden">
+                            <img 
+                              src={article.image} 
+                              alt={article.title}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{article.title}</h3>
-                            <p className="text-gray-600 text-sm mb-3 line-clamp-2">{article.excerpt}</p>
-                            <div className="flex items-center justify-between text-sm text-gray-500">
-                              <span>{article.author.name} • {article.author.company}</span>
-                              <span>{formatDate(article.publishedAt)}</span>
+                        )}
+                        <div className="p-6">
+                          <div className="flex items-start space-x-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold">
+                              {article.author.name.charAt(0)}
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">{article.title}</h3>
+                              <p className="text-gray-600 text-sm mb-3 line-clamp-2">{article.excerpt}</p>
+                              <div className="flex items-center justify-between text-sm text-gray-500">
+                                <span>{article.author.name} • {article.author.company}</span>
+                                <span>{formatDate(article.publishedAt)}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -319,77 +337,93 @@ export default function JournalPage() {
             <div className="space-y-6">
               {sortedArticles.map((article) => (
                 <Link key={article.id} href={`/journal/${article.id}`} className="block">
-                  <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all p-6">
-                    <div className="flex items-start space-x-4">
-                      {/* Author Avatar */}
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                        {article.author.name.charAt(0)}
-                      </div>
+                  <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden">
+                    <div className="flex">
+                      {/* 이미지 섹션 */}
+                      {article.image && (
+                        <div className="w-48 h-32 flex-shrink-0 overflow-hidden">
+                          <img 
+                            src={article.image} 
+                            alt={article.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
                       
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        {/* Header */}
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">{article.title}</h3>
-                            <p className="text-gray-600 text-sm mb-2 line-clamp-2">{article.excerpt}</p>
+                      {/* 콘텐츠 섹션 */}
+                      <div className="flex-1 p-6">
+                        <div className="flex items-start space-x-4">
+                          {/* Author Avatar */}
+                          <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                            {article.author.name.charAt(0)}
                           </div>
-                          <div className="flex items-center space-x-2 ml-4">
-                            {article.isTrending && (
-                              <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium flex items-center">
-                                <TrendingUp className="w-3 h-3 mr-1" />
-                                인기
-                              </span>
-                            )}
-                            {article.isFeatured && (
-                              <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium flex items-center">
-                                <Star className="w-3 h-3 mr-1" />
-                                추천
-                              </span>
-                            )}
-                          </div>
-                        </div>
+                          
+                          {/* Content */}
+                          <div className="flex-1 min-w-0">
+                            {/* Header */}
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">{article.title}</h3>
+                                <p className="text-gray-600 text-sm mb-2 line-clamp-2">{article.excerpt}</p>
+                              </div>
+                              <div className="flex items-center space-x-2 ml-4">
+                                {article.isTrending && (
+                                  <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium flex items-center">
+                                    <TrendingUp className="w-3 h-3 mr-1" />
+                                    인기
+                                  </span>
+                                )}
+                                {article.isFeatured && (
+                                  <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium flex items-center">
+                                    <Star className="w-3 h-3 mr-1" />
+                                    추천
+                                  </span>
+                                )}
+                              </div>
+                            </div>
 
-                        {/* Tags */}
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {article.tags.slice(0, 3).map((tag) => (
-                            <span
-                              key={tag}
-                              className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-md"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
+                            {/* Tags */}
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {article.tags.slice(0, 3).map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-md"
+                                >
+                                  #{tag}
+                                </span>
+                              ))}
+                            </div>
 
-                        {/* Meta Info */}
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <div className="flex items-center space-x-4">
-                            <span className="flex items-center">
-                              <User className="w-4 h-4 mr-1" />
-                              {article.author.name}
-                            </span>
-                            <span>{article.author.company}</span>
-                            <span>{article.author.experience}</span>
-                            <span className="flex items-center">
-                              <Clock className="w-4 h-4 mr-1" />
-                              {article.readTime}
-                            </span>
-                            <span>{formatDate(article.publishedAt)}</span>
-                          </div>
-                          <div className="flex items-center space-x-4">
-                            <span className="flex items-center">
-                              <Eye className="w-4 h-4 mr-1" />
-                              {article.views.toLocaleString()}
-                            </span>
-                            <span className="flex items-center">
-                              <ThumbsUp className="w-4 h-4 mr-1" />
-                              {article.likes}
-                            </span>
-                            <span className="flex items-center">
-                              <MessageSquare className="w-4 h-4 mr-1" />
-                              {article.comments}
-                            </span>
+                            {/* Meta Info */}
+                            <div className="flex items-center justify-between text-sm text-gray-500">
+                              <div className="flex items-center space-x-4">
+                                <span className="flex items-center">
+                                  <User className="w-4 h-4 mr-1" />
+                                  {article.author.name}
+                                </span>
+                                <span>{article.author.company}</span>
+                                <span>{article.author.experience}</span>
+                                <span className="flex items-center">
+                                  <Clock className="w-4 h-4 mr-1" />
+                                  {article.readTime}
+                                </span>
+                                <span>{formatDate(article.publishedAt)}</span>
+                              </div>
+                              <div className="flex items-center space-x-4">
+                                <span className="flex items-center">
+                                  <Eye className="w-4 h-4 mr-1" />
+                                  {article.views.toLocaleString()}
+                                </span>
+                                <span className="flex items-center">
+                                  <ThumbsUp className="w-4 h-4 mr-1" />
+                                  {article.likes}
+                                </span>
+                                <span className="flex items-center">
+                                  <MessageSquare className="w-4 h-4 mr-1" />
+                                  {article.comments}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Coffee, Plus, Gift, Download, CreditCard, History, ArrowRight, Star } from 'lucide-react'
-import { mockAuth, MockUser } from '@/lib/mockAuth'
 import MobileBottomNav from '@/components/MobileBottomNav'
 
 interface CoffeeCoupon {
@@ -19,7 +18,6 @@ interface CoffeeCoupon {
 }
 
 export default function CoffeePage() {
-  const [mockUser] = useState<MockUser | null>(mockAuth.getUser())
   const [activeTab, setActiveTab] = useState('overview')
 
   // Mock 데이터
@@ -72,14 +70,6 @@ export default function CoffeePage() {
     .reduce((sum, coupon) => sum + coupon.amount, 0)
 
   const totalAvailable = purchasedAmount + receivedAmount
-
-  if (!mockUser) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">

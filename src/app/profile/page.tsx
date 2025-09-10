@@ -141,8 +141,8 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-6 pb-24 md:pb-6">
-        <div className="grid lg:grid-cols-4 gap-6">
+      <div className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-6">
+        <div className="grid lg:grid-cols-3 gap-6">
           {/* Profile Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white/90 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 text-center mb-6">
@@ -202,7 +202,7 @@ export default function ProfilePage() {
             {/* Activity Stats */}
             <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">활동 통계</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-4 bg-purple-50 rounded-xl">
                   <div className="text-2xl font-bold text-purple-600 mb-1">12</div>
                   <div className="text-sm text-gray-600">질문</div>
@@ -225,7 +225,7 @@ export default function ProfilePage() {
             {/* Quick Actions */}
             <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">빠른 액션</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
                 <Link href="/questions/new">
                   <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center justify-center">
                     <MessageSquare className="w-5 h-5 mr-2" />
@@ -258,7 +258,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             {/* Tabs */}
             <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
               <div className="flex space-x-1 mb-6">
