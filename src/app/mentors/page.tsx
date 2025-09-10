@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Star, MessageCircle, Award, Briefcase, Filter, Search, Users, TrendingUp, Clock } from 'lucide-react'
 import MobileBottomNav from '@/components/MobileBottomNav'
+import PCNavigation from '@/components/PCNavigation'
 
 interface Mentor {
   id: number
@@ -88,14 +89,17 @@ export default function MentorsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-purple-100 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      {/* PC Navigation */}
+      <PCNavigation title="멘토" icon={Users} />
+      
+      {/* Mobile Header */}
+      <header className="md:hidden bg-white/80 backdrop-blur-sm border-b border-purple-100 px-4 py-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
               <Users className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">CareerTalk</span>
+            <span className="text-xl font-bold text-gray-900">멘토</span>
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600">멘토 찾기</span>

@@ -1,6 +1,7 @@
 'use client'
 
 import MobileBottomNav from '@/components/MobileBottomNav'
+import PCNavigation from '@/components/PCNavigation'
 import { Question, getAllQuestions } from '@/lib/questions'
 import { Clock, Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Search, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
@@ -150,16 +151,14 @@ export default function QuestionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      {/* PC Navigation */}
+      <PCNavigation title="질문 & 답변" icon={MessageCircle} />
+      
+      {/* Mobile Header */}
+      <header className="md:hidden bg-white border-b border-gray-200 px-4 py-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <h1 className="text-xl font-bold text-gray-900">질문 & 답변</h1>
-            {status === 'authenticated' && (
-              <div className="text-sm text-gray-600">
-                {session?.user?.name || session?.user?.email || '사용자'}님
-              </div>
-            )}
             <button
               onClick={loadQuestions}
               disabled={loading}
