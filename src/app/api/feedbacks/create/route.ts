@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
             id: finalUserId,
             email: userInfo.email,
             name: userInfo.name,
-            company: userInfo.isDemo ? '데모 회사' : undefined,
-            position: userInfo.isDemo ? '데모 직책' : undefined
+            company: userInfo.isLinkedIn ? undefined : undefined,
+            position: userInfo.isLinkedIn ? undefined : undefined
           }], {
             onConflict: 'id',
             ignoreDuplicates: false

@@ -9,7 +9,7 @@ export type QuestionWithAuthor = Question & {
 }
 
 // 질문 생성
-export async function createQuestion(questionData: Omit<QuestionInsert, 'id' | 'created_at' | 'updated_at'>, userInfo?: { name: string; email: string; isDemo?: boolean }) {
+export async function createQuestion(questionData: Omit<QuestionInsert, 'id' | 'created_at' | 'updated_at'>, userInfo?: { name: string; email: string; isLinkedIn?: boolean }) {
   try {
     console.log('API Route를 통한 질문 생성 시작...', { userId: questionData.user_id, userInfo })
     

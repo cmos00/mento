@@ -1,8 +1,8 @@
 'use client'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import { createQuestion } from '@/lib/questions'
-import { AlertCircle, ArrowLeft, FileText, MessageSquare, Plane, Send, Tag, Target, User } from 'lucide-react'
-import { signIn, useSession } from 'next-auth/react'
+import { AlertCircle, ArrowLeft, FileText, MessageSquare, Plane, Send, Tag, Target } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -42,36 +42,6 @@ export default function NewQuestionPage() {
     setTags(tags.filter((tag) => tag !== tagToRemove))
   }
 
-  const handleDemoLogin = async () => {
-    setIsLoading(true)
-    setError('')
-    
-    try {
-      // 기존 세션 완전히 제거
-      await fetch('/api/auth/signout', { method: 'POST' })
-      
-      // 새로운 데모 로그인
-      const result = await signIn('demo-login', {
-        email: 'demo@example.com',
-        name: '데모 사용자',
-        callbackUrl: '/questions/new',
-        redirect: false
-      })
-      
-      if (result?.error) {
-        console.error('데모 로그인 오류:', result.error)
-        setError('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
-      } else if (result?.ok) {
-        // 로그인 성공 시 페이지 새로고침하여 로그인 상태 반영
-        window.location.reload()
-      }
-    } catch (error) {
-      console.error('데모 로그인 오류:', error)
-      setError('데모 로그인 중 오류가 발생했습니다. 다시 시도해주세요.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -88,15 +58,9 @@ export default function NewQuestionPage() {
     setError('')
 
     try {
-      // UUID 형식 검증
+      // 사용자 ID 가져오기 (UUID가 아니어도 서버에서 처리)
       const userId = session.user.id
-      const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)
-      
-      if (!isValidUUID) {
-        console.error('Invalid user ID format:', userId)
-        setError('사용자 ID 형식이 올바르지 않습니다. 다시 로그인해주세요.')
-        return
-      }
+      console.log('Current user ID:', userId)
 
       const questionData = {
         user_id: userId,
@@ -114,7 +78,7 @@ export default function NewQuestionPage() {
       const { data, error } = await createQuestion(questionData, {
         name: session.user.name || '사용자',
         email: session.user.email || 'user@example.com',
-        isDemo: (session.user as any).isDemo || false
+        isLinkedIn: (session.user as any)?.provider === 'linkedin'
       })
 
       if (error) {
@@ -153,24 +117,11 @@ export default function NewQuestionPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">로그인이 필요합니다</h1>
           <p className="text-gray-600 mb-6">질문을 작성하려면 먼저 로그인해주세요.</p>
           
-          {/* 데모 로그인 버튼만 */}
-          <button
-            onClick={handleDemoLogin}
-            disabled={isLoading}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-4 px-6 rounded-xl transition-colors duration-200 mb-4 text-lg"
-          >
-            {isLoading ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline mr-2"></div>
-                로그인 중...
-              </>
-            ) : (
-              <>
-                <User className="w-5 h-5 mr-2 inline" />
-                데모로 로그인
-              </>
-            )}
-          </button>
+          <Link href="/auth/login">
+            <button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-4 px-6 rounded-xl transition-colors duration-200 mb-4 text-lg">
+              LinkedIn으로 로그인
+            </button>
+          </Link>
 
           {/* 오류 메시지 */}
           {error && (

@@ -77,7 +77,7 @@ export default function QuestionDetailPage() {
         id: (session.user as any).id,
         email: session.user.email!,
         name: session.user.name!,
-        isDemo: (session.user as any).isDemo || false
+        isLinkedIn: (session.user as any)?.provider === 'linkedin'
       }
 
       const response = await fetch('/api/feedbacks/create', {

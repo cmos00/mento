@@ -1,5 +1,4 @@
 import { NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
 import LinkedInProvider from 'next-auth/providers/linkedin'
 
 // 환경 변수 검증
@@ -26,8 +25,20 @@ export const authOptions: NextAuthOptions = {
         console.log('🔍 [LinkedIn Profile] LinkedIn 프로필 정보 수신:', JSON.stringify(profile, null, 2))
         
         try {
-          // LinkedIn OIDC에서 받아오는 사용자 정보 처리
-          const userId = profile.sub || profile.id || `linkedin_${Date.now()}`
+          // LinkedIn OIDC에서 받아오는 사용자 정보 처리 - UUID 형식으로 생성
+          const generateUUID = () => {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+              return crypto.randomUUID()
+            }
+            // 백업 방법: 더 정확한 UUID v4 형식
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+              const r = Math.random() * 16 | 0;
+              const v = c === 'x' ? r : (r & 0x3 | 0x8);
+              return v.toString(16);
+            });
+          }
+          
+          const userId = generateUUID()
           
           // 이름 처리 - 더 안전한 방식
           let userName = 'LinkedIn 사용자'
@@ -83,34 +94,7 @@ export const authOptions: NextAuthOptions = {
           console.error('❌ [LinkedIn Profile] 오류 스택:', error instanceof Error ? error.stack : 'No stack')
           console.error('❌ [LinkedIn Profile] 원본 프로필 데이터:', JSON.stringify(profile, null, 2))
           
-          // 더 안전한 기본값으로 폴백
-          const fallbackId = `linkedin_${Date.now()}`
-          const fallbackResult = {
-            id: fallbackId,
-            name: 'LinkedIn 사용자',
-            email: `${fallbackId}@linkedin.local`,
-            image: null,
-          }
-          
-          console.log('🔄 [LinkedIn Profile] 폴백 결과 반환:', fallbackResult)
-          return fallbackResult
-        }
-      },
-    }),
-    CredentialsProvider({
-      id: 'demo-login',
-      name: 'Demo Login',
-      credentials: {
-        email: { label: "이메일", type: "email", placeholder: "demo@example.com" },
-        name: { label: "이름", type: "text", placeholder: "데모 사용자" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.name) {
-          return null
-        }
-
-        try {
-          // crypto를 사용하여 더 확실한 UUID v4 생성
+          // 더 안전한 기본값으로 폴백 - UUID 형식으로 생성
           const generateUUID = () => {
             if (typeof crypto !== 'undefined' && crypto.randomUUID) {
               return crypto.randomUUID()
@@ -123,22 +107,19 @@ export const authOptions: NextAuthOptions = {
             });
           }
           
-          const demoUserId = generateUUID()
-          console.log('Generated demo user ID:', demoUserId)
-          
-          return {
-            id: demoUserId,
-            email: credentials.email,
-            name: credentials.name,
-            image: `https://api.dicebear.com/7.x/avataaars/svg?seed=${credentials.name}`,
-            isDemo: true
+          const fallbackId = generateUUID()
+          const fallbackResult = {
+            id: fallbackId,
+            name: 'LinkedIn 사용자',
+            email: `${fallbackId}@linkedin.local`,
+            image: null,
           }
-        } catch (error) {
-          console.error('데모 사용자 생성 오류:', error)
-          return null
+          
+          console.log('🔄 [LinkedIn Profile] 폴백 결과 반환:', fallbackResult)
+          return fallbackResult
         }
-      }
-    })
+      },
+    }),
   ],
   
   callbacks: {
@@ -149,10 +130,7 @@ export const authOptions: NextAuthOptions = {
       console.log('📋 Profile:', JSON.stringify(profile, null, 2))
       
       try {
-        if (account?.provider === 'demo-login') {
-          console.log('✅ [Demo] 데모 로그인 확인됨')
-          return true
-        } else if (account?.provider === 'linkedin') {
+        if (account?.provider === 'linkedin') {
           console.log('✅ [LinkedIn] LinkedIn 로그인 확인됨')
           
           // LinkedIn 사용자 정보 검증 - 매우 관대한 검증
@@ -219,11 +197,6 @@ export const authOptions: NextAuthOptions = {
           console.log('✅ [Auth Debug] Account와 User 모두 존재')
           token.id = user.id
           
-          if ((user as any).isDemo) {
-            token.isDemo = true
-            console.log('✅ [Demo] 데모 사용자 토큰 설정')
-          }
-          
           if (account.provider === 'linkedin') {
             token.provider = 'linkedin'
             // LinkedIn 사용자 정보를 토큰에 저장 - 안전한 방식
@@ -260,11 +233,6 @@ export const authOptions: NextAuthOptions = {
       try {
         if (session.user) {
           session.user.id = token.id as string
-          
-          if (token.isDemo) {
-            (session.user as any).isDemo = true
-            console.log('✅ [Demo] 데모 사용자 세션 설정')
-          }
           
           if (token.provider === 'linkedin') {
             (session.user as any).provider = 'linkedin'

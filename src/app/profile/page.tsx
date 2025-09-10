@@ -1,35 +1,31 @@
 "use client"
 
-import { useState } from 'react'
-import Link from 'next/link'
-import {
-  MessageCircle,
-  Award,
-  MessageSquare,
-  ThumbsUp,
-  Coffee,
-  Calendar,
-  Briefcase,
-  Star,
-  TrendingUp,
-  BookOpen,
-  Sparkles,
-  Users,
-  Settings,
-  LogOut
-} from 'lucide-react'
-import { useSession, signOut } from 'next-auth/react'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
+import {
+    Award,
+    BookOpen,
+    Coffee,
+    LogOut,
+    MessageCircle,
+    MessageSquare,
+    Settings,
+    Star,
+    ThumbsUp,
+    TrendingUp,
+    Users
+} from 'lucide-react'
+import { signOut, useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { useState } from 'react'
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const [activeTab, setActiveTab] = useState('overview')
   const user = session?.user
   
-  // LinkedIn 사용자와 데모 사용자 구분
+  // LinkedIn 사용자 구분
   const isLinkedInUser = (user as any)?.provider === 'linkedin'
-  const isDemoUser = (user as any)?.isDemo === true
 
   const userStats = {
     questionsAsked: 12,
@@ -173,9 +169,6 @@ export default function ProfilePage() {
                   <div className="w-4 h-4 bg-[#0077b5] rounded mr-2"></div>
                   <p className="text-sm text-[#0077b5] font-medium">LinkedIn 계정</p>
                 </div>
-              )}
-              {isDemoUser && (
-                <p className="text-sm text-purple-600 mb-4">🎭 데모 계정</p>
               )}
               <div className="flex justify-center space-x-2 mb-4">
                 <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm flex items-center">

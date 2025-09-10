@@ -30,8 +30,16 @@ export async function POST(request: NextRequest) {
       try {
         console.log('받은 userInfo:', userInfo)
         
-        // userInfo.id가 없으면 UUID 생성
-        const userId = userInfo.id || crypto.randomUUID()
+        // userInfo.id가 없으면 UUID 생성, 있으면 UUID 형식 검증 후 필요시 변환
+        let userId = userInfo.id || crypto.randomUUID()
+        
+        // UUID 형식이 아닌 경우 UUID로 변환
+        const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)
+        if (!isValidUUID) {
+          console.log('기존 userId가 UUID 형식이 아님, UUID로 변환:', userId)
+          userId = crypto.randomUUID()
+        }
+        
         console.log('사용할 userId:', userId)
         
         // 기존 사용자가 있는지 확인
@@ -50,8 +58,8 @@ export async function POST(request: NextRequest) {
             id: finalUserId,
             email: userInfo.email,
             name: userInfo.name,
-            company: userInfo.isDemo ? '데모 회사' : undefined,
-            position: userInfo.isDemo ? '데모 직책' : undefined
+            company: userInfo.isLinkedIn ? undefined : undefined,
+            position: userInfo.isLinkedIn ? undefined : undefined
           }], { 
             onConflict: 'id',
             ignoreDuplicates: false 
@@ -77,6 +85,13 @@ export async function POST(request: NextRequest) {
     try {
       // 사용자 생성 단계에서 결정된 finalUserId 재사용
       let questionUserId = userInfo?.id || crypto.randomUUID()
+      
+      // UUID 형식이 아닌 경우 UUID로 변환
+      const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(questionUserId)
+      if (!isValidUUID) {
+        console.log('질문용 userId가 UUID 형식이 아님, UUID로 변환:', questionUserId)
+        questionUserId = crypto.randomUUID()
+      }
       
       if (userInfo) {
         // 기존 사용자가 있는지 확인 (사용자 생성 단계와 동일한 로직)

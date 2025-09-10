@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { getServerSession } from 'next-auth'
+import { NextRequest, NextResponse } from 'next/server'
 
 // Dynamic route로 설정하여 정적 렌더링 방지
 export const dynamic = 'force-dynamic'
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         userName: session?.user?.name,
         userEmail: session?.user?.email,
         provider: (session?.user as any)?.provider,
-        isDemo: (session?.user as any)?.isDemo
+        isLinkedIn: (session?.user as any)?.provider === 'linkedin'
       }
     })
   } catch (error) {

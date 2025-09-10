@@ -13,6 +13,26 @@ const LinkedInIcon = ({ className }: { className?: string }) => (
 
 export default function LoginPage() {
   const [linkedinLoading, setLinkedinLoading] = useState(false)
+  const [clearingSession, setClearingSession] = useState(false)
+
+  const handleClearSession = async () => {
+    setClearingSession(true)
+    try {
+      console.log('🧹 세션 초기화 중...')
+      
+      // 세션 초기화 API 호출
+      await fetch('/api/auth/clear-session', { method: 'POST' })
+      
+      // 페이지 새로고침
+      window.location.reload()
+      
+    } catch (error) {
+      console.error('세션 초기화 오류:', error)
+      alert('세션 초기화 중 오류가 발생했습니다.')
+    } finally {
+      setClearingSession(false)
+    }
+  }
 
   const handleLinkedInLogin = async () => {
     setLinkedinLoading(true)
@@ -78,6 +98,15 @@ export default function LoginPage() {
                   LinkedIn으로 로그인
                 </>
               )}
+            </button>
+            
+            {/* 세션 초기화 버튼 (디버깅용) */}
+            <button
+              onClick={handleClearSession}
+              disabled={clearingSession}
+              className="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              {clearingSession ? '세션 초기화 중...' : '세션 초기화 (문제 해결용)'}
             </button>
           </div>
         </div>

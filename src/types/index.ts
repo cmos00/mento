@@ -22,7 +22,7 @@ export interface ExtendedUser {
   name?: string | null
   email?: string | null
   image?: string | null
-  isDemo?: boolean
+  provider?: string
   linkedinId?: string
   linkedinProfile?: LinkedInProfile
 }
