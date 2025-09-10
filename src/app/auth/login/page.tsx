@@ -1,8 +1,7 @@
 "use client"
 
-import { MessageCircle, Sparkles, User } from 'lucide-react'
+import { MessageCircle, Sparkles } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 // LinkedIn 아이콘 컴포넌트
@@ -13,9 +12,7 @@ const LinkedInIcon = ({ className }: { className?: string }) => (
 )
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
   const [linkedinLoading, setLinkedinLoading] = useState(false)
-  const router = useRouter()
 
   const handleLinkedInLogin = async () => {
     setLinkedinLoading(true)
@@ -35,38 +32,6 @@ export default function LoginPage() {
       console.error('LinkedIn 로그인 예외:', error)
       alert(`LinkedIn 로그인 중 오류가 발생했습니다: ${error}`)
       setLinkedinLoading(false)
-    }
-  }
-
-  const handleDemoLogin = async () => {
-    setIsLoading(true)
-    
-    try {
-      console.log('🎭 데모 로그인 시도 중...')
-      
-      // 데모 세션 생성
-      const demoSession = {
-        user: {
-          id: 'demo_user_123',
-          name: '김멘티',
-          email: 'demo@example.com',
-          image: null,
-          provider: 'demo'
-        },
-        accessToken: 'demo_token',
-        expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24시간
-      }
-      
-      // 세션을 쿠키에 저장
-      document.cookie = `linkedin_session=${JSON.stringify(demoSession)}; path=/; max-age=${24 * 60 * 60}`
-      
-      console.log('✅ 데모 로그인 성공, 메인페이지로 이동...')
-      router.push('/')
-      
-    } catch (error) {
-      console.error('데모 로그인 예외:', error)
-      alert('데모 로그인 중 예외가 발생했습니다. 다시 시도해주세요.')
-      setIsLoading(false)
     }
   }
 
@@ -99,7 +64,7 @@ export default function LoginPage() {
             {/* LinkedIn 로그인 버튼 */}
             <button
               onClick={handleLinkedInLogin}
-              disabled={linkedinLoading || isLoading}
+              disabled={linkedinLoading}
               className="w-full bg-[#0077b5] hover:bg-[#005885] text-white py-4 rounded-2xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center"
             >
               {linkedinLoading ? (
@@ -111,35 +76,6 @@ export default function LoginPage() {
                 <>
                   <LinkedInIcon className="w-6 h-6 mr-3 fill-white" />
                   LinkedIn으로 로그인
-                </>
-              )}
-            </button>
-
-            {/* 구분선 */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">또는</span>
-              </div>
-            </div>
-
-            {/* 데모 로그인 버튼 */}
-            <button
-              onClick={handleDemoLogin}
-              disabled={isLoading || linkedinLoading}
-              className="w-full bg-gray-600 hover:bg-gray-700 text-white py-4 rounded-2xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-lg flex items-center justify-center"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  로그인 중...
-                </>
-              ) : (
-                <>
-                  <User className="w-6 h-6 mr-3" />
-                  데모로 로그인
                 </>
               )}
             </button>

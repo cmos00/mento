@@ -1,7 +1,7 @@
 "use client"
 
 import Link from 'next/link'
-import { Home, Users, BookOpen, User, Coffee } from 'lucide-react'
+import { Home, Users, BookOpen, User, Bell } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 
@@ -13,7 +13,7 @@ export default function MobileBottomNav() {
     { href: '/questions', icon: Home, label: '홈', requireAuth: false },
     { href: '/mentors', icon: Users, label: '멘토', requireAuth: false },
     { href: '/journal', icon: BookOpen, label: '저널', requireAuth: false },
-    { href: '/coffee', icon: Coffee, label: '커피쿠폰', requireAuth: true },
+    { href: '/notifications', icon: Bell, label: '알림', requireAuth: true },
     { href: '/profile', icon: User, label: '프로필', requireAuth: true }
   ]
 

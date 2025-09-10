@@ -67,6 +67,26 @@ export default function HomePage() {
             </div>
             <span className="text-2xl font-bold text-white">CareerTalk</span>
           </div>
+          
+          {/* PC 네비게이션 */}
+          <div className="hidden md:flex items-center space-x-6">
+            <Link href="/" className="text-white hover:text-white/80 transition-colors">
+              홈
+            </Link>
+            <Link href="/mentors" className="text-white hover:text-white/80 transition-colors">
+              멘토
+            </Link>
+            <Link href="/journal" className="text-white hover:text-white/80 transition-colors">
+              저널
+            </Link>
+            <Link href="/notifications" className="text-white hover:text-white/80 transition-colors">
+              알림
+            </Link>
+            <Link href="/profile" className="text-white hover:text-white/80 transition-colors">
+              프로필
+            </Link>
+          </div>
+          
           <div className="flex items-center space-x-3">
             {loading ? (
               <div className="text-white text-sm">로딩 중...</div>
