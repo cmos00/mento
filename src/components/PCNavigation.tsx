@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { MessageCircle, Users, BookOpen, Bell, User } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 interface PCNavigationProps {
   title: string
@@ -11,6 +12,7 @@ interface PCNavigationProps {
 
 export default function PCNavigation({ title, icon: Icon }: PCNavigationProps) {
   const pathname = usePathname()
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
 
   const navItems = [
     { href: '/questions', icon: MessageCircle, label: '홈' },
@@ -19,6 +21,13 @@ export default function PCNavigation({ title, icon: Icon }: PCNavigationProps) {
     { href: '/notifications', icon: Bell, label: '알림' },
     { href: '/profile', icon: User, label: '프로필' }
   ]
+
+  // 알림 개수 확인 (실제로는 API 호출)
+  useEffect(() => {
+    // Mock data - 실제로는 API에서 가져와야 함
+    const mockUnreadCount = 3 // 예시: 읽지 않은 알림 3개
+    setUnreadNotifications(mockUnreadCount)
+  }, [])
 
   return (
     <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
@@ -37,12 +46,13 @@ export default function PCNavigation({ title, icon: Icon }: PCNavigationProps) {
             const ItemIcon = item.icon
             const isActive = pathname === item.href || 
               (item.href === '/questions' && (pathname.startsWith('/questions') || pathname === '/'))
+            const isNotification = item.href === '/notifications'
             
             return (
               <Link 
                 key={item.href}
                 href={item.href} 
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors relative ${
                   isActive 
                     ? 'bg-purple-100 text-purple-700' 
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -50,6 +60,10 @@ export default function PCNavigation({ title, icon: Icon }: PCNavigationProps) {
               >
                 <ItemIcon className="w-4 h-4" />
                 <span className="font-medium">{item.label}</span>
+                {/* 알림 red dot */}
+                {isNotification && unreadNotifications > 0 && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                )}
               </Link>
             )
           })}

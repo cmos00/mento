@@ -2,20 +2,29 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Bell, MessageCircle, Coffee, Star, Calendar, ArrowRight, Check, X } from 'lucide-react'
+import { Bell, MessageCircle, Coffee, Star, Calendar, ArrowRight, Check, X, User, Heart, BookOpen } from 'lucide-react'
 import { mockAuth, MockUser } from '@/lib/mockAuth'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 
 interface Notification {
   id: number
-  type: 'mentoring' | 'answer' | 'coffee' | 'system'
+  type: 'question_answer' | 'journal_comment' | 'coffee_chat_request' | 'coffee_chat_accepted' | 'coffee_coupon' | 'system'
   title: string
   message: string
   timeAgo: string
   isRead: boolean
   actionUrl?: string
   actionText?: string
+  sender?: {
+    name: string
+    avatar?: string
+    company?: string
+  }
+  relatedContent?: {
+    title: string
+    type: 'question' | 'journal' | 'coffee_chat'
+  }
 }
 
 export default function NotificationsPage() {
@@ -23,51 +32,115 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 1,
-      type: 'mentoring',
-      title: '멘토링 신청이 수락되었습니다',
-      message: '김시니어 멘토님이 3월 15일 오후 2시 멘토링을 수락했습니다.',
+      type: 'question_answer',
+      title: '질문에 새로운 답변이 달렸습니다',
+      message: '"3년차 개발자, 이직 타이밍이 맞을까요?" 질문에 김시니어님이 답변을 달았습니다.',
       timeAgo: '10분 전',
       isRead: false,
-      actionUrl: '/mentors/1',
-      actionText: '멘토 프로필 보기'
+      actionUrl: '/questions/1',
+      actionText: '답변 보기',
+      sender: {
+        name: '김시니어',
+        company: '네이버'
+      },
+      relatedContent: {
+        title: '3년차 개발자, 이직 타이밍이 맞을까요?',
+        type: 'question'
+      }
     },
     {
       id: 2,
-      type: 'answer',
-      title: '질문에 새로운 답변이 달렸습니다',
-      message: '"3년차 개발자, 이직 타이밍이 맞을까요?" 질문에 박매니저님이 답변을 달았습니다.',
+      type: 'journal_comment',
+      title: '저널 글에 댓글이 달렸습니다',
+      message: '"팀 리드가 되기 전에 준비해야 할 것들" 글에 박매니저님이 댓글을 남겼습니다.',
       timeAgo: '1시간 전',
       isRead: false,
-      actionUrl: '/questions/1',
-      actionText: '답변 보기'
+      actionUrl: '/journal/2',
+      actionText: '댓글 보기',
+      sender: {
+        name: '박매니저',
+        company: '카카오'
+      },
+      relatedContent: {
+        title: '팀 리드가 되기 전에 준비해야 할 것들',
+        type: 'journal'
+      }
     },
     {
       id: 3,
-      type: 'coffee',
-      title: '커피 쿠폰을 받았습니다',
-      message: '이신입님이 멘토링에 감사한 마음을 담아 커피 쿠폰을 보내주셨습니다.',
+      type: 'coffee_chat_request',
+      title: '커피챗 요청이 들어왔습니다',
+      message: '이신입님이 커피챗을 요청했습니다. "개발자 커리어 상담" 주제로 30분간 진행하고 싶어합니다.',
       timeAgo: '2시간 전',
-      isRead: true,
-      actionUrl: '/profile',
-      actionText: '쿠폰 확인'
+      isRead: false,
+      actionUrl: '/coffee/chat/3',
+      actionText: '요청 확인',
+      sender: {
+        name: '이신입',
+        company: '스타트업B'
+      },
+      relatedContent: {
+        title: '개발자 커리어 상담',
+        type: 'coffee_chat'
+      }
     },
     {
       id: 4,
-      type: 'system',
-      title: '프로필 인증이 완료되었습니다',
-      message: 'LinkedIn 연동을 통한 프로필 인증이 성공적으로 완료되었습니다.',
-      timeAgo: '1일 전',
-      isRead: true
+      type: 'coffee_coupon',
+      title: '커피 쿠폰을 받았습니다',
+      message: '최멘티님이 멘토링에 감사한 마음을 담아 커피 쿠폰을 보내주셨습니다.',
+      timeAgo: '3시간 전',
+      isRead: true,
+      actionUrl: '/profile',
+      actionText: '쿠폰 확인',
+      sender: {
+        name: '최멘티',
+        company: '대기업C'
+      }
     },
     {
       id: 5,
-      type: 'mentoring',
-      title: '멘토링 일정이 변경되었습니다',
-      message: '3월 15일 오후 2시로 예정된 멘토링이 오후 3시로 변경되었습니다.',
+      type: 'coffee_chat_accepted',
+      title: '커피챗 요청이 수락되었습니다',
+      message: '김시니어님이 커피챗 요청을 수락했습니다. 3월 15일 오후 2시에 진행 예정입니다.',
       timeAgo: '1일 전',
       isRead: true,
-      actionUrl: '/profile',
-      actionText: '일정 확인'
+      actionUrl: '/coffee/chat/5',
+      actionText: '일정 확인',
+      sender: {
+        name: '김시니어',
+        company: '네이버'
+      },
+      relatedContent: {
+        title: '개발자 이직 상담',
+        type: 'coffee_chat'
+      }
+    },
+    {
+      id: 6,
+      type: 'system',
+      title: '프로필 인증이 완료되었습니다',
+      message: 'LinkedIn 연동을 통한 프로필 인증이 성공적으로 완료되었습니다.',
+      timeAgo: '2일 전',
+      isRead: true
+    },
+    {
+      id: 7,
+      type: 'question_answer',
+      title: '질문에 새로운 답변이 달렸습니다',
+      message: '"신입 개발자 온보딩 어떻게 하면 좋을까요?" 질문에 이디자이너님이 답변을 달았습니다.',
+      timeAgo: '3일 전',
+      isRead: true,
+      actionUrl: '/questions/7',
+      actionText: '답변 보기',
+      sender: {
+        name: '이디자이너',
+        company: '토스'
+      },
+      relatedContent: {
+        title: '신입 개발자 온보딩 어떻게 하면 좋을까요?',
+        type: 'question'
+      }
     }
   ])
 
@@ -91,14 +164,18 @@ export default function NotificationsPage() {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'mentoring':
-        return <Calendar className="w-5 h-5 text-blue-600" />
-      case 'answer':
-        return <MessageCircle className="w-5 h-5 text-green-600" />
-      case 'coffee':
+      case 'question_answer':
+        return <MessageCircle className="w-5 h-5 text-blue-600" />
+      case 'journal_comment':
+        return <BookOpen className="w-5 h-5 text-green-600" />
+      case 'coffee_chat_request':
+        return <Calendar className="w-5 h-5 text-purple-600" />
+      case 'coffee_chat_accepted':
+        return <Check className="w-5 h-5 text-green-600" />
+      case 'coffee_coupon':
         return <Coffee className="w-5 h-5 text-yellow-600" />
       case 'system':
-        return <Bell className="w-5 h-5 text-purple-600" />
+        return <Bell className="w-5 h-5 text-gray-600" />
       default:
         return <Bell className="w-5 h-5 text-gray-600" />
     }
@@ -106,16 +183,39 @@ export default function NotificationsPage() {
 
   const getNotificationColor = (type: string) => {
     switch (type) {
-      case 'mentoring':
+      case 'question_answer':
         return 'bg-blue-50 border-blue-200'
-      case 'answer':
+      case 'journal_comment':
         return 'bg-green-50 border-green-200'
-      case 'coffee':
+      case 'coffee_chat_request':
+        return 'bg-purple-50 border-purple-200'
+      case 'coffee_chat_accepted':
+        return 'bg-green-50 border-green-200'
+      case 'coffee_coupon':
         return 'bg-yellow-50 border-yellow-200'
       case 'system':
-        return 'bg-purple-50 border-purple-200'
+        return 'bg-gray-50 border-gray-200'
       default:
         return 'bg-gray-50 border-gray-200'
+    }
+  }
+
+  const getNotificationTypeLabel = (type: string) => {
+    switch (type) {
+      case 'question_answer':
+        return '질문 답변'
+      case 'journal_comment':
+        return '저널 댓글'
+      case 'coffee_chat_request':
+        return '커피챗 요청'
+      case 'coffee_chat_accepted':
+        return '커피챗 수락'
+      case 'coffee_coupon':
+        return '커피쿠폰'
+      case 'system':
+        return '시스템'
+      default:
+        return '알림'
     }
   }
 
@@ -142,13 +242,13 @@ export default function NotificationsPage() {
               <Bell className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold text-gray-900">알림</span>
-          </div>
-          <div className="flex items-center space-x-2">
             {unreadCount > 0 && (
               <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-full font-medium">
                 {unreadCount}
               </span>
             )}
+          </div>
+          <div className="flex items-center space-x-2">
             <button
               onClick={markAllAsRead}
               className="text-sm text-purple-600 hover:text-purple-700 font-medium"
@@ -164,20 +264,20 @@ export default function NotificationsPage() {
         <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{notifications.filter(n => n.type === 'mentoring').length}</div>
-              <div className="text-sm text-gray-600">멘토링</div>
+              <div className="text-2xl font-bold text-blue-600">{notifications.filter(n => n.type === 'question_answer').length}</div>
+              <div className="text-sm text-gray-600">질문 답변</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{notifications.filter(n => n.type === 'answer').length}</div>
-              <div className="text-sm text-gray-600">답변</div>
+              <div className="text-2xl font-bold text-green-600">{notifications.filter(n => n.type === 'journal_comment').length}</div>
+              <div className="text-sm text-gray-600">저널 댓글</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">{notifications.filter(n => n.type === 'coffee').length}</div>
+              <div className="text-2xl font-bold text-purple-600">{notifications.filter(n => n.type.includes('coffee_chat')).length}</div>
+              <div className="text-sm text-gray-600">커피챗</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-yellow-600">{notifications.filter(n => n.type === 'coffee_coupon').length}</div>
               <div className="text-sm text-gray-600">커피쿠폰</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{notifications.filter(n => n.type === 'system').length}</div>
-              <div className="text-sm text-gray-600">시스템</div>
             </div>
           </div>
         </div>
@@ -199,20 +299,51 @@ export default function NotificationsPage() {
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className={`text-lg font-semibold ${notification.isRead ? 'text-gray-600' : 'text-gray-900'}`}>
-                        {notification.title}
-                      </h3>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <h3 className={`text-lg font-semibold ${notification.isRead ? 'text-gray-600' : 'text-gray-900'}`}>
+                            {notification.title}
+                          </h3>
+                          <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                            {getNotificationTypeLabel(notification.type)}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 mb-3 leading-relaxed">
+                          {notification.message}
+                        </p>
+                        
+                        {/* Sender Info */}
+                        {notification.sender && (
+                          <div className="flex items-center space-x-2 mb-3">
+                            <div className="w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                              {notification.sender.name.charAt(0)}
+                            </div>
+                            <span className="text-sm text-gray-600">
+                              {notification.sender.name}
+                              {notification.sender.company && ` • ${notification.sender.company}`}
+                            </span>
+                          </div>
+                        )}
+                        
+                        {/* Related Content */}
+                        {notification.relatedContent && (
+                          <div className="bg-gray-50 rounded-lg p-3 mb-3">
+                            <div className="flex items-center space-x-2">
+                              {notification.relatedContent.type === 'question' && <MessageCircle className="w-4 h-4 text-blue-600" />}
+                              {notification.relatedContent.type === 'journal' && <BookOpen className="w-4 h-4 text-green-600" />}
+                              {notification.relatedContent.type === 'coffee_chat' && <Calendar className="w-4 h-4 text-purple-600" />}
+                              <span className="text-sm text-gray-700 font-medium">{notification.relatedContent.title}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2 ml-4">
                         <span className="text-sm text-gray-500">{notification.timeAgo}</span>
                         {!notification.isRead && (
                           <span className="w-2 h-2 bg-red-500 rounded-full"></span>
                         )}
                       </div>
                     </div>
-                    
-                    <p className="text-gray-600 mb-3 leading-relaxed">
-                      {notification.message}
-                    </p>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
@@ -266,8 +397,8 @@ export default function NotificationsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-gray-900">멘토링 관련 알림</p>
-                <p className="text-sm text-gray-600">멘토링 신청, 수락, 일정 변경 등</p>
+                <p className="font-medium text-gray-900">질문 답변 알림</p>
+                <p className="text-sm text-gray-600">질문에 새로운 답변이 달렸을 때</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" defaultChecked className="sr-only peer" />
@@ -277,8 +408,19 @@ export default function NotificationsPage() {
             
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-gray-900">답변 알림</p>
-                <p className="text-sm text-gray-600">질문에 새로운 답변이 달렸을 때</p>
+                <p className="font-medium text-gray-900">저널 댓글 알림</p>
+                <p className="text-sm text-gray-600">저널 글에 새로운 댓글이 달렸을 때</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" defaultChecked className="sr-only peer" />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+              </label>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-gray-900">커피챗 알림</p>
+                <p className="text-sm text-gray-600">커피챗 요청과 승락 알림</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" defaultChecked className="sr-only peer" />
@@ -290,17 +432,6 @@ export default function NotificationsPage() {
               <div>
                 <p className="font-medium text-gray-900">커피쿠폰 알림</p>
                 <p className="text-sm text-gray-600">커피쿠폰을 받았을 때</p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" defaultChecked className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-              </label>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900">시스템 알림</p>
-                <p className="text-sm text-gray-600">프로필 인증, 정책 변경 등</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" defaultChecked className="sr-only peer" />

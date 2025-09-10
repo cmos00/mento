@@ -152,13 +152,13 @@ export default function QuestionsPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* PC Navigation */}
-      <PCNavigation title="질문 & 답변" icon={MessageCircle} />
+      <PCNavigation title="홈" icon={MessageCircle} />
       
       {/* Mobile Header */}
       <header className="md:hidden bg-white border-b border-gray-200 px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <h1 className="text-xl font-bold text-gray-900">질문 & 답변</h1>
+            <h1 className="text-xl font-bold text-gray-900">홈</h1>
             <button
               onClick={loadQuestions}
               disabled={loading}
