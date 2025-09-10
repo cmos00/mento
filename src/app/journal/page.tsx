@@ -303,7 +303,7 @@ export default function JournalPage() {
                       <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden">
                         {/* 이미지 */}
                         {article.image && (
-                          <div className="h-48 w-full overflow-hidden">
+                          <div className="h-56 w-full overflow-hidden">
                             <img 
                               src={article.image} 
                               alt={article.title}
@@ -337,21 +337,21 @@ export default function JournalPage() {
             <div className="space-y-6">
               {sortedArticles.map((article) => (
                 <Link key={article.id} href={`/journal/${article.id}`} className="block">
-                  <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden">
-                    <div className="flex">
-                      {/* 이미지 섹션 */}
-                      {article.image && (
-                        <div className="w-48 h-32 flex-shrink-0 overflow-hidden">
-                          <img 
-                            src={article.image} 
-                            alt={article.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
-                      
-                      {/* 콘텐츠 섹션 */}
-                      <div className="flex-1 p-6">
+                      <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden">
+                        <div className="flex">
+                          {/* 이미지 섹션 */}
+                          {article.image && (
+                            <div className="w-64 h-40 flex-shrink-0 overflow-hidden">
+                              <img 
+                                src={article.image} 
+                                alt={article.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          )}
+                          
+                          {/* 콘텐츠 섹션 */}
+                          <div className="flex-1 p-6">
                         <div className="flex items-start space-x-4">
                           {/* Author Avatar */}
                           <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">

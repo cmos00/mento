@@ -324,6 +324,109 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   </div>
+
+                  {/* 추가 섹션들 */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* 성과 요약 */}
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <TrendingUp className="w-5 h-5 text-purple-600 mr-2" />
+                        이번 달 성과
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">질문 작성</span>
+                          <span className="font-semibold text-purple-600">3개</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">답변 작성</span>
+                          <span className="font-semibold text-green-600">7개</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">받은 좋아요</span>
+                          <span className="font-semibold text-blue-600">24개</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">저널 작성</span>
+                          <span className="font-semibold text-yellow-600">1개</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 업적 배지 */}
+                    <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <Award className="w-5 h-5 text-yellow-600 mr-2" />
+                        업적 배지
+                      </h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="text-center p-3 bg-white rounded-lg">
+                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <MessageCircle className="w-4 h-4 text-purple-600" />
+                          </div>
+                          <p className="text-xs text-gray-600">질문왕</p>
+                        </div>
+                        <div className="text-center p-3 bg-white rounded-lg">
+                          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <ThumbsUp className="w-4 h-4 text-green-600" />
+                          </div>
+                          <p className="text-xs text-gray-600">도움왕</p>
+                        </div>
+                        <div className="text-center p-3 bg-white rounded-lg">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <Star className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <p className="text-xs text-gray-600">멘토</p>
+                        </div>
+                        <div className="text-center p-3 bg-white rounded-lg">
+                          <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <BookOpen className="w-4 h-4 text-yellow-600" />
+                          </div>
+                          <p className="text-xs text-gray-600">작가</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 최근 멘토링 활동 */}
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                      <Users className="w-5 h-5 text-blue-600 mr-2" />
+                      최근 멘토링 활동
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                        <div>
+                          <p className="font-medium text-gray-900">백엔드 아키텍처 상담</p>
+                          <p className="text-sm text-gray-600">김신입님과의 1:1 멘토링</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-gray-500">2일 전</p>
+                          <p className="text-sm text-blue-600 font-medium">완료</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                        <div>
+                          <p className="font-medium text-gray-900">이직 준비 상담</p>
+                          <p className="text-sm text-gray-600">박주니어님과의 커피챗</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-gray-500">1주 전</p>
+                          <p className="text-sm text-green-600 font-medium">완료</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg">
+                        <div>
+                          <p className="font-medium text-gray-900">코드 리뷰 멘토링</p>
+                          <p className="text-sm text-gray-600">이개발자님의 코드 리뷰</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-gray-500">3일 전</p>
+                          <p className="text-sm text-yellow-600 font-medium">진행중</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
 
