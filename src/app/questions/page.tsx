@@ -2,7 +2,7 @@
 
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
-import { Question, getAllQuestionsWithStats, getUserStats } from '@/lib/questions'
+import { Question, getAllQuestionsWithStats, getTrendingQuestions, getUserStats } from '@/lib/questions'
 import { Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Search, Star, ThumbsUp, TrendingUp, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -13,6 +13,7 @@ export default function QuestionsPage() {
   const user = session?.user
   const [questions, setQuestions] = useState<Question[]>([])
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([])
+  const [trendingQuestions, setTrendingQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
@@ -69,6 +70,12 @@ export default function QuestionsPage() {
         if (statsResult.data) {
           setUserStats(statsResult.data)
         }
+      }
+      
+      // 인기 질문 조회
+      const trendingResult = await getTrendingQuestions(3)
+      if (trendingResult.data) {
+        setTrendingQuestions(trendingResult.data)
       }
     } catch (err) {
       console.error('질문 로딩 실패:', err)
@@ -154,10 +161,12 @@ export default function QuestionsPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* PC Navigation */}
-      <PCNavigation title="홈" icon={MessageCircle} />
+      <div id="pc-navigation">
+        <PCNavigation title="홈" icon={MessageCircle} />
+      </div>
       
       {/* Mobile Header */}
-      <header className="md:hidden bg-white border-b border-gray-200 px-4 py-4">
+      <header id="mobile-header" className="md:hidden bg-white border-b border-gray-200 px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <h1 className="text-xl font-bold text-gray-900">홈</h1>
@@ -189,7 +198,7 @@ export default function QuestionsPage() {
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Hero Section */}
-        <div className="mb-8">
+        <div id="hero-section" className="mb-8">
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 mb-6">
             <div className="flex items-center justify-between">
               <div>
@@ -202,22 +211,6 @@ export default function QuestionsPage() {
                     : '멘토들과 함께 커리어 성장의 여정을 시작하세요'
                   }
                 </p>
-                {status === 'authenticated' && (
-                  <div className="flex items-center space-x-6 text-sm text-gray-500">
-                    <span className="flex items-center">
-                      <MessageCircle className="w-4 h-4 mr-1 text-purple-600" />
-                      질문 {userStats.questionsAsked}개
-                    </span>
-                    <span className="flex items-center">
-                      <ThumbsUp className="w-4 h-4 mr-1 text-green-600" />
-                      답변 {userStats.answersGiven}개
-                    </span>
-                    <span className="flex items-center">
-                      <Star className="w-4 h-4 mr-1 text-yellow-600" />
-                      멘토링 {userStats.mentoringSessions}회
-                    </span>
-                  </div>
-                )}
               </div>
               <div className="hidden md:block">
                 {status === 'authenticated' ? (
@@ -241,7 +234,7 @@ export default function QuestionsPage() {
         </div>
 
         {/* Trending Questions Section */}
-        <div className="mb-8">
+        <div id="trending-questions-section" className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-900 flex items-center">
               <TrendingUp className="w-5 h-5 text-orange-500 mr-2" />
@@ -251,13 +244,46 @@ export default function QuestionsPage() {
               더보기 →
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {questions.slice(0, 3).map((question) => (
+          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`} className="group">
-                <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
+                <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
                   <div className="flex items-start justify-between mb-3">
                     <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
-                      인기
+                      인기 {(question as any).trendingScore ? `(${Math.round((question as any).trendingScore)})` : ''}
+                    </span>
+                    <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors">
+                    {question.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    {question.content}
+                  </p>
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <span className="flex items-center">
+                      <User className="w-4 h-4 mr-1" />
+                      {getUserDisplayName(question)}
+                    </span>
+                    <div className="flex items-center space-x-3">
+                      <span className="flex items-center">
+                        <MessageCircle className="w-4 h-4 mr-1" />
+                        {getAnswerCount(question)}
+                      </span>
+                      <span className="flex items-center">
+                        <Eye className="w-4 h-4 mr-1" />
+                        {question.views || 0}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            )) : questions.slice(0, 3).map((question, index) => (
+              <Link key={question.id} href={`/questions/${question.id}`} className="group">
+                <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
+                      최신
                     </span>
                     <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
                   </div>
@@ -290,11 +316,12 @@ export default function QuestionsPage() {
         </div>
 
         {/* 검색 및 필터 */}
-        <div className="mb-6 space-y-4">
+        <div id="search-and-filter" className="mb-6 space-y-4">
           {/* 검색바 */}
-          <div className="relative">
+          <div id="search-bar" className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
+              id="search-input"
               type="text"
               placeholder="질문을 검색해보세요..."
               value={searchTerm}
@@ -304,7 +331,7 @@ export default function QuestionsPage() {
           </div>
 
           {/* 필터 토글 */}
-          <div className="flex items-center justify-between">
+          <div id="filter-toggle" className="flex items-center justify-between">
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center text-gray-600 hover:text-gray-900"
@@ -324,12 +351,13 @@ export default function QuestionsPage() {
 
           {/* 카테고리 필터 */}
           {showFilters && (
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <div id="category-filter" className="bg-white border border-gray-200 rounded-xl p-4">
               <h3 className="text-sm font-medium text-gray-700 mb-3">카테고리</h3>
               <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
+                {categories.map((category, index) => (
                   <button
                     key={category}
+                    id={`category-button-${index}`}
                     onClick={() => handleCategoryChange(category)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       selectedCategory === category
@@ -347,15 +375,15 @@ export default function QuestionsPage() {
 
         {/* 에러 메시지 */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+          <div id="error-message" className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
             <p className="text-red-700">{error}</p>
           </div>
         )}
 
         {/* 질문 목록 */}
-        <div>
+        <div id="questions-list">
           {filteredQuestions.length === 0 ? (
-            <div className="text-center py-12">
+            <div id="empty-state" className="text-center py-12">
               <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 {searchTerm || selectedCategory ? '검색 결과가 없습니다' : '아직 질문이 없습니다'}
@@ -369,13 +397,13 @@ export default function QuestionsPage() {
               {!searchTerm && !selectedCategory && (
                 status === 'authenticated' ? (
                   <Link href="/questions/new">
-                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all">
+                    <button id="create-question-button" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all">
                       질문 작성하기
                     </button>
                   </Link>
                 ) : (
                   <Link href="/auth/login">
-                    <button className="bg-gray-400 text-white px-6 py-3 rounded-lg font-medium transition-all opacity-60">
+                    <button id="login-required-button" className="bg-gray-400 text-white px-6 py-3 rounded-lg font-medium transition-all opacity-60">
                       로그인 후 질문 작성
                     </button>
                   </Link>
@@ -383,10 +411,10 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            <div className="space-y-6">
-              {filteredQuestions.map((question) => (
+            <div id="questions-container" className="space-y-6">
+              {filteredQuestions.map((question, index) => (
                 <Link key={question.id} href={`/questions/${question.id}`} className="block group">
-                  <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1">
+                  <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
@@ -450,7 +478,9 @@ export default function QuestionsPage() {
         </div>
       </div>
 
-      <MobileBottomNav />
+      <div id="mobile-bottom-nav">
+        <MobileBottomNav />
+      </div>
     </div>
   )
 }

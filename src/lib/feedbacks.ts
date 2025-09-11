@@ -1,3 +1,4 @@
+import { updateQuestionStats } from '@/lib/questions'
 import { supabase } from '@/lib/supabase'
 
 export interface Feedback {
@@ -42,6 +43,11 @@ export async function createFeedback(feedbackData: Partial<Feedback>): Promise<F
     if (error) {
       console.error('피드백 생성 오류:', error)
       return null
+    }
+
+    // 답변 생성 시 통계 업데이트
+    if (data && feedbackData.question_id) {
+      updateQuestionStats(feedbackData.question_id, 'answer')
     }
 
     return data
