@@ -158,14 +158,130 @@ export async function getQuestionsByUser(userId: string) {
   }
 }
 
-// 질문 조회수 증가 (현재는 로그만 출력)
+// 질문 조회수 증가
 export async function incrementQuestionViews(id: string) {
   try {
-    // 조회수 증가 기능은 향후 구현 예정
-    console.log(`질문 ${id} 조회됨`)
-    return { data: null, error: null }
+    const { data, error } = await supabase
+      .from('questions')
+      .update({ views: supabase.sql`views + 1` })
+      .eq('id', id)
+      .select('views')
+
+    if (error) {
+      console.error('조회수 증가 오류:', error)
+      throw new Error(error.message)
+    }
+
+    return { data, error: null }
   } catch (error) {
     console.error('조회수 증가 중 예외 발생:', error)
-    return { data: null, error: null }
+    return { data: null, error: error as Error }
+  }
+}
+
+// 질문별 답변 수 조회
+export async function getAnswerCountByQuestionId(questionId: string) {
+  try {
+    const { count, error } = await supabase
+      .from('feedbacks')
+      .select('*', { count: 'exact', head: true })
+      .eq('question_id', questionId)
+
+    if (error) {
+      console.error('답변 수 조회 오류:', error)
+      throw new Error(error.message)
+    }
+
+    return { data: count || 0, error: null }
+  } catch (error) {
+    console.error('답변 수 조회 중 예외 발생:', error)
+    return { data: 0, error: error as Error }
+  }
+}
+
+// 사용자 통계 조회
+export async function getUserStats(userId: string) {
+  try {
+    // 질문 수 조회
+    const { count: questionsCount, error: questionsError } = await supabase
+      .from('questions')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('status', 'active')
+
+    if (questionsError) {
+      console.error('질문 수 조회 오류:', questionsError)
+      throw new Error(questionsError.message)
+    }
+
+    // 답변 수 조회
+    const { count: answersCount, error: answersError } = await supabase
+      .from('feedbacks')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+
+    if (answersError) {
+      console.error('답변 수 조회 오류:', answersError)
+      throw new Error(answersError.message)
+    }
+
+    // 멘토링 세션 수 (현재는 피드백 수로 대체)
+    const mentoringSessions = answersCount || 0
+
+    return {
+      data: {
+        questionsAsked: questionsCount || 0,
+        answersGiven: answersCount || 0,
+        mentoringSessions: mentoringSessions,
+      },
+      error: null
+    }
+  } catch (error) {
+    console.error('사용자 통계 조회 중 예외 발생:', error)
+    return { 
+      data: { questionsAsked: 0, answersGiven: 0, mentoringSessions: 0 }, 
+      error: error as Error 
+    }
+  }
+}
+
+// 질문과 답변 수를 함께 조회
+export async function getAllQuestionsWithStats() {
+  try {
+    const { data: questions, error } = await supabase
+      .from('questions')
+      .select(`
+        *,
+        users!questions_user_id_fkey (
+          id,
+          name,
+          avatar_url,
+          company,
+          position
+        )
+      `)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('질문 조회 오류:', error)
+      throw new Error(error.message)
+    }
+
+    // 각 질문별로 답변 수 조회
+    const questionsWithStats = await Promise.all(
+      (questions || []).map(async (question) => {
+        const { data: answerCount } = await getAnswerCountByQuestionId(question.id)
+        return {
+          ...question,
+          answerCount: answerCount || 0
+        }
+      })
+    )
+
+    return { data: questionsWithStats, error: null }
+  } catch (error) {
+    console.error('질문 및 통계 조회 중 예외 발생:', error)
+    return { data: null, error: error as Error }
   }
 }

@@ -2,7 +2,7 @@
 
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
-import { Question, getAllQuestions } from '@/lib/questions'
+import { Question, getAllQuestionsWithStats, getUserStats } from '@/lib/questions'
 import { Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Search, Star, ThumbsUp, TrendingUp, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -18,13 +18,11 @@ export default function QuestionsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [showFilters, setShowFilters] = useState(false)
-
-  // Mock user stats for authenticated users
-  const userStats = {
-    questionsAsked: 12,
-    answersGiven: 28,
-    mentoringSessions: 15,
-  }
+  const [userStats, setUserStats] = useState({
+    questionsAsked: 0,
+    answersGiven: 0,
+    mentoringSessions: 0,
+  })
 
   const categories = [
     '커리어 전환',
@@ -56,19 +54,29 @@ export default function QuestionsPage() {
     try {
       setLoading(true)
       setError('')
-      const result = await getAllQuestions()
+      
+      // 질문과 답변 수를 함께 조회
+      const result = await getAllQuestionsWithStats()
       if (result.error) {
         throw new Error(result.error.message)
       }
       setQuestions(result.data || [])
       setFilteredQuestions(result.data || [])
+      
+      // 로그인한 사용자의 통계 조회
+      if (status === 'authenticated' && user?.email) {
+        const statsResult = await getUserStats(user.email)
+        if (statsResult.data) {
+          setUserStats(statsResult.data)
+        }
+      }
     } catch (err) {
       console.error('질문 로딩 실패:', err)
       setError('질문을 불러오는데 실패했습니다.')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [status, user?.email])
 
   useEffect(() => {
     loadQuestions()
@@ -128,9 +136,8 @@ export default function QuestionsPage() {
 
   // 답변 수 계산 함수
   const getAnswerCount = (question: Question) => {
-    // 실제로는 feedbacks 테이블에서 해당 질문의 답변 수를 계산해야 함
-    // 현재는 mock 데이터로 처리
-    return Math.floor(Math.random() * 10) + 1
+    // 질문 객체에 answerCount가 포함되어 있으면 사용, 없으면 0
+    return (question as any).answerCount || 0
   }
 
   if (loading) {
