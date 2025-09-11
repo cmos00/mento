@@ -201,18 +201,18 @@ export default function QuestionsPage() {
         <div id="hero-section" className="mb-8">
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 mb-6">
             <div className="flex items-center justify-between min-h-[120px]">
-              <div>
+              <div className="flex flex-col justify-center flex-1">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
                   {status === 'authenticated' ? `안녕하세요, ${getDisplayName(user?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
                 </h1>
-                <p className="text-lg text-gray-600 mb-4">
+                <p className="text-lg text-gray-600">
                   {status === 'authenticated' 
                     ? '오늘도 멘토들과 함께 성장해보세요' 
                     : '멘토들과 함께 커리어 성장의 여정을 시작하세요'
                   }
                 </p>
               </div>
-              <div className="hidden md:block p-2">
+              <div className="hidden md:block p-4">
                 {status === 'authenticated' ? (
                   <Link href="/questions/new">
                     <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
@@ -246,38 +246,64 @@ export default function QuestionsPage() {
           </div>
           <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
             {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
-              <Link key={question.id} href={`/questions/${question.id}`} className="group">
-                <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
-                  <div className="flex items-start justify-between mb-3">
-                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-                      인기 {(question as any).trendingScore ? `(${Math.round((question as any).trendingScore)})` : ''}
-                    </span>
-                    <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
+              <div key={question.id} className="relative">
+                {/* 프로필 영역 - 카드 밖 */}
+                <div className="flex items-center mb-3">
+                  <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3">
+                    {getUserDisplayName(question).charAt(0)}
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors">
-                    {question.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                    {question.content}
-                  </p>
-                  <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span className="flex items-center">
-                      <User className="w-4 h-4 mr-1" />
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">
                       {getUserDisplayName(question)}
-                    </span>
-                    <div className="flex items-center space-x-3">
-                      <span className="flex items-center">
-                        <MessageCircle className="w-4 h-4 mr-1" />
-                        {getAnswerCount(question)}
-                      </span>
-                      <span className="flex items-center">
-                        <Eye className="w-4 h-4 mr-1" />
-                        {question.views || 0}
-                      </span>
                     </div>
+                    <div className="text-xs text-gray-500">CEO • {formatDate(question.created_at)}</div>
                   </div>
                 </div>
-              </Link>
+                
+                {/* 카드 영역 */}
+                <Link href={`/questions/${question.id}`} className="group block">
+                  <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
+                    {/* 날짜를 카드 우측 상단에 배치 */}
+                    <div className="absolute top-4 right-4">
+                      <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                        {getCategoryDisplayName(question.category) || '기술개발'}
+                      </span>
+                    </div>
+                    
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
+                      {question.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                      {question.content}
+                    </p>
+                    
+                    <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center space-x-3">
+                        <span className="flex items-center">
+                          <MessageCircle className="w-4 h-4 mr-1" />
+                          {getAnswerCount(question)}
+                        </span>
+                        <span className="flex items-center">
+                          <Eye className="w-4 h-4 mr-1" />
+                          {question.views || 0}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className="flex items-center">
+                          👍 1
+                        </span>
+                        <span className="flex items-center">
+                          ⭐ 1
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </div>
             )) : questions.slice(0, 3).map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`} className="group">
                 <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
@@ -413,65 +439,78 @@ export default function QuestionsPage() {
           ) : (
             <div id="questions-container" className="space-y-6 p-2">
               {filteredQuestions.map((question, index) => (
-                <Link key={question.id} href={`/questions/${question.id}`} className="block group">
-                  <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          {question.category && (
-                            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-                              {getCategoryDisplayName(question.category)}
-                            </span>
-                          )}
-                          <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-700 transition-colors">
-                          {question.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                          {question.content}
-                        </p>
-                      </div>
+                <div key={question.id} className="relative">
+                  {/* 프로필 영역 - 카드 밖 */}
+                  <div className="flex items-center mb-3">
+                    <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3">
+                      {getUserDisplayName(question).charAt(0)}
                     </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span className="flex items-center">
-                          <User className="w-4 h-4 mr-1" />
-                          {getUserDisplayName(question)}
-                        </span>
-                        <span className="flex items-center">
-                          <MessageCircle className="w-4 h-4 mr-1" />
-                          {getAnswerCount(question)}개 답변
-                        </span>
-                        <span className="flex items-center">
-                          <Eye className="w-4 h-4 mr-1" />
-                          {question.views || 0}회 조회
-                        </span>
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {getUserDisplayName(question)}
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <button 
-                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            // Handle like action
-                          }}
-                        >
-                          <ThumbsUp className="w-4 h-4" />
-                        </button>
-                        <button 
-                          className="p-2 text-gray-400 hover:text-yellow-500 transition-colors"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            // Handle bookmark action
-                          }}
-                        >
-                          <Star className="w-4 h-4" />
-                        </button>
-                      </div>
+                      <div className="text-xs text-gray-500">CEO • {formatDate(question.created_at)}</div>
                     </div>
                   </div>
-                </Link>
+                  
+                  {/* 카드 영역 */}
+                  <Link href={`/questions/${question.id}`} className="block group">
+                    <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1 relative">
+                      {/* 날짜를 카드 우측 상단에 배치 */}
+                      <div className="absolute top-4 right-4">
+                        <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
+                      </div>
+                      
+                      <div className="mb-3">
+                        {question.category && (
+                          <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                            {getCategoryDisplayName(question.category)}
+                          </span>
+                        )}
+                      </div>
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
+                        {question.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                        {question.content}
+                      </p>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <span className="flex items-center">
+                            <MessageCircle className="w-4 h-4 mr-1" />
+                            {getAnswerCount(question)}개 답변
+                          </span>
+                          <span className="flex items-center">
+                            <Eye className="w-4 h-4 mr-1" />
+                            {question.views || 0}회 조회
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <button 
+                            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              // Handle like action
+                            }}
+                          >
+                            <ThumbsUp className="w-4 h-4" />
+                          </button>
+                          <button 
+                            className="p-2 text-gray-400 hover:text-yellow-500 transition-colors"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              // Handle bookmark action
+                            }}
+                          >
+                            <Star className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
               ))}
             </div>
           )}
