@@ -3,7 +3,7 @@
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 import { Question, getAllQuestions } from '@/lib/questions'
-import { Clock, Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Search, User, TrendingUp, ThumbsUp, Star } from 'lucide-react'
+import { Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Search, Star, ThumbsUp, TrendingUp, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
@@ -113,7 +113,16 @@ export default function QuestionsPage() {
       return '익명 사용자'
     }
     // users 테이블과 조인된 데이터가 있다면 사용
-    return (question as any).users?.name || '사용자'
+    return getDisplayName((question as any).users?.name || '사용자')
+  }
+
+  const getDisplayName = (name: string) => {
+    if (!name || name === '사용자') return name
+    const parts = name.split('')
+    if (parts.length >= 2) {
+      return `${parts[0]}${parts.slice(1).join('')}`
+    }
+    return name
   }
 
   // 답변 수 계산 함수
@@ -170,14 +179,14 @@ export default function QuestionsPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Hero Section */}
         <div className="mb-8">
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 mb-6">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {status === 'authenticated' ? `안녕하세요, ${user?.name || '사용자'}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
+                  {status === 'authenticated' ? `안녕하세요, ${getDisplayName(user?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
                 </h1>
                 <p className="text-lg text-gray-600 mb-4">
                   {status === 'authenticated' 

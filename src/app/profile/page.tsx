@@ -24,8 +24,14 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('overview')
   const user = session?.user
   
-  // LinkedIn 사용자 구분
-  const isLinkedInUser = (user as any)?.provider === 'linkedin'
+  const getDisplayName = (name: string) => {
+    if (!name || name === '사용자') return name
+    const parts = name.split('')
+    if (parts.length >= 2) {
+      return `${parts[0]}${parts.slice(1).join('')}`
+    }
+    return name
+  }
 
   const userStats = {
     questionsAsked: 12,
@@ -137,8 +143,8 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-6">
-        <div className="grid lg:grid-cols-3 gap-6">
+      <div className="max-w-6xl mx-auto px-4 py-6 pb-24 md:pb-6">
+        <div className="grid lg:grid-cols-4 gap-6">
           {/* Profile Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white/90 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 text-center mb-6">
@@ -158,7 +164,7 @@ export default function ProfilePage() {
               )}
               
               {/* 사용자 이름 */}
-              <h2 className="text-xl font-semibold mb-2 text-gray-800">{user.name || '사용자'}</h2>
+              <h2 className="text-xl font-semibold mb-2 text-gray-800">{getDisplayName(user.name || '사용자')}</h2>
               
               {/* 이메일 */}
               <p className="text-gray-600 mb-4">{user.email}</p>
@@ -251,7 +257,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             {/* Tabs */}
             <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
               <div className="flex space-x-1 mb-6">

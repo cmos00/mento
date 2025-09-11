@@ -1,10 +1,10 @@
 "use client"
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { Bell, MessageCircle, Coffee, Star, Calendar, ArrowRight, Check, X, User, Heart, BookOpen } from 'lucide-react'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
+import { ArrowRight, Bell, BookOpen, Calendar, Check, Coffee, MessageCircle, X } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
 
 interface Notification {
   id: number
@@ -249,7 +249,7 @@ export default function NotificationsPage() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-6">
+      <div className="max-w-6xl mx-auto px-4 py-6 pb-24 md:pb-6">
         {/* Notification Stats */}
         <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
