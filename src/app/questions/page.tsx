@@ -200,7 +200,7 @@ export default function QuestionsPage() {
         {/* Hero Section */}
         <div id="hero-section" className="mb-8">
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 mb-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between min-h-[120px]">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
                   {status === 'authenticated' ? `안녕하세요, ${getDisplayName(user?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
@@ -212,7 +212,7 @@ export default function QuestionsPage() {
                   }
                 </p>
               </div>
-              <div className="hidden md:block">
+              <div className="hidden md:block p-2">
                 {status === 'authenticated' ? (
                   <Link href="/questions/new">
                     <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
@@ -237,19 +237,19 @@ export default function QuestionsPage() {
         <div id="trending-questions-section" className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-gray-900 flex items-center">
-              <TrendingUp className="w-5 h-5 text-orange-500 mr-2" />
+              <TrendingUp className="w-5 h-5 text-purple-500 mr-2" />
               인기 질문
             </h2>
             <Link href="/questions?sort=trending" className="text-purple-600 hover:text-purple-700 font-medium">
               더보기 →
             </Link>
           </div>
-          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
             {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`} className="group">
                 <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
                   <div className="flex items-start justify-between mb-3">
-                    <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full font-medium">
+                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
                       인기 {(question as any).trendingScore ? `(${Math.round((question as any).trendingScore)})` : ''}
                     </span>
                     <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
@@ -411,7 +411,7 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            <div id="questions-container" className="space-y-6">
+            <div id="questions-container" className="space-y-6 p-2">
               {filteredQuestions.map((question, index) => (
                 <Link key={question.id} href={`/questions/${question.id}`} className="block group">
                   <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1">
