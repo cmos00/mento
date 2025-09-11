@@ -3,17 +3,17 @@
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 import {
-    Award,
-    BookOpen,
-    Coffee,
-    LogOut,
-    MessageCircle,
-    MessageSquare,
-    Settings,
-    Star,
-    ThumbsUp,
-    TrendingUp,
-    Users
+  Award,
+  BookOpen,
+  Coffee,
+  LogOut,
+  MessageCircle,
+  MessageSquare,
+  Settings,
+  Star,
+  ThumbsUp,
+  TrendingUp,
+  Users
 } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -26,9 +26,10 @@ export default function ProfilePage() {
   
   const getDisplayName = (name: string) => {
     if (!name || name === '사용자') return name
-    const parts = name.split('')
+    const parts = name.split(' ')
     if (parts.length >= 2) {
-      return `${parts[0]}${parts.slice(1).join('')}`
+      // 성과 이름을 바꿔서 표시 (예: "동현 김" -> "김 동현")
+      return `${parts[parts.length - 1]} ${parts.slice(0, -1).join(' ')}`
     }
     return name
   }
@@ -152,7 +153,7 @@ export default function ProfilePage() {
           <div className="lg:col-span-1">
             <div className="bg-white/90 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 text-center mb-6">
               {/* 프로필 이미지 */}
-              {isLinkedInUser && user.image ? (
+              {user.image ? (
                 <div className="w-20 h-20 rounded-full mx-auto mb-4 ring-4 ring-purple-200 overflow-hidden">
                   <img 
                     src={user.image} 

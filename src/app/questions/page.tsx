@@ -118,9 +118,10 @@ export default function QuestionsPage() {
 
   const getDisplayName = (name: string) => {
     if (!name || name === '사용자') return name
-    const parts = name.split('')
+    const parts = name.split(' ')
     if (parts.length >= 2) {
-      return `${parts[0]}${parts.slice(1).join('')}`
+      // 성과 이름을 바꿔서 표시 (예: "동현 김" -> "김 동현")
+      return `${parts[parts.length - 1]} ${parts.slice(0, -1).join(' ')}`
     }
     return name
   }
