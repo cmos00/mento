@@ -246,22 +246,7 @@ export default function QuestionsPage() {
           </div>
           <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
             {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
-              <div key={question.id} className="relative">
-                {/* 프로필 영역 - 카드 밖 */}
-                <div className="flex items-center mb-3">
-                  <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3">
-                    {getUserDisplayName(question).charAt(0)}
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">
-                      {getUserDisplayName(question)}
-                    </div>
-                    <div className="text-xs text-gray-500">CEO • {formatDate(question.created_at)}</div>
-                  </div>
-                </div>
-                
-                {/* 카드 영역 */}
-                <Link href={`/questions/${question.id}`} className="group block">
+              <Link key={question.id} href={`/questions/${question.id}`} className="group block">
                   <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
                     {/* 날짜를 카드 우측 상단에 배치 */}
                     <div className="absolute top-4 right-4">
@@ -293,17 +278,28 @@ export default function QuestionsPage() {
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <span className="flex items-center">
-                          👍 1
-                        </span>
-                        <span className="flex items-center">
-                          ⭐ 1
-                        </span>
+                        <button 
+                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            // Handle like action
+                          }}
+                        >
+                          <ThumbsUp className="w-4 h-4" />
+                        </button>
+                        <button 
+                          className="p-2 text-gray-400 hover:text-yellow-500 transition-colors"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            // Handle bookmark action
+                          }}
+                        >
+                          <Star className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                   </div>
                 </Link>
-              </div>
             )) : questions.slice(0, 3).map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`} className="group">
                 <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
@@ -439,23 +435,30 @@ export default function QuestionsPage() {
           ) : (
             <div id="questions-container" className="space-y-6 p-2">
               {filteredQuestions.map((question, index) => (
-                <div key={question.id} className="relative">
+                <div key={question.id} className="relative flex flex-col">
                   {/* 프로필 영역 - 카드 밖 */}
-                  <div className="flex items-center mb-3">
+                  <div className="flex items-center mb-3 overflow-visible">
                     <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3">
                       {getUserDisplayName(question).charAt(0)}
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
+                      <a 
+                        href={(question as any).users?.linkedin_url || `https://linkedin.com/in/${getUserDisplayName(question).toLowerCase().replace(' ', '-')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-gray-900 hover:text-purple-700 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {getUserDisplayName(question)}
-                      </div>
-                      <div className="text-xs text-gray-500">CEO • {formatDate(question.created_at)}</div>
+                      </a>
+                      <div className="text-xs text-gray-500">{formatDate(question.created_at)}</div>
                     </div>
                   </div>
                   
-                  {/* 카드 영역 */}
-                  <Link href={`/questions/${question.id}`} className="block group">
-                    <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1 relative">
+                  {/* 카드 영역 - 우측 정렬 */}
+                  <div className="ml-auto w-[85%]">
+                    <Link href={`/questions/${question.id}`} className="block group">
+                      <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
                       <div className="absolute top-4 right-4">
                         <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
@@ -507,9 +510,10 @@ export default function QuestionsPage() {
                             <Star className="w-4 h-4" />
                           </button>
                         </div>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 </div>
               ))}
             </div>
