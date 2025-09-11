@@ -33,6 +33,9 @@ export default function ProfilePage() {
     return name
   }
 
+  // LinkedIn 사용자 구분
+  const isLinkedInUser = (user as any)?.provider === 'linkedin'
+
   const userStats = {
     questionsAsked: 12,
     answersGiven: 28,
