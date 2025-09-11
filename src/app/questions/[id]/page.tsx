@@ -135,7 +135,17 @@ export default function QuestionDetailPage() {
     if (question.is_anonymous) {
       return '익명 사용자'
     }
-    return (question as any).users?.name || '사용자'
+    return getDisplayName((question as any).users?.name || '사용자')
+  }
+
+  const getDisplayName = (name: string) => {
+    if (!name || name === '사용자') return name
+    const parts = name.split(' ')
+    if (parts.length >= 2) {
+      // 성과 이름을 바꿔서 표시 (예: "동현 김" -> "김 동현")
+      return `${parts[parts.length - 1]} ${parts.slice(0, -1).join(' ')}`
+    }
+    return name
   }
 
   if (loading) {

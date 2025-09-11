@@ -64,8 +64,8 @@ export default function QuestionsPage() {
       setFilteredQuestions(result.data || [])
       
       // 로그인한 사용자의 통계 조회
-      if (status === 'authenticated' && user?.email) {
-        const statsResult = await getUserStats(user.email)
+      if (status === 'authenticated' && user?.id) {
+        const statsResult = await getUserStats(user.id)
         if (statsResult.data) {
           setUserStats(statsResult.data)
         }
@@ -76,7 +76,7 @@ export default function QuestionsPage() {
     } finally {
       setLoading(false)
     }
-  }, [status, user?.email])
+  }, [status, user?.id])
 
   useEffect(() => {
     loadQuestions()
