@@ -161,9 +161,23 @@ export async function getQuestionsByUser(userId: string) {
 // 질문 조회수 증가
 export async function incrementQuestionViews(id: string) {
   try {
+    // 먼저 현재 조회수를 가져온 후 1 증가
+    const { data: currentQuestion, error: fetchError } = await supabase
+      .from('questions')
+      .select('views')
+      .eq('id', id)
+      .single()
+
+    if (fetchError) {
+      console.error('현재 조회수 조회 오류:', fetchError)
+      throw new Error(fetchError.message)
+    }
+
+    const newViews = (currentQuestion?.views || 0) + 1
+
     const { data, error } = await supabase
       .from('questions')
-      .update({ views: supabase.sql`views + 1` })
+      .update({ views: newViews })
       .eq('id', id)
       .select('views')
 
