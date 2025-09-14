@@ -244,7 +244,7 @@ export default function QuestionsPage() {
               더보기 →
             </Link>
           </div>
-          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2 ml-[52px]">
+          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
             {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`} className="group block">
                   <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
@@ -348,7 +348,7 @@ export default function QuestionsPage() {
               placeholder="질문을 검색해보세요..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors duration-200"
             />
           </div>
 
@@ -433,7 +433,7 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            <div id="questions-container" className="space-y-6 p-2">
+            <div id="questions-container" className="space-y-6 p-4">
               {filteredQuestions.map((question, index) => (
                 <div key={question.id} className="relative flex flex-col">
                   {/* 프로필 영역 - 카드 밖 */}
