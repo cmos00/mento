@@ -200,12 +200,12 @@ export default function QuestionsPage() {
         {/* Hero Section */}
         <div id="hero-section" className="mb-8">
           <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 mb-6">
-            <div className="flex items-center justify-between min-h-[120px]">
+            <div className="flex items-center justify-between min-h-[80px]">
               <div className="flex flex-col justify-center flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-xl font-bold text-gray-900 mb-1">
                   {status === 'authenticated' ? `안녕하세요, ${getDisplayName(user?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
                 </h1>
-                <p className="text-lg text-gray-600">
+                <p className="text-base text-gray-600">
                   {status === 'authenticated' 
                     ? '오늘도 멘토들과 함께 성장해보세요' 
                     : '멘토들과 함께 커리어 성장의 여정을 시작하세요'
@@ -455,8 +455,8 @@ export default function QuestionsPage() {
                     </div>
                   </div>
                   
-                  {/* 카드 영역 - 우측 정렬 */}
-                  <div className="ml-auto w-[85%]">
+                  {/* 카드 영역 - 프로필 이름과 시작점 맞춤 */}
+                  <div className="ml-[52px]">
                     <Link href={`/questions/${question.id}`} className="block group">
                       <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
