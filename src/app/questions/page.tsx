@@ -353,18 +353,15 @@ export default function QuestionsPage() {
 
           {/* 카테고리 필터 - 항상 표시 */}
           <div id="category-filter" className="bg-white border border-gray-200 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-medium text-gray-700">카테고리</h3>
+            <div className="flex flex-wrap gap-2">
               {selectedCategory && (
                 <button
                   onClick={() => setSelectedCategory('')}
-                  className="text-sm text-purple-600 hover:text-purple-700"
+                  className="px-3 py-2 rounded-lg text-sm font-medium bg-red-100 text-red-700 border border-red-300 hover:bg-red-200 transition-colors"
                 >
-                  필터 초기화
+                  ✕ 필터 초기화
                 </button>
               )}
-            </div>
-            <div className="flex flex-wrap gap-2">
               {categories.map((category, index) => (
                 <button
                   key={category}
@@ -443,8 +440,8 @@ export default function QuestionsPage() {
                     </div>
                   </div>
                   
-                  {/* 카드 영역 - 프로필 이름과 시작점 맞춤, search-input과 끝점 맞춤 */}
-                  <div className="ml-[52px] w-[calc(100%-36px)]">
+                  {/* 카드 영역 - 프로필 이름과 시작점 맞춤, category-filter와 width 맞춤 */}
+                  <div className="ml-[52px] w-[calc(100%-52px)]">
                     <Link href={`/questions/${question.id}`} className="block group">
                       <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
