@@ -199,8 +199,8 @@ export default function QuestionsPage() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Hero Section */}
         <div id="hero-section" className="mb-8">
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 mb-6">
-            <div className="flex items-center justify-between min-h-[80px]">
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6">
+            <div className="flex items-center justify-between min-h-[60px]">
               <div className="flex flex-col justify-center flex-1">
                 <h1 className="text-xl font-bold text-gray-900 mb-1">
                   {status === 'authenticated' ? `안녕하세요, ${getDisplayName(user?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
@@ -244,7 +244,7 @@ export default function QuestionsPage() {
               더보기 →
             </Link>
           </div>
-          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2 ml-[52px]">
             {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`} className="group block">
                   <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
