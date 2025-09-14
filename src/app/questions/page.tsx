@@ -244,7 +244,7 @@ export default function QuestionsPage() {
               더보기 →
             </Link>
           </div>
-          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
             {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`} className="group block">
                   <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
@@ -433,7 +433,7 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            <div id="questions-container" className="space-y-6 p-4">
+            <div id="questions-container" className="space-y-8 px-4 py-8">
               {filteredQuestions.map((question, index) => (
                 <div key={question.id} className="relative flex flex-col">
                   {/* 프로필 영역 - 카드 밖 */}
