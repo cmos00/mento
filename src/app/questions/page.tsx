@@ -279,7 +279,7 @@ export default function QuestionsPage() {
                       </div>
                       <div className="flex items-center space-x-2">
                         <button 
-                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
                           onClick={(e) => {
                             e.preventDefault()
                             // Handle like action
@@ -288,7 +288,7 @@ export default function QuestionsPage() {
                           <ThumbsUp className="w-4 h-4" />
                         </button>
                         <button 
-                          className="p-2 text-gray-400 hover:text-yellow-500 transition-colors"
+                          className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
                           onClick={(e) => {
                             e.preventDefault()
                             // Handle bookmark action
@@ -433,7 +433,7 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            <div id="questions-container" className="space-y-8 px-4 py-8">
+            <div id="questions-container" className="space-y-12 px-4 py-12">
               {filteredQuestions.map((question, index) => (
                 <div key={question.id} className="relative flex flex-col">
                   {/* 프로필 영역 - 카드 밖 */}
@@ -455,8 +455,8 @@ export default function QuestionsPage() {
                     </div>
                   </div>
                   
-                  {/* 카드 영역 - 프로필 이름과 시작점 맞춤 */}
-                  <div className="ml-[52px]">
+                  {/* 카드 영역 - 프로필 이름과 시작점 맞춤, search-input과 끝점 맞춤 */}
+                  <div className="ml-[52px] w-[calc(100%-52px)]">
                     <Link href={`/questions/${question.id}`} className="block group">
                       <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
@@ -492,7 +492,7 @@ export default function QuestionsPage() {
                         </div>
                         <div className="flex items-center space-x-2">
                           <button 
-                            className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                            className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
                             onClick={(e) => {
                               e.preventDefault()
                               // Handle like action
@@ -501,7 +501,7 @@ export default function QuestionsPage() {
                             <ThumbsUp className="w-4 h-4" />
                           </button>
                           <button 
-                            className="p-2 text-gray-400 hover:text-yellow-500 transition-colors"
+                            className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
                             onClick={(e) => {
                               e.preventDefault()
                               // Handle bookmark action
