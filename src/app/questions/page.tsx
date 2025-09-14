@@ -18,7 +18,6 @@ export default function QuestionsPage() {
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
-  const [showFilters, setShowFilters] = useState(false)
   const [userStats, setUserStats] = useState({
     questionsAsked: 0,
     answersGiven: 0,
@@ -215,14 +214,14 @@ export default function QuestionsPage() {
               <div className="hidden md:block p-4">
                 {status === 'authenticated' ? (
                   <Link href="/questions/new">
-                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-lg transform hover:-translate-y-1">
                       <Plus className="w-5 h-5 mr-2" />
                       질문하기
                     </button>
                   </Link>
                 ) : (
                   <Link href="/auth/login">
-                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-lg transform hover:-translate-y-1">
                       <Plus className="w-5 h-5 mr-2" />
                       시작하기
                     </button>
@@ -240,7 +239,7 @@ export default function QuestionsPage() {
               <TrendingUp className="w-5 h-5 text-purple-500 mr-2" />
               인기 질문
             </h2>
-            <Link href="/questions?sort=trending" className="text-purple-600 hover:text-purple-700 font-medium">
+            <Link href="/questions/trending" className="text-purple-600 hover:text-purple-700 font-medium">
               더보기 →
             </Link>
           </div>
@@ -352,47 +351,36 @@ export default function QuestionsPage() {
             />
           </div>
 
-          {/* 필터 토글 */}
-          <div id="filter-toggle" className="flex items-center justify-between">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center text-gray-600 hover:text-gray-900"
-            >
-              <Filter className="w-4 h-4 mr-2" />
-              필터
-            </button>
-            {selectedCategory && (
-              <button
-                onClick={() => setSelectedCategory('')}
-                className="text-sm text-purple-600 hover:text-purple-700"
-              >
-                필터 초기화
-              </button>
-            )}
-          </div>
-
-          {/* 카테고리 필터 */}
-          {showFilters && (
-            <div id="category-filter" className="bg-white border border-gray-200 rounded-xl p-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">카테고리</h3>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category, index) => (
-                  <button
-                    key={category}
-                    id={`category-button-${index}`}
-                    onClick={() => handleCategoryChange(category)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      selectedCategory === category
-                        ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
+          {/* 카테고리 필터 - 항상 표시 */}
+          <div id="category-filter" className="bg-white border border-gray-200 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-medium text-gray-700">카테고리</h3>
+              {selectedCategory && (
+                <button
+                  onClick={() => setSelectedCategory('')}
+                  className="text-sm text-purple-600 hover:text-purple-700"
+                >
+                  필터 초기화
+                </button>
+              )}
             </div>
-          )}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category, index) => (
+                <button
+                  key={category}
+                  id={`category-button-${index}`}
+                  onClick={() => handleCategoryChange(category)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedCategory === category
+                      ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* 에러 메시지 */}
@@ -456,9 +444,9 @@ export default function QuestionsPage() {
                   </div>
                   
                   {/* 카드 영역 - 프로필 이름과 시작점 맞춤, search-input과 끝점 맞춤 */}
-                  <div className="ml-[52px] w-[calc(100%-52px)]">
+                  <div className="ml-[52px] w-[calc(100%-36px)]">
                     <Link href={`/questions/${question.id}`} className="block group">
-                      <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1 relative">
+                      <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
                       <div className="absolute top-4 right-4">
                         <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
