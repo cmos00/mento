@@ -506,7 +506,7 @@ export default function QuestionsPage() {
                   </div>
                   
                   {/* 카드 영역 - 프로필 이름과 시작점 맞춤, 전체 width 사용 */}
-                  <div className="ml-[52px] w-[calc(100%-52px)]">
+                  <div className="ml-[52px] w-[calc(100%-52px)] py-2 px-1">
                     <Link href={`/questions/${question.id}`} className="block group">
                       <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
