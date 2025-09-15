@@ -167,6 +167,15 @@ export default function QuestionsPage() {
     const displayName = user?.name || '사용자' // DB의 실제 이름 사용
     const avatarUrl = user?.image || user?.avatar_url // DB의 이미지 우선 사용
     
+    // 디버깅을 위한 로그
+    console.log('🖼️ [Questions Page] 사용자 이미지 정보:', {
+      userId: user?.id,
+      userName: user?.name,
+      image: user?.image,
+      avatar_url: user?.avatar_url,
+      finalAvatarUrl: avatarUrl
+    })
+    
     return {
       displayName: displayName,
       avatarUrl: avatarUrl,
@@ -472,10 +481,14 @@ export default function QuestionsPage() {
                                 alt={profileInfo.displayName}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
+                                  console.error('❌ [Questions Page] 이미지 로드 실패:', profileInfo.avatarUrl)
                                   const target = e.target as HTMLImageElement;
                                   target.style.display = 'none';
                                   const sibling = target.nextElementSibling as HTMLElement;
                                   if (sibling) sibling.style.display = 'flex';
+                                }}
+                                onLoad={() => {
+                                  console.log('✅ [Questions Page] 이미지 로드 성공:', profileInfo.avatarUrl)
                                 }}
                               />
                             ) : null}
