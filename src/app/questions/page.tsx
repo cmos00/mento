@@ -412,7 +412,7 @@ export default function QuestionsPage() {
               {filteredQuestions.map((question, index) => (
                 <div key={question.id} className="relative flex flex-col">
                   {/* 프로필 영역 - 카드 밖 */}
-                  <div className="flex items-center mb-2 overflow-visible pl-4">
+                  <div className="flex items-center mb-2 overflow-visible">
                     <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3">
                       {getUserDisplayName(question).charAt(0)}
                     </div>
@@ -431,7 +431,7 @@ export default function QuestionsPage() {
                   </div>
                   
                   {/* 카드 영역 - 프로필 이름과 시작점 맞춤, 전체 width 사용 */}
-                  <div className="ml-[56px] w-[calc(100%-60px)]">
+                  <div className="ml-[52px] w-[calc(100%-52px)]">
                     <Link href={`/questions/${question.id}`} className="block group">
                       <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
