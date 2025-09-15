@@ -216,20 +216,35 @@ export default function ProfilePage() {
             <div className="bg-white/90 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 text-center mb-6">
               {/* 프로필 이미지 */}
               <div className="w-20 h-20 rounded-full mx-auto mb-4 ring-4 ring-purple-200 overflow-hidden">
-                {user?.image ? (
-                  <img 
-                    src={user.image} 
-                    alt={user.name || '프로필'} 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const sibling = target.nextElementSibling as HTMLElement;
-                      if (sibling) sibling.style.display = 'flex';
-                    }}
-                  />
-                ) : null}
-                <div className={`${user?.image ? 'hidden' : 'flex'} w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 items-center justify-center text-white text-2xl font-bold`}>
+                {(() => {
+                  // DB 이미지 정보 우선 사용
+                  const imageUrl = user?.image || user?.avatar_url || (session?.user as any)?.image
+                  console.log('🖼️ [Profile Image] 이미지 정보:', {
+                    dbImage: user?.image,
+                    dbAvatarUrl: user?.avatar_url,
+                    sessionImage: (session?.user as any)?.image,
+                    finalUrl: imageUrl
+                  })
+                  
+                  return imageUrl ? (
+                    <img 
+                      src={imageUrl} 
+                      alt={user?.name || '프로필'} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('❌ [Profile Image] 이미지 로드 실패:', imageUrl)
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const sibling = target.nextElementSibling as HTMLElement;
+                        if (sibling) sibling.style.display = 'flex';
+                      }}
+                      onLoad={() => {
+                        console.log('✅ [Profile Image] 이미지 로드 성공:', imageUrl)
+                      }}
+                    />
+                  ) : null
+                })()}
+                <div className={`${(user?.image || user?.avatar_url || (session?.user as any)?.image) ? 'hidden' : 'flex'} w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 items-center justify-center text-white text-2xl font-bold`}>
                   {user?.name?.charAt(0) || 'U'}
                 </div>
               </div>
