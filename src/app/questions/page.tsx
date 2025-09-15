@@ -422,7 +422,8 @@ export default function QuestionsPage() {
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
-                            target.nextElementSibling!.style.display = 'flex';
+                            const sibling = target.nextElementSibling as HTMLElement;
+                            if (sibling) sibling.style.display = 'flex';
                           }}
                         />
                       ) : null}
