@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
         url: "https://api.linkedin.com/v2/userinfo",
         async request({ tokens, provider }) {
           console.log('🔍 [LinkedIn UserInfo] 사용자 정보 요청 시작')
-          const response = await fetch(provider.userinfo?.url as string, {
+          const response = await fetch("https://api.linkedin.com/v2/userinfo", {
             headers: {
               Authorization: `Bearer ${tokens.access_token}`,
             },
