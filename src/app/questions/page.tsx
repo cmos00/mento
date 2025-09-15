@@ -126,8 +126,51 @@ export default function QuestionsPage() {
     if (question.is_anonymous) {
       return '익명 사용자'
     }
+    
+    const user = (question as any).users
+    
+    // 탈퇴한 사용자인 경우
+    if (user?.is_deleted) {
+      return '탈퇴한 사용자'
+    }
+    
     // users 테이블과 조인된 데이터가 있다면 사용
-    return getDisplayName((question as any).users?.name || '사용자')
+    return getDisplayName(user?.name || '사용자')
+  }
+
+  const getUserProfileInfo = (question: Question) => {
+    const user = (question as any).users
+    
+    // 익명 사용자인 경우
+    if (question.is_anonymous) {
+      return {
+        displayName: '익명 사용자',
+        avatarUrl: null,
+        linkedinUrl: null,
+        isDeleted: false,
+        showProfile: false
+      }
+    }
+    
+    // 탈퇴한 사용자인 경우
+    if (user?.is_deleted) {
+      return {
+        displayName: '탈퇴한 사용자',
+        avatarUrl: null,
+        linkedinUrl: null,
+        isDeleted: true,
+        showProfile: false
+      }
+    }
+    
+    // 일반 사용자인 경우
+    return {
+      displayName: getDisplayName(user?.name || '사용자'),
+      avatarUrl: user?.avatar_url || user?.image,
+      linkedinUrl: user?.linkedin_url || `https://linkedin.com/in/${getDisplayName(user?.name || '사용자').toLowerCase().replace(' ', '-')}`,
+      isDeleted: false,
+      showProfile: true
+    }
   }
 
   const getDisplayName = (name: string) => {
@@ -413,36 +456,53 @@ export default function QuestionsPage() {
                 <div key={question.id} className="relative flex flex-col py-6 overflow-visible">
                   {/* 프로필 영역 - 카드 밖 */}
                   <div className="flex items-center mb-2 overflow-visible">
-                    <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3 overflow-hidden">
-                      {(question as any).users?.avatar_url ? (
-                        <img 
-                          src={(question as any).users.avatar_url} 
-                          alt={getUserDisplayName(question)}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const sibling = target.nextElementSibling as HTMLElement;
-                            if (sibling) sibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <span className={`${(question as any).users?.avatar_url ? 'hidden' : 'flex'} w-full h-full items-center justify-center`}>
-                        {getUserDisplayName(question).charAt(0)}
-                      </span>
-                    </div>
-                    <div>
-                      <a 
-                        href={(question as any).users?.linkedin_url || `https://linkedin.com/in/${getUserDisplayName(question).toLowerCase().replace(' ', '-')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-medium text-gray-900 hover:text-purple-700 transition-colors"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {getUserDisplayName(question)}
-                      </a>
-                      <div className="text-xs text-gray-500">{formatDate(question.created_at)}</div>
-                    </div>
+                    {(() => {
+                      const profileInfo = getUserProfileInfo(question)
+                      return (
+                        <>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm mr-3 overflow-hidden ${
+                            profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-500'
+                          }`}>
+                            {profileInfo.avatarUrl ? (
+                              <img 
+                                src={profileInfo.avatarUrl} 
+                                alt={profileInfo.displayName}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const sibling = target.nextElementSibling as HTMLElement;
+                                  if (sibling) sibling.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            <span className={`${profileInfo.avatarUrl ? 'hidden' : 'flex'} w-full h-full items-center justify-center`}>
+                              {profileInfo.isDeleted ? '?' : profileInfo.displayName.charAt(0)}
+                            </span>
+                          </div>
+                          <div>
+                            {profileInfo.showProfile ? (
+                              <a 
+                                href={profileInfo.linkedinUrl || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm font-medium text-gray-900 hover:text-purple-700 transition-colors"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {profileInfo.displayName}
+                              </a>
+                            ) : (
+                              <span className={`text-sm font-medium ${
+                                profileInfo.isDeleted ? 'text-gray-500' : 'text-gray-900'
+                              }`}>
+                                {profileInfo.displayName}
+                              </span>
+                            )}
+                            <div className="text-xs text-gray-500">{formatDate(question.created_at)}</div>
+                          </div>
+                        </>
+                      )
+                    })()}
                   </div>
                   
                   {/* 카드 영역 - 프로필 이름과 시작점 맞춤, 전체 width 사용 */}

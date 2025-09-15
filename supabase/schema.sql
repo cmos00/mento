@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS users (
   skills TEXT[],
   linkedin_url TEXT,
   website TEXT,
+  is_verified BOOLEAN DEFAULT false,
+  is_deleted BOOLEAN DEFAULT false,
+  deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -133,5 +136,16 @@ DO $$
 BEGIN 
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='image') THEN
         ALTER TABLE users ADD COLUMN image TEXT;
+    END IF;
+END $$;
+
+-- 기존 users 테이블에 삭제 관련 칼럼 추가 (이미 존재하면 무시)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='is_deleted') THEN
+        ALTER TABLE users ADD COLUMN is_deleted BOOLEAN DEFAULT false;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='deleted_at') THEN
+        ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL;
     END IF;
 END $$;

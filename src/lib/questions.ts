@@ -46,8 +46,12 @@ export async function getAllQuestions() {
           id,
           name,
           avatar_url,
+          image,
           company,
-          position
+          position,
+          linkedin_url,
+          is_deleted,
+          deleted_at
         )
       `)
       .eq('status', 'active')
@@ -76,8 +80,12 @@ export async function getQuestionById(id: string) {
           id,
           name,
           avatar_url,
+          image,
           company,
-          position
+          position,
+          linkedin_url,
+          is_deleted,
+          deleted_at
         )
       `)
       .eq('id', id)
@@ -107,8 +115,12 @@ export async function getQuestionsByCategory(category: string) {
           id,
           name,
           avatar_url,
+          image,
           company,
-          position
+          position,
+          linkedin_url,
+          is_deleted,
+          deleted_at
         )
       `)
       .eq('category', category)
@@ -138,8 +150,12 @@ export async function getQuestionsByUser(userId: string) {
           id,
           name,
           avatar_url,
+          image,
           company,
-          position
+          position,
+          linkedin_url,
+          is_deleted,
+          deleted_at
         )
       `)
       .eq('user_id', userId)
@@ -273,8 +289,12 @@ export async function getAllQuestionsWithStats() {
           id,
           name,
           avatar_url,
+          image,
           company,
-          position
+          position,
+          linkedin_url,
+          is_deleted,
+          deleted_at
         )
       `)
       .eq('status', 'active')
@@ -318,8 +338,12 @@ export async function getTrendingQuestions(limit: number = 3) {
           id,
           name,
           avatar_url,
+          image,
           company,
-          position
+          position,
+          linkedin_url,
+          is_deleted,
+          deleted_at
         )
       `)
       .eq('status', 'active')
