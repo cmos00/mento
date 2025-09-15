@@ -451,9 +451,9 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            <div id="questions-container" className="space-y-24 py-24 w-full overflow-visible">
+            <div id="questions-container" className="space-y-12 py-12 w-full overflow-visible">
               {filteredQuestions.map((question, index) => (
-                <div key={question.id} className="relative flex flex-col py-6 overflow-visible">
+                <div key={question.id} className="relative flex flex-col py-4 overflow-visible">
                   {/* 프로필 영역 - 카드 밖 */}
                   <div className="flex items-center mb-2 overflow-visible">
                     {(() => {
