@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
@@ -36,6 +36,41 @@ export default function ProfilePage() {
 
   // LinkedIn 사용자 구분
   const isLinkedInUser = (user as any)?.provider === 'linkedin'
+  
+  // 디버깅: 프로필 이미지 정보 확인
+  console.log('🖼️ [Profile Page] 사용자 이미지 정보:', {
+    hasImage: !!user?.image,
+    imageUrl: user?.image,
+    provider: (user as any)?.provider,
+    fullUser: user
+  })
+
+  // 프로필 페이지 로드 시 사용자 정보 업데이트
+  useEffect(() => {
+    const updateUserInfo = async () => {
+      if (session && user && (user as any)?.provider === 'linkedin') {
+        try {
+          console.log('🔄 [Profile Page] LinkedIn 사용자 정보 업데이트 시도')
+          const response = await fetch('/api/user/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          })
+          
+          if (response.ok) {
+            console.log('✅ [Profile Page] 사용자 정보 업데이트 완료')
+          } else {
+            console.warn('⚠️ [Profile Page] 사용자 정보 업데이트 실패:', response.status)
+          }
+        } catch (error) {
+          console.error('❌ [Profile Page] 사용자 정보 업데이트 오류:', error)
+        }
+      }
+    }
+
+    updateUserInfo()
+  }, [session, user])
 
   const userStats = {
     questionsAsked: 12,

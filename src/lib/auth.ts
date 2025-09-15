@@ -56,8 +56,24 @@ export const authOptions: NextAuthOptions = {
             userEmail = profile.email.trim()
           }
           
-          // 이미지 처리
-          const userImage = (profile.picture || profile.picture_url || null)
+          // 이미지 처리 - LinkedIn OIDC 다양한 필드 지원
+          const userImage = (
+            profile.picture || 
+            profile.picture_url || 
+            profile.avatar_url ||
+            profile.photo ||
+            (profile as any).profile_picture ||
+            null
+          )
+          
+          console.log('🖼️ [LinkedIn Profile] 이미지 필드 확인:', {
+            picture: profile.picture,
+            picture_url: profile.picture_url,
+            avatar_url: (profile as any).avatar_url,
+            photo: (profile as any).photo,
+            profile_picture: (profile as any).profile_picture,
+            final_image: userImage
+          })
           
           console.log('✅ [LinkedIn Profile] 처리된 사용자 정보:', {
             id: userId,
