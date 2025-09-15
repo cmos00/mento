@@ -408,9 +408,9 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            <div id="questions-container" className="space-y-16 py-16 w-full">
+            <div id="questions-container" className="space-y-20 py-20 w-full">
               {filteredQuestions.map((question, index) => (
-                <div key={question.id} className="relative flex flex-col">
+                <div key={question.id} className="relative flex flex-col py-4">
                   {/* 프로필 영역 - 카드 밖 */}
                   <div className="flex items-center mb-2 overflow-visible">
                     <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3">
