@@ -73,7 +73,7 @@ export const authOptions: NextAuthOptions = {
           } else if (profile.given_name || profile.family_name) {
             const givenName = profile.given_name || ''
             const familyName = profile.family_name || ''
-            userName = `${givenName} ${familyName}`.trim()
+            userName = `${familyName} ${givenName}`.trim()
           }
           
           // 이메일 처리 - 더 안전한 방식

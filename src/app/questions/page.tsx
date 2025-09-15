@@ -164,10 +164,13 @@ export default function QuestionsPage() {
     }
     
     // 일반 사용자인 경우
+    const displayName = user?.name || '사용자' // DB의 실제 이름 사용
+    const avatarUrl = user?.image || user?.avatar_url // DB의 이미지 우선 사용
+    
     return {
-      displayName: getDisplayName(user?.name || '사용자'),
-      avatarUrl: user?.avatar_url || user?.image,
-      linkedinUrl: user?.linkedin_url || `https://linkedin.com/in/${getDisplayName(user?.name || '사용자').toLowerCase().replace(' ', '-')}`,
+      displayName: displayName,
+      avatarUrl: avatarUrl,
+      linkedinUrl: user?.linkedin_url || `https://linkedin.com/in/${displayName.toLowerCase().replace(' ', '-')}`,
       isDeleted: false,
       showProfile: true
     }
