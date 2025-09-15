@@ -373,7 +373,7 @@ export default function QuestionDetailPage() {
                     </div>
                     <div className="ml-3">
                       <p className="font-medium text-gray-900">
-                        {feedback.users?.name || '익명 사용자'}
+                        {getDisplayName(feedback.users?.name || '익명 사용자')}
                       </p>
                       <div className="flex items-center text-sm text-gray-500">
                         {feedback.users?.company && feedback.users?.position && (

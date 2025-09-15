@@ -252,7 +252,7 @@ export default function QuestionsPage() {
                       <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
                     </div>
                     
-                    <div className="mb-3">
+                    <div className="mb-3 overflow-hidden">
                       <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
                         {getCategoryDisplayName(question.category) || '기술개발'}
                       </span>
@@ -416,7 +416,7 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            <div id="questions-container" className="space-y-12 px-4 py-12">
+            <div id="questions-container" className="space-y-16 px-4 py-16">
               {filteredQuestions.map((question, index) => (
                 <div key={question.id} className="relative flex flex-col">
                   {/* 프로필 영역 - 카드 밖 */}
@@ -447,7 +447,7 @@ export default function QuestionsPage() {
                         <span className="text-xs text-gray-500 whitespace-nowrap">{formatDate(question.created_at)}</span>
                       </div>
                       
-                      <div className="mb-3">
+                      <div className="mb-3 overflow-hidden">
                         {question.category && (
                           <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
                             {getCategoryDisplayName(question.category)}
