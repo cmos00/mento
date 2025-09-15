@@ -22,7 +22,8 @@ import { useState, useEffect } from 'react'
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const [activeTab, setActiveTab] = useState('overview')
-  const user = session?.user
+  const [dbUser, setDbUser] = useState<any>(null)
+  const user = dbUser || session?.user
   
   const getDisplayName = (name: string) => {
     if (!name || name === '사용자') return name
@@ -45,32 +46,58 @@ export default function ProfilePage() {
     fullUser: user
   })
 
-  // 프로필 페이지 로드 시 사용자 정보 업데이트
+  // 프로필 페이지 로드 시 사용자 정보 업데이트 및 DB에서 최신 정보 가져오기
   useEffect(() => {
-    const updateUserInfo = async () => {
-      if (session && user && (user as any)?.provider === 'linkedin') {
+    const updateAndFetchUserInfo = async () => {
+      if (session && session.user) {
         try {
-          console.log('🔄 [Profile Page] LinkedIn 사용자 정보 업데이트 시도')
-          const response = await fetch('/api/user/update', {
+          // 1. LinkedIn 사용자인 경우 정보 업데이트
+          if ((session.user as any)?.provider === 'linkedin') {
+            console.log('🔄 [Profile Page] LinkedIn 사용자 정보 업데이트 시도')
+            const updateResponse = await fetch('/api/user/update', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+            
+            if (updateResponse.ok) {
+              console.log('✅ [Profile Page] 사용자 정보 업데이트 완료')
+            } else {
+              console.warn('⚠️ [Profile Page] 사용자 정보 업데이트 실패:', updateResponse.status)
+            }
+          }
+
+          // 2. DB에서 최신 사용자 정보 가져오기
+          console.log('📥 [Profile Page] DB에서 사용자 정보 조회 시도')
+          const getUserResponse = await fetch('/api/user/get', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             }
           })
           
-          if (response.ok) {
-            console.log('✅ [Profile Page] 사용자 정보 업데이트 완료')
+          if (getUserResponse.ok) {
+            const userData = await getUserResponse.json()
+            console.log('✅ [Profile Page] DB에서 사용자 정보 조회 완료:', userData)
+            if (userData.user) {
+              setDbUser({
+                ...session.user,
+                image: userData.user.image || userData.user.avatar_url,
+                ...userData.user
+              })
+            }
           } else {
-            console.warn('⚠️ [Profile Page] 사용자 정보 업데이트 실패:', response.status)
+            console.warn('⚠️ [Profile Page] DB 사용자 정보 조회 실패:', getUserResponse.status)
           }
         } catch (error) {
-          console.error('❌ [Profile Page] 사용자 정보 업데이트 오류:', error)
+          console.error('❌ [Profile Page] 사용자 정보 처리 오류:', error)
         }
       }
     }
 
-    updateUserInfo()
-  }, [session, user])
+    updateAndFetchUserInfo()
+  }, [session])
 
   const userStats = {
     questionsAsked: 12,
@@ -188,19 +215,24 @@ export default function ProfilePage() {
           <div className="lg:col-span-1">
             <div className="bg-white/90 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 text-center mb-6">
               {/* 프로필 이미지 */}
-              {user.image ? (
-                <div className="w-20 h-20 rounded-full mx-auto mb-4 ring-4 ring-purple-200 overflow-hidden">
+              <div className="w-20 h-20 rounded-full mx-auto mb-4 ring-4 ring-purple-200 overflow-hidden">
+                {user?.image ? (
                   <img 
                     src={user.image} 
                     alt={user.name || '프로필'} 
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const sibling = target.nextElementSibling as HTMLElement;
+                      if (sibling) sibling.style.display = 'flex';
+                    }}
                   />
+                ) : null}
+                <div className={`${user?.image ? 'hidden' : 'flex'} w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 items-center justify-center text-white text-2xl font-bold`}>
+                  {user?.name?.charAt(0) || 'U'}
                 </div>
-              ) : (
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4 ring-4 ring-purple-200">
-                  {user.name?.charAt(0) || 'U'}
-                </div>
-              )}
+              </div>
               
               {/* 사용자 이름 */}
               <h2 className="text-xl font-semibold mb-2 text-gray-800">{getDisplayName(user.name || '사용자')}</h2>
