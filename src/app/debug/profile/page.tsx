@@ -225,11 +225,11 @@ export default function DebugProfilePage() {
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mt-6">
           <h2 className="text-xl font-semibold mb-4 text-yellow-800">권장 테스트 절차</h2>
           <ol className="list-decimal list-inside space-y-2 text-yellow-800">
-            <li>현재 페이지에서 "DB에서 사용자 정보 조회" 버튼 클릭</li>
+            <li>현재 페이지에서 &quot;DB에서 사용자 정보 조회&quot; 버튼 클릭</li>
             <li>콘솔에서 LinkedIn 프로필 수집 로그 확인</li>
-            <li>이미지가 없다면 "사용자 정보 업데이트 테스트" 클릭</li>
+            <li>이미지가 없다면 &quot;사용자 정보 업데이트 테스트&quot; 클릭</li>
             <li>여전히 없다면 로그아웃 후 LinkedIn으로 재로그인</li>
-            <li>재로그인 시 콘솔에서 "🔍 [LinkedIn Profile]" 로그 확인</li>
+            <li>재로그인 시 콘솔에서 &quot;🔍 [LinkedIn Profile]&quot; 로그 확인</li>
           </ol>
         </div>
       </div>
