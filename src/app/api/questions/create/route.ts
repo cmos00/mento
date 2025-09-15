@@ -58,6 +58,7 @@ export async function POST(request: NextRequest) {
             id: finalUserId,
             email: userInfo.email,
             name: userInfo.name,
+            avatar_url: userInfo.image || null,
             company: userInfo.isLinkedIn ? undefined : undefined,
             position: userInfo.isLinkedIn ? undefined : undefined
           }], { 

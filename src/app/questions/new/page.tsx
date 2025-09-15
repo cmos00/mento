@@ -88,6 +88,7 @@ export default function NewQuestionPage() {
       const { data, error } = await createQuestion(questionData, {
         name: getDisplayName(session.user.name || '사용자'),
         email: session.user.email || 'user@example.com',
+        image: session.user.image || null,
         isLinkedIn: (session.user as any)?.provider === 'linkedin'
       })
 

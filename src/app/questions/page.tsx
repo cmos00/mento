@@ -408,13 +408,27 @@ export default function QuestionsPage() {
               )}
             </div>
           ) : (
-            <div id="questions-container" className="space-y-20 py-20 w-full">
+            <div id="questions-container" className="space-y-24 py-24 w-full overflow-visible">
               {filteredQuestions.map((question, index) => (
-                <div key={question.id} className="relative flex flex-col py-4">
+                <div key={question.id} className="relative flex flex-col py-6 overflow-visible">
                   {/* 프로필 영역 - 카드 밖 */}
                   <div className="flex items-center mb-2 overflow-visible">
-                    <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3">
-                      {getUserDisplayName(question).charAt(0)}
+                    <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3 overflow-hidden">
+                      {(question as any).users?.avatar_url ? (
+                        <img 
+                          src={(question as any).users.avatar_url} 
+                          alt={getUserDisplayName(question)}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            target.nextElementSibling!.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <span className={`${(question as any).users?.avatar_url ? 'hidden' : 'flex'} w-full h-full items-center justify-center`}>
+                        {getUserDisplayName(question).charAt(0)}
+                      </span>
                     </div>
                     <div>
                       <a 
