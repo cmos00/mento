@@ -21,8 +21,34 @@ export const authOptions: NextAuthOptions = {
           scope: 'openid profile email',
         },
       },
+      // LinkedIn 프로필 이미지를 위한 추가 설정
+      userinfo: {
+        url: "https://api.linkedin.com/v2/userinfo",
+        async request({ tokens, provider }) {
+          console.log('🔍 [LinkedIn UserInfo] 사용자 정보 요청 시작')
+          const response = await fetch(provider.userinfo?.url as string, {
+            headers: {
+              Authorization: `Bearer ${tokens.access_token}`,
+            },
+          })
+          const userinfo = await response.json()
+          console.log('🔍 [LinkedIn UserInfo] 사용자 정보 응답:', JSON.stringify(userinfo, null, 2))
+          return userinfo
+        },
+      },
       profile(profile) {
         console.log('🔍 [LinkedIn Profile] LinkedIn 프로필 정보 수신:', JSON.stringify(profile, null, 2))
+        console.log('🔍 [LinkedIn Profile] 원본 프로필 객체 키들:', Object.keys(profile))
+        console.log('🔍 [LinkedIn Profile] 이미지 관련 필드들:', {
+          picture: profile.picture,
+          picture_url: profile.picture_url,
+          avatar_url: (profile as any).avatar_url,
+          photo: (profile as any).photo,
+          profile_picture: (profile as any).profile_picture,
+          image: (profile as any).image,
+          profilePicture: (profile as any).profilePicture,
+          avatar: (profile as any).avatar
+        })
         
         try {
           // LinkedIn OIDC에서 받아오는 사용자 정보 처리 - UUID 형식으로 생성
