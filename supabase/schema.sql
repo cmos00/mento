@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   avatar_url TEXT,
+  image TEXT,
   company TEXT,
   position TEXT,
   experience TEXT,
@@ -126,3 +127,11 @@ CREATE POLICY "Question stats are viewable by everyone" ON question_stats
 -- 서버에서만 질문 통계 생성/수정 가능
 CREATE POLICY "Server can manage question stats" ON question_stats
   FOR ALL USING (true);
+
+-- 기존 users 테이블에 image 칼럼 추가 (이미 존재하면 무시)
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='image') THEN
+        ALTER TABLE users ADD COLUMN image TEXT;
+    END IF;
+END $$;
