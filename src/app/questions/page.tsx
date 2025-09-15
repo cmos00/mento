@@ -129,8 +129,8 @@ export default function QuestionsPage() {
     
     const user = (question as any).users
     
-    // 탈퇴한 사용자인 경우
-    if (user?.is_deleted) {
+    // 탈퇴한 사용자인 경우 (컬럼이 존재할 때만 체크)
+    if (user?.is_deleted === true) {
       return '탈퇴한 사용자'
     }
     
@@ -152,8 +152,8 @@ export default function QuestionsPage() {
       }
     }
     
-    // 탈퇴한 사용자인 경우
-    if (user?.is_deleted) {
+    // 탈퇴한 사용자인 경우 (컬럼이 존재할 때만 체크)
+    if (user?.is_deleted === true) {
       return {
         displayName: '탈퇴한 사용자',
         avatarUrl: null,
