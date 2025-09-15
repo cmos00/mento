@@ -59,6 +59,14 @@ export default function NewQuestionPage() {
       setError('제목, 내용, 카테고리를 모두 입력해주세요.')
       return
     }
+    if (title.trim().length < 5) {
+      setError('제목은 최소 5자 이상 입력해주세요.')
+      return
+    }
+    if (content.trim().length < 15) {
+      setError('상세내용은 최소 15자 이상 입력해주세요.')
+      return
+    }
     if (!session?.user?.id) {
       setError('로그인이 필요합니다.')
       return
@@ -153,7 +161,7 @@ export default function NewQuestionPage() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-purple-100 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-[1120px] mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Link href="/questions" className="p-2 text-gray-600 hover:text-purple-600 transition-colors">
               <ArrowLeft className="w-5 h-5" />
@@ -166,7 +174,7 @@ export default function NewQuestionPage() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-6">
+      <div className="max-w-[1120px] mx-auto px-4 py-6 pb-24 md:pb-6">
         <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">새 질문 작성</h1>
@@ -183,14 +191,14 @@ export default function NewQuestionPage() {
             <div className="space-y-2">
               <label htmlFor="title" className="text-gray-700 font-medium flex items-center">
                 <FileText className="w-4 h-4 mr-2" />
-                제목 *
+                제목 * (최소 5자)
               </label>
               <input
                 id="title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="질문의 핵심을 간단하게 표현해주세요"
+                placeholder="질문의 핵심을 간단하게 표현해주세요 (최소 5자)"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-purple-500 transition-colors duration-200"
                 required
                 maxLength={100}
@@ -231,13 +239,13 @@ export default function NewQuestionPage() {
             <div className="space-y-2">
               <label htmlFor="content" className="text-gray-700 font-medium flex items-center">
                 <MessageSquare className="w-4 h-4 mr-2" />
-                상세 내용 *
+                상세 내용 * (최소 15자)
               </label>
               <textarea
                 id="content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                placeholder={`구체적인 상황을 설명해주세요. 예시:
+                placeholder={`구체적인 상황을 설명해주세요 (최소 15자). 예시:
 
 • 현재 상황과 배경
 • 구체적인 문제나 고민
@@ -335,15 +343,7 @@ export default function NewQuestionPage() {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-end space-x-3 pt-4">
-              <Link href="/questions">
-                <button
-                  type="button"
-                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors"
-                >
-                  취소
-                </button>
-              </Link>
+            <div className="flex justify-end pt-4">
               <button
                 type="submit"
                 disabled={isSubmitting}
