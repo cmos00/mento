@@ -32,6 +32,16 @@ export default function NewQuestionPage() {
     "개발자", "마케터", "디자이너", "기획자", "PM", "PO", "스타트업", "대기업", "중소기업", "신입", "주니어", "시니어", "팀장", "리더"
   ]
 
+  const getDisplayName = (name: string) => {
+    if (!name || name === '사용자') return name
+    const parts = name.split(' ')
+    if (parts.length >= 2) {
+      // 성과 이름을 바꿔서 표시 (예: "동현 김" -> "김 동현")
+      return `${parts[parts.length - 1]} ${parts.slice(0, -1).join(' ')}`
+    }
+    return name
+  }
+
   const addTag = (tag: string) => {
     if (!tags.includes(tag) && tag.trim()) {
       setTags([...tags, tag.trim()])
@@ -76,7 +86,7 @@ export default function NewQuestionPage() {
       console.log('Creating question with user ID:', userId) // 디버깅용
 
       const { data, error } = await createQuestion(questionData, {
-        name: session.user.name || '사용자',
+        name: getDisplayName(session.user.name || '사용자'),
         email: session.user.email || 'user@example.com',
         isLinkedIn: (session.user as any)?.provider === 'linkedin'
       })
@@ -162,7 +172,7 @@ export default function NewQuestionPage() {
             <p className="text-gray-600">커리어 고민을 솔직하게 나누고 전문가들의 조언을 받아보세요</p>
             {session?.user && (
               <p className="text-sm text-purple-600 mt-2">
-                👋 {session.user.name}님, 안녕하세요!
+                👋 {getDisplayName(session.user.name || '사용자')}님, 안녕하세요!
               </p>
             )}
           </div>

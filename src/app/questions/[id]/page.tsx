@@ -294,7 +294,7 @@ export default function QuestionDetailPage() {
                 <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
                   <User className="w-4 h-4 text-purple-600" />
                 </div>
-                <span className="font-medium text-gray-900">{session?.user?.name}</span>
+                <span className="font-medium text-gray-900">{getDisplayName(session?.user?.name || '사용자')}</span>
               </div>
               
               <textarea

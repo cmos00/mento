@@ -59,6 +59,13 @@ tests/
 
 ## 외부 서비스 설정 상태 (중요!)
 
+### Supabase 환경 변수 (고정값 - 변경 금지)
+```
+NEXT_PUBLIC_SUPABASE_URL=https://tpfamzghtqjwqahsddml.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwZmFtemdodHFqd3FhaHNkZG1sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0OTIzMDcsImV4cCI6MjA3MTA2ODMwN30.TLLxvQq73bV_fPSpJo3jAHYemASLIrAHEswHsGWez2c
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwZmFtemdodHFqd3FhaHNkZG1sIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NTQ5MjMwNywiZXhwIjoyMDcxMDY4MzA3fQ._-vJVA7OlQ-iLkA1Rf3tqm4pIUbCbwJRBzVC81x8Gm0
+```
+
 ### 현재 설정 상태 (2025년 1월 기준)
 
 #### 1. Supabase 설정

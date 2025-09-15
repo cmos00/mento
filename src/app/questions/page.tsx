@@ -3,7 +3,7 @@
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 import { Question, getAllQuestionsWithStats, getTrendingQuestions, getUserStats } from '@/lib/questions'
-import { Eye, Filter, MessageCircle, MessageSquare, Plus, RefreshCw, Search, Star, ThumbsUp, TrendingUp, User } from 'lucide-react'
+import { Eye, MessageCircle, MessageSquare, Plus, RefreshCw, Search, Star, ThumbsUp, TrendingUp, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
@@ -352,31 +352,29 @@ export default function QuestionsPage() {
           </div>
 
           {/* 카테고리 필터 - 항상 표시 */}
-          <div id="category-filter" className="bg-white border border-gray-200 rounded-xl p-4">
-            <div className="flex flex-wrap gap-2">
-              {selectedCategory && (
-                <button
-                  onClick={() => setSelectedCategory('')}
-                  className="px-3 py-2 rounded-lg text-sm font-medium bg-red-100 text-red-700 border border-red-300 hover:bg-red-200 transition-colors"
-                >
-                  ✕ 필터 초기화
-                </button>
-              )}
-              {categories.map((category, index) => (
-                <button
-                  key={category}
-                  id={`category-button-${index}`}
-                  onClick={() => handleCategoryChange(category)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedCategory === category
-                      ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
+          <div id="category-filter" className="flex flex-wrap gap-2">
+            {selectedCategory && (
+              <button
+                onClick={() => setSelectedCategory('')}
+                className="px-3 py-2 rounded-lg text-sm font-medium bg-red-100 text-red-700 border border-red-300 hover:bg-red-200 transition-colors"
+              >
+                ✕ 필터 초기화
+              </button>
+            )}
+            {categories.map((category, index) => (
+              <button
+                key={category}
+                id={`category-button-${index}`}
+                onClick={() => handleCategoryChange(category)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -422,7 +420,7 @@ export default function QuestionsPage() {
               {filteredQuestions.map((question, index) => (
                 <div key={question.id} className="relative flex flex-col">
                   {/* 프로필 영역 - 카드 밖 */}
-                  <div className="flex items-center mb-3 overflow-visible">
+                  <div className="flex items-center mb-2 overflow-visible">
                     <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white font-medium text-sm mr-3">
                       {getUserDisplayName(question).charAt(0)}
                     </div>
@@ -445,8 +443,8 @@ export default function QuestionsPage() {
                     <Link href={`/questions/${question.id}`} className="block group">
                       <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
-                      <div className="absolute top-4 right-4">
-                        <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
+                      <div className="absolute top-4 right-4 overflow-hidden">
+                        <span className="text-xs text-gray-500 whitespace-nowrap">{formatDate(question.created_at)}</span>
                       </div>
                       
                       <div className="mb-3">
