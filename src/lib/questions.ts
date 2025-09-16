@@ -50,7 +50,8 @@ export async function getAllQuestions() {
           company,
           position,
           linkedin_url
-        )
+        ),
+        question_votes (count)
       `)
       .eq('status', 'active')
       .order('created_at', { ascending: false })
@@ -82,7 +83,8 @@ export async function getQuestionById(id: string) {
           company,
           position,
           linkedin_url
-        )
+        ),
+        question_votes (count)
       `)
       .eq('id', id)
       .eq('status', 'active')
@@ -115,7 +117,8 @@ export async function getQuestionsByCategory(category: string) {
           company,
           position,
           linkedin_url
-        )
+        ),
+        question_votes (count)
       `)
       .eq('category', category)
       .eq('status', 'active')
@@ -148,7 +151,8 @@ export async function getQuestionsByUser(userId: string) {
           company,
           position,
           linkedin_url
-        )
+        ),
+        question_votes (count)
       `)
       .eq('user_id', userId)
       .eq('status', 'active')
@@ -285,7 +289,8 @@ export async function getAllQuestionsWithStats() {
           company,
           position,
           linkedin_url
-        )
+        ),
+        question_votes (count)
       `)
       .eq('status', 'active')
       .order('created_at', { ascending: false })
@@ -332,7 +337,8 @@ export async function getTrendingQuestions(limit: number = 3) {
           company,
           position,
           linkedin_url
-        )
+        ),
+        question_votes (count)
       `)
       .eq('status', 'active')
       .gte('created_at', yesterday.toISOString())

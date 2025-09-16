@@ -3,7 +3,7 @@
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 import { Question, getAllQuestionsWithStats, getTrendingQuestions, getUserStats } from '@/lib/questions'
-import { Eye, MessageCircle, MessageSquare, Plus, RefreshCw, Search, Star, ThumbsUp, TrendingUp, User } from 'lucide-react'
+import { Eye, MessageCircle, MessageSquare, Plus, RefreshCw, Search, ThumbsUp, TrendingUp, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
@@ -18,6 +18,7 @@ export default function QuestionsPage() {
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
+  const [votedQuestions, setVotedQuestions] = useState<Set<string>>(new Set())
   const [userStats, setUserStats] = useState({
     questionsAsked: 0,
     answersGiven: 0,
@@ -120,6 +121,49 @@ export default function QuestionsPage() {
     if (diffDays < 7) return `${diffDays}일 전`
     if (diffDays < 30) return `${Math.ceil(diffDays / 7)}주 전`
     return date.toLocaleDateString('ko-KR')
+  }
+
+  const handleVote = async (questionId: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!session?.user) {
+      alert('로그인이 필요합니다.')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/questions/vote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ questionId }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // 투표 상태 업데이트
+        setVotedQuestions(prev => {
+          const newSet = new Set(prev)
+          if (result.isVoted) {
+            newSet.add(questionId)
+          } else {
+            newSet.delete(questionId)
+          }
+          return newSet
+        })
+
+        // 질문 목록 새로고침
+        loadQuestions()
+      } else {
+        alert(result.error || '투표에 실패했습니다.')
+      }
+    } catch (error) {
+      console.error('투표 오류:', error)
+      alert('투표 중 오류가 발생했습니다.')
+    }
   }
 
   const getUserDisplayName = (question: Question) => {
@@ -225,7 +269,7 @@ export default function QuestionsPage() {
       </div>
       
       {/* Mobile Header */}
-      <header id="mobile-header" className="md:hidden bg-white border-b border-gray-200 px-4 py-4">
+      <header id="mobile-header" className="md:hidden bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-4 sticky top-0 z-50">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <h1 className="text-xl font-bold text-gray-900">홈</h1>
@@ -345,15 +389,6 @@ export default function QuestionsPage() {
                           }}
                         >
                           <ThumbsUp className="w-4 h-4" />
-                        </button>
-                        <button 
-                          className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            // Handle bookmark action
-                          }}
-                        >
-                          <Star className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -560,8 +595,22 @@ export default function QuestionsPage() {
                             <Eye className="w-4 h-4 mr-1" />
                             {question.views || 0}회 조회
                           </span>
+                          <span className="flex items-center">
+                            <ThumbsUp className="w-4 h-4 mr-1" />
+                            {(question as any).question_votes?.[0]?.count || 0}개 좋아요
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
+                          <button
+                            className={`p-2 transition-colors ${
+                              votedQuestions.has(question.id) 
+                                ? 'text-purple-500 hover:text-purple-600' 
+                                : 'text-gray-400 hover:text-purple-500'
+                            }`}
+                            onClick={(e) => handleVote(question.id, e)}
+                          >
+                            <ThumbsUp className="w-4 h-4" />
+                          </button>
                           <button 
                             className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
                             onClick={(e) => {
@@ -570,15 +619,6 @@ export default function QuestionsPage() {
                             }}
                           >
                             <ThumbsUp className="w-4 h-4" />
-                          </button>
-                          <button 
-                            className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              // Handle bookmark action
-                            }}
-                          >
-                            <Star className="w-4 h-4" />
                           </button>
                         </div>
                         </div>

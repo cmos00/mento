@@ -149,3 +149,35 @@ BEGIN
         ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL;
     END IF;
 END $$;
+
+-- 투표 테이블
+CREATE TABLE IF NOT EXISTS question_votes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(question_id, user_id)
+);
+
+-- question_stats 테이블에 votes_24h 컬럼 추가
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='question_stats' AND column_name='votes_24h') THEN
+        ALTER TABLE question_stats ADD COLUMN votes_24h INTEGER DEFAULT 0;
+    END IF;
+END $$;
+
+-- RLS 정책 추가
+ALTER TABLE question_votes ENABLE ROW LEVEL SECURITY;
+
+-- 투표 조회 정책
+CREATE POLICY "Anyone can view votes" ON question_votes
+  FOR SELECT USING (true);
+
+-- 투표 생성 정책  
+CREATE POLICY "Users can create their own votes" ON question_votes
+  FOR INSERT WITH CHECK (true);
+
+-- 투표 삭제 정책
+CREATE POLICY "Users can delete their own votes" ON question_votes
+  FOR DELETE USING (true);
