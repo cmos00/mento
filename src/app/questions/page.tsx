@@ -597,7 +597,7 @@ export default function QuestionsPage() {
                           </span>
                           <span className="flex items-center">
                             <ThumbsUp className="w-4 h-4 mr-1" />
-                            {(question as any).question_votes?.[0]?.count || 0}개 좋아요
+                            0개 좋아요
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
