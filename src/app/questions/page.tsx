@@ -165,15 +165,20 @@ export default function QuestionsPage() {
     
     // 일반 사용자인 경우
     const displayName = user?.name || '사용자' // DB의 실제 이름 사용
-    const avatarUrl = user?.image || user?.avatar_url // DB의 이미지 우선 사용
+    const originalImageUrl = user?.image || user?.avatar_url // DB의 이미지 우선 사용
+    
+    // LinkedIn 이미지인 경우 프록시를 통해 제공
+    const avatarUrl = originalImageUrl && originalImageUrl.includes('media.licdn.com') 
+      ? `/api/image-proxy?url=${encodeURIComponent(originalImageUrl)}`
+      : originalImageUrl
     
     // 디버깅을 위한 로그
     console.log('🖼️ [Questions Page] 사용자 이미지 정보:', {
       userId: user?.id,
       userName: user?.name,
-      image: user?.image,
-      avatar_url: user?.avatar_url,
-      finalAvatarUrl: avatarUrl
+      originalImage: originalImageUrl,
+      proxyImage: avatarUrl,
+      isLinkedInImage: originalImageUrl?.includes('media.licdn.com')
     })
     
     return {

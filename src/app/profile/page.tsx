@@ -218,12 +218,20 @@ export default function ProfilePage() {
               <div className="w-20 h-20 rounded-full mx-auto mb-4 ring-4 ring-purple-200 overflow-hidden">
                 {(() => {
                   // DB 이미지 정보 우선 사용
-                  const imageUrl = user?.image || user?.avatar_url || (session?.user as any)?.image
+                  const originalImageUrl = user?.image || user?.avatar_url || (session?.user as any)?.image
+                  
+                  // LinkedIn 이미지인 경우 프록시를 통해 제공
+                  const imageUrl = originalImageUrl && originalImageUrl.includes('media.licdn.com') 
+                    ? `/api/image-proxy?url=${encodeURIComponent(originalImageUrl)}`
+                    : originalImageUrl
+                  
                   console.log('🖼️ [Profile Image] 이미지 정보:', {
                     dbImage: user?.image,
                     dbAvatarUrl: user?.avatar_url,
                     sessionImage: (session?.user as any)?.image,
-                    finalUrl: imageUrl
+                    originalUrl: originalImageUrl,
+                    proxyUrl: imageUrl,
+                    isLinkedInImage: originalImageUrl?.includes('media.licdn.com')
                   })
                   
                   return imageUrl ? (
