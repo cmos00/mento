@@ -302,7 +302,7 @@ export default function QuestionsPage() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Hero Section */}
         <div id="hero-section" className="mb-8">
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6">
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6 ml-6">
             <div className="flex items-center justify-between min-h-[60px]">
               <div className="flex flex-col justify-center flex-1">
                 <h1 className="text-xl font-bold text-gray-900 mb-1">
@@ -350,7 +350,7 @@ export default function QuestionsPage() {
           <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
             {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`} className="group block">
-                  <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
+                  <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative h-48 flex flex-col">
                     {/* 날짜를 카드 우측 상단에 배치 */}
                     <div className="absolute top-4 right-4">
                       <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
@@ -365,11 +365,11 @@ export default function QuestionsPage() {
                     <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
                       {question.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-1">
                       {question.content}
                     </p>
                     
-                    <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div className="flex items-center justify-between text-sm text-gray-500 mt-auto">
                       <div className="flex items-center space-x-3">
                         <span className="flex items-center">
                           <MessageCircle className="w-4 h-4 mr-1" />
@@ -595,12 +595,12 @@ export default function QuestionsPage() {
                             <Eye className="w-4 h-4 mr-1" />
                             {question.views || 0}회 조회
                           </span>
-                          <span className="flex items-center">
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <span className="flex items-center text-sm text-gray-500">
                             <ThumbsUp className="w-4 h-4 mr-1" />
                             0개 좋아요
                           </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
                           <button
                             className={`p-2 transition-colors ${
                               votedQuestions.has(question.id) 
@@ -608,15 +608,6 @@ export default function QuestionsPage() {
                                 : 'text-gray-400 hover:text-purple-500'
                             }`}
                             onClick={(e) => handleVote(question.id, e)}
-                          >
-                            <ThumbsUp className="w-4 h-4" />
-                          </button>
-                          <button 
-                            className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              // Handle like action
-                            }}
                           >
                             <ThumbsUp className="w-4 h-4" />
                           </button>
