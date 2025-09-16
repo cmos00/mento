@@ -302,9 +302,9 @@ export default function QuestionsPage() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Hero Section */}
         <div id="hero-section" className="mb-8">
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6 ml-6">
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6">
             <div className="flex items-center justify-between min-h-[60px]">
-              <div className="flex flex-col justify-center flex-1">
+              <div className="flex flex-col justify-center flex-1 ml-6">
                 <h1 className="text-xl font-bold text-gray-900 mb-1">
                   {status === 'authenticated' ? `안녕하세요, ${getDisplayName(user?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
                 </h1>
@@ -379,17 +379,6 @@ export default function QuestionsPage() {
                           <Eye className="w-4 h-4 mr-1" />
                           {question.views || 0}
                         </span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <button 
-                          className="p-2 text-gray-400 hover:text-purple-500 transition-colors"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            // Handle like action
-                          }}
-                        >
-                          <ThumbsUp className="w-4 h-4" />
-                        </button>
                       </div>
                     </div>
                   </div>
