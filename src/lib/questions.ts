@@ -365,7 +365,7 @@ export async function getTrendingQuestions(limit: number = 3) {
         return {
           ...question,
           answerCount: totalAnswers,
-          recentAnswerCount: recentAnswers,
+          recentAnswerCount: recentAnswerCount || 0,
           trendingScore
         }
       })
