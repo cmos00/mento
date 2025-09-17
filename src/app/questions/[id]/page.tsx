@@ -158,7 +158,39 @@ export default function QuestionDetailPage() {
     }
     
     const displayName = getDisplayName(user?.name || '사용자')
-    const avatarUrl = user?.image || user?.avatar_url
+    let avatarUrl = user?.image || user?.avatar_url
+    
+    // LinkedIn 이미지인 경우 proxy 사용
+    if (avatarUrl && avatarUrl.includes('linkedin.com')) {
+      avatarUrl = `/api/image-proxy?url=${encodeURIComponent(avatarUrl)}`
+    }
+    
+    return {
+      displayName,
+      avatarUrl,
+      isDeleted: false
+    }
+  }
+
+  const getFeedbackUserProfileInfo = (feedback: FeedbackWithAuthor) => {
+    const user = feedback.users
+    
+    // 탈퇴한 사용자인 경우
+    if (user?.is_deleted === true) {
+      return {
+        displayName: '탈퇴한 사용자',
+        avatarUrl: null,
+        isDeleted: true
+      }
+    }
+    
+    const displayName = getDisplayName(user?.name || '익명 사용자')
+    let avatarUrl = user?.image || user?.avatar_url
+    
+    // LinkedIn 이미지인 경우 proxy 사용
+    if (avatarUrl && avatarUrl.includes('linkedin.com')) {
+      avatarUrl = `/api/image-proxy?url=${encodeURIComponent(avatarUrl)}`
+    }
     
     return {
       displayName,
@@ -422,19 +454,52 @@ export default function QuestionDetailPage() {
                   
                   {/* 답변자 정보 */}
                   <div className="flex items-center mb-4">
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <div className="ml-3">
-                      <p className="font-medium text-gray-900">
-                        {getDisplayName(feedback.users?.name || '익명 사용자')}
-                      </p>
-                      {feedback.users?.company && feedback.users?.position && (
-                        <div className="text-sm text-gray-500">
-                          <span>{feedback.users.company} · {feedback.users.position}</span>
-                        </div>
-                      )}
-                    </div>
+                    {(() => {
+                      const profileInfo = getFeedbackUserProfileInfo(feedback)
+                      return (
+                        <>
+                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden">
+                            {profileInfo.avatarUrl ? (
+                              <img 
+                                src={profileInfo.avatarUrl} 
+                                alt={profileInfo.displayName}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  console.log('❌ [Feedback Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
+                                  e.currentTarget.style.display = 'none'
+                                  const parent = e.currentTarget.parentElement
+                                  if (parent) {
+                                    const fallback = parent.querySelector('.fallback-text')
+                                    if (fallback) {
+                                      (fallback as HTMLElement).style.display = 'flex'
+                                    }
+                                  }
+                                }}
+                                onLoad={() => {
+                                  console.log('✅ [Feedback Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)
+                                }}
+                              />
+                            ) : null}
+                            <div 
+                              className={`fallback-text w-full h-full ${profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-400'} text-white text-sm font-bold flex items-center justify-center ${profileInfo.avatarUrl ? 'hidden' : 'flex'}`}
+                              style={{ display: profileInfo.avatarUrl ? 'none' : 'flex' }}
+                            >
+                              {profileInfo.isDeleted ? '?' : profileInfo.displayName.charAt(0)}
+                            </div>
+                          </div>
+                          <div className="ml-3">
+                            <p className="font-medium text-gray-900">
+                              {profileInfo.displayName}
+                            </p>
+                            {feedback.users?.company && feedback.users?.position && (
+                              <div className="text-sm text-gray-500">
+                                <span>{feedback.users.company} · {feedback.users.position}</span>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )
+                    })()}
                   </div>
 
                   {/* 답변 내용 */}
