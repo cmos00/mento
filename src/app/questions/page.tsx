@@ -585,22 +585,10 @@ export default function QuestionsPage() {
                             {question.views || 0}회 조회
                           </span>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="flex items-center text-sm text-gray-500">
-                            <ThumbsUp className="w-4 h-4 mr-1" />
-                            0개 좋아요
-                          </span>
-                          <button
-                            className={`p-2 transition-colors ${
-                              votedQuestions.has(question.id) 
-                                ? 'text-purple-500 hover:text-purple-600' 
-                                : 'text-gray-400 hover:text-purple-500'
-                            }`}
-                            onClick={(e) => handleVote(question.id, e)}
-                          >
-                            <ThumbsUp className="w-4 h-4" />
-                          </button>
-                        </div>
+                        <span className="flex items-center text-sm text-gray-500">
+                          <ThumbsUp className="w-4 h-4 mr-1" />
+                          0개 좋아요
+                        </span>
                         </div>
                       </div>
                     </Link>

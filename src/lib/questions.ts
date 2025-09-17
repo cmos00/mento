@@ -313,12 +313,12 @@ export async function getAllQuestionsWithStats() {
   }
 }
 
-// 인기 질문 조회 (24시간 기준 트렌딩 스코어로 정렬)
+// 인기 질문 조회 (120시간 기준 트렌딩 스코어로 정렬)
 export async function getTrendingQuestions(limit: number = 3) {
   try {
-    // 최근 24시간 동안의 통계를 계산
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
+    // 최근 120시간 동안의 통계를 계산
+    const fiveDaysAgo = new Date()
+    fiveDaysAgo.setTime(fiveDaysAgo.getTime() - (120 * 60 * 60 * 1000))
     
     const { data: questions, error } = await supabase
       .from('questions')
@@ -335,7 +335,7 @@ export async function getTrendingQuestions(limit: number = 3) {
         )
       `)
       .eq('status', 'active')
-      .gte('created_at', yesterday.toISOString())
+      .gte('created_at', fiveDaysAgo.toISOString())
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -347,20 +347,20 @@ export async function getTrendingQuestions(limit: number = 3) {
     const questionsWithTrendingScore = await Promise.all(
       (questions || []).map(async (question) => {
         const { data: answerCount } = await getAnswerCountByQuestionId(question.id)
-        const { data: recentAnswerCount } = await getRecentAnswerCount(question.id, 24) // 24시간 이내 답변 수
+        const { data: recentAnswerCount } = await getRecentAnswerCount(question.id, 120) // 120시간 이내 답변 수
         
-        // 트렌딩 스코어 계산 (답변에 더 높은 가중치 적용)
-        const viewsWeight = 1
-        const answersWeight = 3 // 답변에 3배 가중치
-        const recentAnswersWeight = 5 // 최근 답변에 5배 가중치
+        // 트렌딩 스코어 계산 (댓글 > 좋아요 > 조회수 순)
+        const viewsWeight = 1        // 조회수: 1배 가중치
+        const likesWeight = 3        // 좋아요: 3배 가중치  
+        const answersWeight = 5      // 댓글(답변): 5배 가중치
         
         const views = question.views || 0
         const totalAnswers = answerCount || 0
-        const recentAnswers = recentAnswerCount || 0
+        const likes = 0 // TODO: 좋아요 수 구현 후 실제 값으로 변경
         
         const trendingScore = (views * viewsWeight) + 
-                            (totalAnswers * answersWeight) + 
-                            (recentAnswers * recentAnswersWeight)
+                            (likes * likesWeight) + 
+                            (totalAnswers * answersWeight)
 
         return {
           ...question,
