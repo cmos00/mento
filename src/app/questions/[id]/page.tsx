@@ -139,8 +139,8 @@ export default function QuestionDetailPage() {
   const getUserProfileInfo = (question: Question) => {
     const user = (question as any).users
     
-    // 탈퇴한 사용자인 경우
-    if (user?.is_deleted === true) {
+    // 탈퇴한 사용자인 경우 (타입 안전성을 위해 any로 캐스팅)
+    if ((user as any)?.is_deleted === true) {
       return {
         displayName: '탈퇴한 사용자',
         avatarUrl: null,
@@ -175,8 +175,8 @@ export default function QuestionDetailPage() {
   const getFeedbackUserProfileInfo = (feedback: FeedbackWithAuthor) => {
     const user = feedback.users
     
-    // 탈퇴한 사용자인 경우
-    if (user?.is_deleted === true) {
+    // 탈퇴한 사용자인 경우 (타입 안전성을 위해 any로 캐스팅)
+    if ((user as any)?.is_deleted === true) {
       return {
         displayName: '탈퇴한 사용자',
         avatarUrl: null,
