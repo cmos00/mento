@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
+import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 
 export default function QuestionDetailPage() {
   const params = useParams()
@@ -117,20 +118,6 @@ export default function QuestionDetailPage() {
     }
   }, [questionId, loadQuestion, loadFeedbacks])
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffTime = Math.abs(now.getTime() - date.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-    if (diffDays === 1) return '오늘'
-    if (diffDays === 2) return '어제'
-    if (diffDays <= 7) return `${diffDays - 1}일 전`
-    if (diffDays <= 30) return `${Math.floor(diffDays / 7)}주 전`
-    if (diffDays <= 365) return `${Math.floor(diffDays / 30)}개월 전`
-    return `${Math.floor(diffDays / 365)}년 전`
-  }
-
   const getUserDisplayName = (question: Question) => {
     if (question.is_anonymous) {
       return '익명 사용자'
@@ -138,14 +125,35 @@ export default function QuestionDetailPage() {
     return getDisplayName((question as any).users?.name || '사용자')
   }
 
-  const getDisplayName = (name: string) => {
-    if (!name || name === '사용자') return name
-    const parts = name.split(' ')
-    if (parts.length >= 2) {
-      // 성과 이름을 바꿔서 표시 (예: "동현 김" -> "김 동현")
-      return `${parts[parts.length - 1]} ${parts.slice(0, -1).join(' ')}`
+  const getUserProfileInfo = (question: Question) => {
+    const user = (question as any).users
+    
+    // 탈퇴한 사용자인 경우
+    if (user?.is_deleted === true) {
+      return {
+        displayName: '탈퇴한 사용자',
+        avatarUrl: null,
+        isDeleted: true
+      }
     }
-    return name
+    
+    // 익명 사용자인 경우
+    if (question.is_anonymous) {
+      return {
+        displayName: '익명 사용자',
+        avatarUrl: null,
+        isDeleted: false
+      }
+    }
+    
+    const displayName = getDisplayName(user?.name || '사용자')
+    const avatarUrl = user?.image || user?.avatar_url
+    
+    return {
+      displayName,
+      avatarUrl,
+      isDeleted: false
+    }
   }
 
   if (loading) {
@@ -204,17 +212,47 @@ export default function QuestionDetailPage() {
           {/* 질문 헤더 */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-900">
-                  {getUserDisplayName(question)}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {formatDate(question.created_at)}
-                </p>
-              </div>
+              {(() => {
+                const profileInfo = getUserProfileInfo(question)
+                return (
+                  <>
+                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden">
+                      {profileInfo.avatarUrl ? (
+                        <img 
+                          src={profileInfo.avatarUrl} 
+                          alt={profileInfo.displayName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.log('❌ [Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
+                            e.currentTarget.style.display = 'none'
+                            const parent = e.currentTarget.parentElement
+                            if (parent) {
+                              const fallback = parent.querySelector('.fallback-text')
+                              if (fallback) {
+                                (fallback as HTMLElement).style.display = 'flex'
+                              }
+                            }
+                          }}
+                          onLoad={() => {
+                            console.log('✅ [Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={`fallback-text w-full h-full ${profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-400'} text-white text-sm font-bold flex items-center justify-center ${profileInfo.avatarUrl ? 'hidden' : 'flex'}`}
+                        style={{ display: profileInfo.avatarUrl ? 'none' : 'flex' }}
+                      >
+                        {profileInfo.isDeleted ? '?' : profileInfo.displayName.charAt(0)}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {profileInfo.displayName}
+                      </p>
+                    </div>
+                  </>
+                )
+              })()}
             </div>
             <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full">
               {question.category}
@@ -252,17 +290,17 @@ export default function QuestionDetailPage() {
           <div className="flex items-center justify-between pt-4 border-t border-gray-200">
             <div className="flex items-center space-x-6 text-sm text-gray-500">
               <div className="flex items-center">
-                <Eye className="w-4 h-4 mr-2" />
-                {question.views || 0} 조회
-              </div>
-              <div className="flex items-center">
                 <MessageCircle className="w-4 h-4 mr-2" />
                 {feedbacks.length} 답변
               </div>
               <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-2" />
-                {formatDate(question.created_at)}
+                <Eye className="w-4 h-4 mr-2" />
+                {question.views || 0} 조회
               </div>
+            </div>
+            <div className="flex items-center text-sm text-gray-500">
+              <Clock className="w-4 h-4 mr-2" />
+              {formatTimeAgo(question.created_at)}
             </div>
           </div>
         </div>
@@ -365,7 +403,12 @@ export default function QuestionDetailPage() {
             /* 답변 목록 */
             <div className="space-y-6">
               {feedbacks.map((feedback) => (
-                <div key={feedback.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
+                <div key={feedback.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0 relative">
+                  {/* 답변 시점 정보 (우측 상단) */}
+                  <div className="absolute top-0 right-0 text-xs text-gray-500">
+                    {formatTimeAgo(feedback.created_at)}
+                  </div>
+                  
                   {/* 답변자 정보 */}
                   <div className="flex items-center mb-4">
                     <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
@@ -375,12 +418,11 @@ export default function QuestionDetailPage() {
                       <p className="font-medium text-gray-900">
                         {getDisplayName(feedback.users?.name || '익명 사용자')}
                       </p>
-                      <div className="flex items-center text-sm text-gray-500">
-                        {feedback.users?.company && feedback.users?.position && (
-                          <span className="mr-2">{feedback.users.company} · {feedback.users.position}</span>
-                        )}
-                        <span>{formatDate(feedback.created_at)}</span>
-                      </div>
+                      {feedback.users?.company && feedback.users?.position && (
+                        <div className="text-sm text-gray-500">
+                          <span>{feedback.users.company} · {feedback.users.position}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 

@@ -7,6 +7,7 @@ import { ArrowLeft, Eye, MessageCircle, Star, ThumbsUp, TrendingUp } from 'lucid
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 
 export default function TrendingQuestionsPage() {
   const { data: session, status } = useSession()
@@ -36,7 +37,7 @@ export default function TrendingQuestionsPage() {
     loadTrendingQuestions()
   }, [loadTrendingQuestions])
 
-  const formatDate = (dateString: string) => {
+  const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
     const diffTime = Math.abs(now.getTime() - date.getTime())
@@ -153,7 +154,7 @@ export default function TrendingQuestionsPage() {
                     
                     {/* 날짜 */}
                     <div className="absolute top-4 right-4">
-                      <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
+                      <span className="text-xs text-gray-500">{formatTimeAgo(question.created_at)}</span>
                     </div>
                     
                     {/* 트렌딩 스코어 */}

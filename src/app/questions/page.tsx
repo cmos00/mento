@@ -7,6 +7,7 @@ import { Eye, MessageCircle, MessageSquare, Plus, RefreshCw, Search, ThumbsUp, T
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 
 export default function QuestionsPage() {
   const { data: session, status } = useSession()
@@ -111,17 +112,6 @@ export default function QuestionsPage() {
     setSelectedCategory(selectedCategory === category ? '' : category)
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffTime = Math.abs(now.getTime() - date.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    
-    if (diffDays === 1) return '어제'
-    if (diffDays < 7) return `${diffDays}일 전`
-    if (diffDays < 30) return `${Math.ceil(diffDays / 7)}주 전`
-    return date.toLocaleDateString('ko-KR')
-  }
 
   const handleVote = async (questionId: string, e: React.MouseEvent) => {
     e.preventDefault()
@@ -353,7 +343,7 @@ export default function QuestionsPage() {
                   <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative h-48 flex flex-col">
                     {/* 날짜를 카드 우측 상단에 배치 */}
                     <div className="absolute top-4 right-4">
-                      <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
+                      <span className="text-xs text-gray-500">{formatTimeAgo(question.created_at)}</span>
                     </div>
                     
                     <div className="mb-3 overflow-hidden">
@@ -390,7 +380,7 @@ export default function QuestionsPage() {
                     <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
                       최신
                     </span>
-                    <span className="text-xs text-gray-500">{formatDate(question.created_at)}</span>
+                    <span className="text-xs text-gray-500">{formatTimeAgo(question.created_at)}</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors">
                     {question.title}
@@ -525,7 +515,7 @@ export default function QuestionsPage() {
                               {profileInfo.isDeleted ? '?' : profileInfo.displayName.charAt(0)}
                             </span>
                           </div>
-                          <div>
+                          <div className="flex items-center h-10">
                             {profileInfo.showProfile ? (
                               <a 
                                 href={profileInfo.linkedinUrl || '#'}
@@ -543,7 +533,6 @@ export default function QuestionsPage() {
                                 {profileInfo.displayName}
                               </span>
                             )}
-                            <div className="text-xs text-gray-500">{formatDate(question.created_at)}</div>
                           </div>
                         </>
                       )
@@ -556,7 +545,7 @@ export default function QuestionsPage() {
                       <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
                       <div className="absolute top-4 right-4 overflow-hidden">
-                        <span className="text-xs text-gray-500 whitespace-nowrap">{formatDate(question.created_at)}</span>
+                        <span className="text-xs text-gray-500 whitespace-nowrap">{formatTimeAgo(question.created_at)}</span>
                       </div>
                       
                       <div className="mb-3 overflow-hidden">
