@@ -70,6 +70,23 @@ export async function getAllQuestions() {
 // 특정 질문 조회
 export async function getQuestionById(id: string) {
   try {
+    console.log('🔍 [DEBUG] 질문 조회 시작:', id)
+    
+    // 먼저 질문만 조회해보기
+    const { data: basicQuestion, error: basicError } = await supabase
+      .from('questions')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    console.log('🔍 [DEBUG] 기본 질문 조회 결과:', { basicQuestion, basicError })
+
+    if (basicError) {
+      console.error('❌ [DEBUG] 기본 질문 조회 실패:', basicError)
+      throw new Error(`기본 질문 조회 실패: ${basicError.message}`)
+    }
+
+    // users 조인 포함 조회
     const { data, error } = await supabase
       .from('questions')
       .select(`
@@ -88,9 +105,12 @@ export async function getQuestionById(id: string) {
       .eq('status', 'active')
       .single()
 
+    console.log('🔍 [DEBUG] 조인 질문 조회 결과:', { data, error })
+
     if (error) {
-      console.error('질문 조회 오류:', error)
-      throw new Error(error.message)
+      console.error('❌ [DEBUG] 조인 질문 조회 오류:', error)
+      // 조인에 실패해도 기본 질문은 반환
+      return { data: basicQuestion, error: null }
     }
 
     return { data, error: null }

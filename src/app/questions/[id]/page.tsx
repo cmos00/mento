@@ -28,21 +28,32 @@ export default function QuestionDetailPage() {
   const loadQuestion = useCallback(async () => {
     try {
       setLoading(true)
+      console.log('🔍 [DEBUG] 질문 로딩 시작:', questionId)
+      
       const { data, error } = await getQuestionById(questionId)
       
+      console.log('🔍 [DEBUG] 질문 로딩 결과:', { data, error, questionId })
+      
       if (error) {
-        setError('질문을 불러오는 중 오류가 발생했습니다: ' + error.message)
+        const errorMessage = `질문을 불러오는 중 오류가 발생했습니다: ${error.message}`
+        console.error('❌ [DEBUG] 질문 로딩 에러:', errorMessage)
+        setError(errorMessage)
         return
       }
 
       if (data) {
+        console.log('✅ [DEBUG] 질문 로딩 성공:', data.title)
         setQuestion(data)
         // 조회수 증가
         incrementQuestionViews(questionId)
+      } else {
+        console.error('❌ [DEBUG] 질문 데이터 없음')
+        setError('해당 질문을 찾을 수 없습니다.')
       }
     } catch (err) {
-      setError('질문을 불러오는 중 예상치 못한 오류가 발생했습니다.')
-      console.error('질문 로드 오류:', err)
+      const errorMessage = '질문을 불러오는 중 예상치 못한 오류가 발생했습니다.'
+      console.error('❌ [DEBUG] 질문 로드 예외:', err)
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
