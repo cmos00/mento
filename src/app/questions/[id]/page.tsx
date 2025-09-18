@@ -133,7 +133,7 @@ export default function QuestionDetailPage() {
     if (question.is_anonymous) {
       return '익명 사용자'
     }
-    return getDisplayName((question as any).users?.name || '사용자')
+    return (question as any).users?.name || '사용자'
   }
 
   const getUserProfileInfo = (question: Question) => {
@@ -157,12 +157,17 @@ export default function QuestionDetailPage() {
       }
     }
     
-    const displayName = getDisplayName(user?.name || '사용자')
+    const displayName = user?.name || '사용자'
     let avatarUrl = (user as any)?.image || user?.avatar_url
     
     // LinkedIn 이미지인 경우 proxy 사용
     if (avatarUrl && avatarUrl.includes('linkedin.com')) {
       avatarUrl = `/api/image-proxy?url=${encodeURIComponent(avatarUrl)}`
+      console.log('🔗 [Question Profile] LinkedIn 이미지 proxy 적용:', avatarUrl)
+    } else if (avatarUrl) {
+      console.log('🖼️ [Question Profile] 일반 이미지 사용:', avatarUrl)
+    } else {
+      console.log('❌ [Question Profile] 이미지 URL 없음')
     }
     
     return {
@@ -184,12 +189,17 @@ export default function QuestionDetailPage() {
       }
     }
     
-    const displayName = getDisplayName(user?.name || '익명 사용자')
+    const displayName = user?.name || '익명 사용자'
     let avatarUrl = (user as any)?.image || user?.avatar_url
     
     // LinkedIn 이미지인 경우 proxy 사용
     if (avatarUrl && avatarUrl.includes('linkedin.com')) {
       avatarUrl = `/api/image-proxy?url=${encodeURIComponent(avatarUrl)}`
+      console.log('🔗 [Feedback Profile] LinkedIn 이미지 proxy 적용:', avatarUrl)
+    } else if (avatarUrl) {
+      console.log('🖼️ [Feedback Profile] 일반 이미지 사용:', avatarUrl)
+    } else {
+      console.log('❌ [Feedback Profile] 이미지 URL 없음')
     }
     
     return {
@@ -375,7 +385,7 @@ export default function QuestionDetailPage() {
                 <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
                   <User className="w-4 h-4 text-purple-600" />
                 </div>
-                <span className="font-medium text-gray-900">{getDisplayName(session?.user?.name || '사용자')}</span>
+                <span className="font-medium text-gray-900">{session?.user?.name || '사용자'}</span>
               </div>
               
               <textarea
