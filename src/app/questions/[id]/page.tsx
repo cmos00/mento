@@ -157,7 +157,7 @@ export default function QuestionDetailPage() {
       }
     }
     
-    const displayName = user?.name || '사용자'
+    const displayName = getDisplayName(user?.name || '사용자')
     let avatarUrl = (user as any)?.image || user?.avatar_url
     
     // LinkedIn 이미지인 경우 proxy 사용 (목록 페이지와 동일한 조건)
@@ -198,7 +198,7 @@ export default function QuestionDetailPage() {
       }
     }
     
-    const displayName = user?.name || '익명 사용자'
+    const displayName = getDisplayName(user?.name || '익명 사용자')
     let avatarUrl = (user as any)?.image || user?.avatar_url
     
     // LinkedIn 이미지인 경우 proxy 사용 (목록 페이지와 동일한 조건)
@@ -403,6 +403,7 @@ export default function QuestionDetailPage() {
                   }
                   
                   const userName = session?.user?.name || '사용자'
+                  const displayName = getDisplayName(userName)
                   
                   return (
                     <>
@@ -410,7 +411,7 @@ export default function QuestionDetailPage() {
                         {avatarUrl && (
                           <img 
                             src={avatarUrl} 
-                            alt={userName}
+                            alt={displayName}
                             className="w-full h-full object-cover absolute inset-0 z-10"
                             onError={(e) => {
                               console.error('❌ [Answer Form Profile] 이미지 로드 실패:', avatarUrl)
@@ -422,10 +423,10 @@ export default function QuestionDetailPage() {
                           />
                         )}
                         <div className="fallback-text w-full h-full bg-purple-400 text-white text-sm font-bold flex items-center justify-center absolute inset-0">
-                          {userName.charAt(0)}
+                          {displayName.charAt(0)}
                         </div>
                       </div>
-                      <span className="font-medium text-gray-900">{userName}</span>
+                      <span className="font-medium text-gray-900">{displayName}</span>
                     </>
                   )
                 })()}
