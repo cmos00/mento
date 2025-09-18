@@ -3,7 +3,7 @@
 import MobileBottomNav from '@/components/MobileBottomNav'
 import { FeedbackWithAuthor, getFeedbacksByQuestionId } from '@/lib/feedbacks'
 import { Question, getQuestionById, incrementQuestionViews } from '@/lib/questions'
-import { ArrowLeft, Bookmark, Clock, Eye, MessageCircle, Send, Share2, Tag, User } from 'lucide-react'
+import { ArrowLeft, Bookmark, Clock, Eye, MessageCircle, Send, Share2, Tag, ThumbsUp, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -22,6 +22,8 @@ export default function QuestionDetailPage() {
   const [showAnswerForm, setShowAnswerForm] = useState(false)
   const [answerContent, setAnswerContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [likeData, setLikeData] = useState<{count: number, isLiked: boolean}>({count: 0, isLiked: false})
+  const [likingInProgress, setLikingInProgress] = useState(false)
 
   const questionId = params.id as string
 
@@ -70,6 +72,72 @@ export default function QuestionDetailPage() {
       setFeedbackLoading(false)
     }
   }, [questionId])
+
+  const loadLikeData = useCallback(async () => {
+    try {
+      const params = new URLSearchParams({
+        questionId,
+        ...(session?.user ? { userId: (session.user as any).id } : {})
+      })
+      
+      const response = await fetch(`/api/questions/like?${params.toString()}`)
+      if (response.ok) {
+        const data = await response.json()
+        setLikeData({
+          count: data.likeCount || 0,
+          isLiked: data.isLiked || false
+        })
+      }
+    } catch (error) {
+      console.error('좋아요 데이터 로딩 오류:', error)
+    }
+  }, [questionId, session?.user])
+
+  const handleLikeToggle = async () => {
+    if (!session?.user) {
+      alert('로그인이 필요합니다.')
+      return
+    }
+
+    if (likingInProgress) {
+      return
+    }
+
+    setLikingInProgress(true)
+
+    try {
+      const action = likeData.isLiked ? 'unlike' : 'like'
+
+      const response = await fetch('/api/questions/like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionId,
+          userId: (session.user as any).id,
+          action
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setLikeData({
+          count: data.likeCount,
+          isLiked: !likeData.isLiked
+        })
+      } else {
+        const errorData = await response.json()
+        console.error('좋아요 처리 오류:', errorData.error)
+        alert('좋아요 처리에 실패했습니다.')
+      }
+    } catch (error) {
+      console.error('좋아요 처리 중 오류:', error)
+      alert('좋아요 처리 중 오류가 발생했습니다.')
+    } finally {
+      setLikingInProgress(false)
+    }
+  }
 
   const handleSubmitAnswer = async () => {
     if (!answerContent.trim() || !session?.user) {
@@ -126,8 +194,9 @@ export default function QuestionDetailPage() {
     if (questionId) {
       loadQuestion()
       loadFeedbacks()
+      loadLikeData()
     }
-  }, [questionId, loadQuestion, loadFeedbacks])
+  }, [questionId, loadQuestion, loadFeedbacks, loadLikeData])
 
   const getUserDisplayName = (question: Question) => {
     if (question.is_anonymous) {
@@ -280,6 +349,18 @@ export default function QuestionDetailPage() {
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* 질문 카드 */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+          {/* 카테고리 */}
+          <div className="mb-3 overflow-hidden">
+            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+              {question.category}
+            </span>
+          </div>
+
+          {/* 질문 제목 */}
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            {question.title}
+          </h1>
+
           {/* 질문 헤더 */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-3">
@@ -317,15 +398,11 @@ export default function QuestionDetailPage() {
                 )
               })()}
             </div>
-            <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full">
-              {question.category}
-            </span>
+            <div className="flex items-center text-sm text-gray-500">
+              <Clock className="w-4 h-4 mr-2" />
+              {formatTimeAgo(question.created_at)}
+            </div>
           </div>
-
-          {/* 질문 제목 */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            {question.title}
-          </h1>
 
           {/* 질문 내용 */}
           <div className="prose max-w-none mb-6">
@@ -361,10 +438,22 @@ export default function QuestionDetailPage() {
                 {question.views || 0} 조회
               </div>
             </div>
-            <div className="flex items-center text-sm text-gray-500">
-              <Clock className="w-4 h-4 mr-2" />
-              {formatTimeAgo(question.created_at)}
-            </div>
+            <button
+              onClick={handleLikeToggle}
+              disabled={likingInProgress}
+              className={`flex items-center text-sm transition-colors ${
+                likeData.isLiked 
+                  ? 'text-purple-500 hover:text-purple-600' 
+                  : 'text-gray-500 hover:text-purple-500'
+              } ${likingInProgress ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            >
+              <ThumbsUp 
+                className={`w-4 h-4 mr-2 ${
+                  likeData.isLiked ? 'fill-current' : ''
+                }`} 
+              />
+              {likeData.count}개 좋아요
+            </button>
           </div>
         </div>
 
