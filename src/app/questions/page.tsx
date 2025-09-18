@@ -19,8 +19,15 @@ export default function QuestionsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('')
+  const [likes, setLikes] = useState<{[key: string]: {count: number, isLiked: boolean}}>({})
+  const [likingQuestions, setLikingQuestions] = useState<Set<string>>(new Set())
+  const [currentPage, setCurrentPage] = useState(0)
+  const [hasMoreQuestions, setHasMoreQuestions] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   
   console.log('✅ 단계 1: 기본 상태 관리 설정 완료')
+  console.log('✅ 단계 2: 페이지네이션 상태 설정 완료', { currentPage, hasMoreQuestions, loadingMore })
 
   if (loading) {
     return (
