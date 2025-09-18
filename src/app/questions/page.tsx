@@ -222,15 +222,6 @@ export default function QuestionsPage() {
       ? `/api/image-proxy?url=${encodeURIComponent(originalImageUrl)}`
       : originalImageUrl
     
-    // 디버깅을 위한 로그
-    console.log('🖼️ [Questions Page] 사용자 이미지 정보:', {
-      userId: user?.id,
-      userName: user?.name,
-      originalImage: originalImageUrl,
-      proxyImage: avatarUrl,
-      isLinkedInImage: originalImageUrl?.includes('media.licdn.com')
-    })
-    
     return {
       displayName: displayName,
       avatarUrl: avatarUrl,
@@ -242,13 +233,12 @@ export default function QuestionsPage() {
 
   // 답변 수 계산 함수
   const getAnswerCount = (question: Question) => {
-    // 질문 객체에 answerCount가 포함되어 있으면 사용, 없으면 0
     return (question as any).answerCount || 0
   }
 
   // 좋아요 토글 함수
   const handleLikeToggle = async (questionId: string, event: React.MouseEvent) => {
-    event.preventDefault() // Link 클릭 방지
+    event.preventDefault()
     event.stopPropagation()
 
     if (!session?.user) {
@@ -257,7 +247,7 @@ export default function QuestionsPage() {
     }
 
     if (likingQuestions.has(questionId)) {
-      return // 이미 처리 중
+      return
     }
 
     setLikingQuestions(prev => new Set(prev).add(questionId))
@@ -318,12 +308,10 @@ export default function QuestionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* PC Navigation */}
       <div id="pc-navigation">
         <PCNavigation title="홈" icon={MessageCircle} />
       </div>
       
-      {/* Mobile Header */}
       <header id="mobile-header" className="md:hidden bg-white/80 backdrop-blur-sm border-b border-gray-200 px-4 py-4 sticky top-0 z-50">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -334,7 +322,6 @@ export default function QuestionsPage() {
               onClick={loadQuestions}
               disabled={loading}
               className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              aria-label="새로고침"
             >
               <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -348,7 +335,6 @@ export default function QuestionsPage() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Hero Section */}
         <div className="mb-8">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -383,7 +369,6 @@ export default function QuestionsPage() {
           )}
         </div>
 
-        {/* Trending Questions Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-900 flex items-center">
@@ -396,7 +381,6 @@ export default function QuestionsPage() {
             {trendingQuestions.map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`}>
                 <div className="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
-                  {/* 날짜를 카드 우측 상단에 배치 */}
                   <div className="flex justify-between items-start mb-2">
                     <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
                       {getCategoryDisplayName(question.category) || '기술개발'}
@@ -423,9 +407,7 @@ export default function QuestionsPage() {
           </div>
         </div>
 
-        {/* 검색 및 필터 */}
         <div id="search-and-filter" className="mb-6 space-y-4">
-          {/* 검색바 */}
           <div id="search-bar" className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
@@ -438,7 +420,6 @@ export default function QuestionsPage() {
             />
           </div>
 
-          {/* 카테고리 필터 - 항상 표시 */}
           <div id="category-filter" className="flex flex-wrap gap-2">
             {categories.map((category, index) => (
               <button
@@ -457,14 +438,12 @@ export default function QuestionsPage() {
           </div>
         </div>
 
-        {/* 에러 메시지 */}
         {error && (
           <div id="error-message" className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
             <p className="text-red-700">{error}</p>
           </div>
         )}
 
-        {/* 질문 목록 */}
         <div id="questions-list">
           {filteredQuestions.length === 0 ? (
             <div id="empty-state" className="text-center py-12">
@@ -491,7 +470,6 @@ export default function QuestionsPage() {
             <div id="questions-grid" className="space-y-6">
               {filteredQuestions.map((question, index) => (
                 <div key={question.id} className="flex flex-col space-y-3">
-                  {/* 프로필 영역 - 카드 밖 */}
                   <div className="flex items-center space-x-3 px-1">
                     {(() => {
                       const profileInfo = getUserProfileInfo(question)
@@ -503,14 +481,6 @@ export default function QuestionsPage() {
                                 src={profileInfo.avatarUrl} 
                                 alt={profileInfo.displayName}
                                 className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  console.error('❌ [Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                }}
-                                onLoad={() => {
-                                  console.log('✅ [Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)
-                                }}
                               />
                             ) : null}
                             <div className={`w-full h-full ${profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-400'} text-white text-xs font-bold flex items-center justify-center`}>
@@ -537,57 +507,56 @@ export default function QuestionsPage() {
                     })()}
                   </div>
                   
-                  {/* 카드 영역 - 프로필 이름과 시작점 맞춤, 전체 width 사용 */}
                   <div className="w-full">
                     <Link href={`/questions/${question.id}`} className="block">
-                      <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
-                      {/* 날짜를 카드 우측 상단에 배치 */}
-                      <div className="absolute top-4 right-4 overflow-hidden">
-                        <span className="text-xs text-gray-500 whitespace-nowrap">{formatTimeAgo(question.created_at)}</span>
-                      </div>
-                      
-                      <div className="mb-3 overflow-hidden">
-                        {question.category && (
-                          <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-                            {getCategoryDisplayName(question.category)}
-                          </span>
-                        )}
-                      </div>
-                      
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
-                        {question.title}
-                      </h3>
-                      <p className="text-gray-600 text-sm mb-6 line-clamp-2 flex-1">
-                        {question.content}
-                      </p>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
-                          <span className="flex items-center">
-                            <MessageCircle className="w-4 h-4 mr-1" />
-                            {getAnswerCount(question)}개 답변
-                          </span>
-                          <span className="flex items-center">
-                            <Eye className="w-4 h-4 mr-1" />
-                            {question.views || 0}회 조회
-                          </span>
+                      <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
+                        <div className="absolute top-4 right-4 overflow-hidden">
+                          <span className="text-xs text-gray-500 whitespace-nowrap">{formatTimeAgo(question.created_at)}</span>
                         </div>
-                        <button
-                          onClick={(e) => handleLikeToggle(question.id, e)}
-                          disabled={likingQuestions.has(question.id)}
-                          className={`flex items-center text-sm transition-colors ${
-                            likes[question.id]?.isLiked 
-                              ? 'text-purple-500 hover:text-purple-600' 
-                              : 'text-gray-500 hover:text-purple-500'
-                          } ${likingQuestions.has(question.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                        >
-                          <ThumbsUp 
-                            className={`w-4 h-4 mr-1 ${
-                              likes[question.id]?.isLiked ? 'fill-current' : ''
-                            }`} 
-                          />
-                          {likes[question.id]?.count || 0}개 좋아요
-                        </button>
+                        
+                        <div className="mb-3 overflow-hidden">
+                          {question.category && (
+                            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                              {getCategoryDisplayName(question.category)}
+                            </span>
+                          )}
+                        </div>
+                        
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
+                          {question.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm mb-6 line-clamp-2 flex-1">
+                          {question.content}
+                        </p>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4 text-sm text-gray-500">
+                            <span className="flex items-center">
+                              <MessageCircle className="w-4 h-4 mr-1" />
+                              {getAnswerCount(question)}개 답변
+                            </span>
+                            <span className="flex items-center">
+                              <Eye className="w-4 h-4 mr-1" />
+                              {question.views || 0}회 조회
+                            </span>
+                          </div>
+                          <button
+                            onClick={(e) => handleLikeToggle(question.id, e)}
+                            disabled={likingQuestions.has(question.id)}
+                            className={`flex items-center text-sm transition-colors ${
+                              likes[question.id]?.isLiked 
+                                ? 'text-purple-500 hover:text-purple-600' 
+                                : 'text-gray-500 hover:text-purple-500'
+                            } ${likingQuestions.has(question.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                          >
+                            <ThumbsUp 
+                              className={`w-4 h-4 mr-1 ${
+                                likes[question.id]?.isLiked ? 'fill-current' : ''
+                              }`} 
+                            />
+                            {likes[question.id]?.count || 0}개 좋아요
+                          </button>
+                        </div>
                       </div>
                     </Link>
                   </div>
@@ -595,7 +564,6 @@ export default function QuestionsPage() {
               ))}
             </div>
             
-            {/* 무한스크롤 로딩 인디케이터 */}
             {loadingMore && (
               <div className="text-center py-8">
                 <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -603,7 +571,6 @@ export default function QuestionsPage() {
               </div>
             )}
             
-            {/* 더 이상 로딩할 질문이 없을 때 */}
             {!hasMoreQuestions && questions.length > 0 && (
               <div className="text-center py-8">
                 <p className="text-gray-500">모든 질문을 확인하셨습니다.</p>
