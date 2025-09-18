@@ -158,7 +158,7 @@ export default function QuestionDetailPage() {
     }
     
     const displayName = getDisplayName(user?.name || '사용자')
-    let avatarUrl = user?.image || user?.avatar_url
+    let avatarUrl = (user as any)?.image || user?.avatar_url
     
     // LinkedIn 이미지인 경우 proxy 사용
     if (avatarUrl && avatarUrl.includes('linkedin.com')) {
@@ -185,7 +185,7 @@ export default function QuestionDetailPage() {
     }
     
     const displayName = getDisplayName(user?.name || '익명 사용자')
-    let avatarUrl = user?.image || user?.avatar_url
+    let avatarUrl = (user as any)?.image || user?.avatar_url
     
     // LinkedIn 이미지인 경우 proxy 사용
     if (avatarUrl && avatarUrl.includes('linkedin.com')) {
