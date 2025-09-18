@@ -160,8 +160,8 @@ export default function QuestionDetailPage() {
     const displayName = user?.name || '사용자'
     let avatarUrl = (user as any)?.image || user?.avatar_url
     
-    // LinkedIn 이미지인 경우 proxy 사용
-    if (avatarUrl && avatarUrl.includes('linkedin.com')) {
+    // LinkedIn 이미지인 경우 proxy 사용 (목록 페이지와 동일한 조건)
+    if (avatarUrl && avatarUrl.includes('media.licdn.com')) {
       avatarUrl = `/api/image-proxy?url=${encodeURIComponent(avatarUrl)}`
       console.log('🔗 [Question Profile] LinkedIn 이미지 proxy 적용:', avatarUrl)
     } else if (avatarUrl) {
@@ -169,6 +169,15 @@ export default function QuestionDetailPage() {
     } else {
       console.log('❌ [Question Profile] 이미지 URL 없음')
     }
+    
+    // 상세 디버깅 정보 추가 (목록 페이지와 동일)
+    console.log('🖼️ [Question Detail] 사용자 이미지 정보:', {
+      userId: user?.id,
+      userName: user?.name,
+      originalImage: (user as any)?.image || user?.avatar_url,
+      proxyImage: avatarUrl,
+      isLinkedInImage: ((user as any)?.image || user?.avatar_url)?.includes('media.licdn.com')
+    })
     
     return {
       displayName,
@@ -192,8 +201,8 @@ export default function QuestionDetailPage() {
     const displayName = user?.name || '익명 사용자'
     let avatarUrl = (user as any)?.image || user?.avatar_url
     
-    // LinkedIn 이미지인 경우 proxy 사용
-    if (avatarUrl && avatarUrl.includes('linkedin.com')) {
+    // LinkedIn 이미지인 경우 proxy 사용 (목록 페이지와 동일한 조건)
+    if (avatarUrl && avatarUrl.includes('media.licdn.com')) {
       avatarUrl = `/api/image-proxy?url=${encodeURIComponent(avatarUrl)}`
       console.log('🔗 [Feedback Profile] LinkedIn 이미지 proxy 적용:', avatarUrl)
     } else if (avatarUrl) {
@@ -201,6 +210,15 @@ export default function QuestionDetailPage() {
     } else {
       console.log('❌ [Feedback Profile] 이미지 URL 없음')
     }
+    
+    // 상세 디버깅 정보 추가 (목록 페이지와 동일)
+    console.log('🖼️ [Feedback Detail] 사용자 이미지 정보:', {
+      userId: user?.id,
+      userName: user?.name,
+      originalImage: (user as any)?.image || user?.avatar_url,
+      proxyImage: avatarUrl,
+      isLinkedInImage: ((user as any)?.image || user?.avatar_url)?.includes('media.licdn.com')
+    })
     
     return {
       displayName,
