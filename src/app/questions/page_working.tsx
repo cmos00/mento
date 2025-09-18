@@ -2,7 +2,7 @@
 
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
-import { Question, getQuestionsWithPagination, getTrendingQuestions, getUserStats } from '@/lib/questions'
+import { Question, getAllQuestionsWithStats, getTrendingQuestions, getUserStats, getQuestionsWithPagination } from '@/lib/questions'
 import { Eye, MessageCircle, MessageSquare, Plus, RefreshCw, Search, ThumbsUp, TrendingUp, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
@@ -31,15 +31,25 @@ export default function QuestionsPage() {
     mentoringSessions: 0,
   })
 
-  const categories = ['전체', '이직', '인간관계', '성과관리', '기술개발', '리더십', '워라밸', '기타']
+  const categories = [
+    '커리어 전환',
+    '면접 준비', 
+    '업무 스킬',
+    '팀 관리',
+    '네트워킹',
+    '워라밸',
+    '인간관계',
+    '리더십'
+  ]
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(prev => prev === category ? '' : category)
-  }
-
+  // 카테고리 표시명 매핑
   const getCategoryDisplayName = (category: string) => {
     const categoryMap: { [key: string]: string } = {
-      'career': '이직',
+      'career-transition': '커리어 전환',
+      'interview-prep': '면접 준비',
+      'work-skills': '업무 스킬',
+      'team-management': '팀 관리',
+      'networking': '네트워킹',
       'work-life-balance': '워라밸',
       '인간관계': '인간관계',
       '리더십': '리더십'
@@ -165,12 +175,60 @@ export default function QuestionsPage() {
       )
     }
 
-    if (selectedCategory && selectedCategory !== '전체') {
+    if (selectedCategory) {
       filtered = filtered.filter(question => question.category === selectedCategory)
     }
 
     setFilteredQuestions(filtered)
   }, [questions, searchTerm, selectedCategory])
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(selectedCategory === category ? '' : category)
+  }
+
+
+  const handleVote = async (questionId: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!session?.user) {
+      alert('로그인이 필요합니다.')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/questions/vote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ questionId }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // 투표 상태 업데이트
+        setVotedQuestions(prev => {
+          const newSet = new Set(prev)
+          if (result.isVoted) {
+            newSet.add(questionId)
+          } else {
+            newSet.delete(questionId)
+          }
+          return newSet
+        })
+
+        // 질문 목록 새로고침
+        loadQuestions()
+      } else {
+        alert(result.error || '투표에 실패했습니다.')
+      }
+    } catch (error) {
+      console.error('투표 오류:', error)
+      alert('투표 중 오류가 발생했습니다.')
+    }
+  }
 
   const getUserDisplayName = (question: Question) => {
     if (question.is_anonymous) {
@@ -239,6 +297,7 @@ export default function QuestionsPage() {
       showProfile: true
     }
   }
+
 
   // 답변 수 계산 함수
   const getAnswerCount = (question: Question) => {
@@ -328,91 +387,143 @@ export default function QuestionsPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <h1 className="text-xl font-bold text-gray-900">홈</h1>
-          </div>
-          <div className="flex items-center space-x-2">
             <button
               onClick={loadQuestions}
               disabled={loading}
-              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              aria-label="새로고침"
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all"
             >
-              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
+          </div>
+          {status === 'authenticated' ? (
             <Link href="/questions/new">
-              <button className="bg-purple-500 text-white p-2 rounded-lg hover:bg-purple-600 transition-colors">
-                <Plus className="w-5 h-5" />
+              <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center">
+                <Plus className="w-4 h-4 mr-2" />
+                질문 작성
               </button>
             </Link>
-          </div>
+          ) : (
+            <Link href="/auth/login">
+              <button className="bg-gray-400 text-white px-4 py-2 rounded-lg font-medium transition-all flex items-center opacity-60">
+                <Plus className="w-4 h-4 mr-2" />
+                로그인 필요
+              </button>
+            </Link>
+          )}
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Hero Section */}
-        <div className="mb-8">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {status === 'authenticated' ? `안녕하세요, ${getDisplayName(user?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
-            </h2>
-            <p className="text-gray-600">
-              {status === 'authenticated' 
-                ? '오늘도 좋은 하루 되세요! 새로운 질문을 확인해보세요.' 
-                : '커리어 고민을 나누고 전문가들의 조언을 받아보세요.'
-              }
-            </p>
-          </div>
-          
-          {status === 'authenticated' && (
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-white p-4 rounded-xl border border-gray-200 text-center">
-                <MessageSquare className="w-6 h-6 text-purple-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-900">{userStats.questionsAsked}</p>
-                <p className="text-sm text-gray-600">작성한 질문</p>
+        <div id="hero-section" className="mb-8">
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-4 mb-6">
+            <div className="flex items-center justify-between min-h-[60px]">
+              <div className="flex flex-col justify-center flex-1 ml-6">
+                <h1 className="text-xl font-bold text-gray-900 mb-1">
+                  {status === 'authenticated' ? `안녕하세요, ${getDisplayName(user?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
+                </h1>
+                <p className="text-base text-gray-600">
+                  {status === 'authenticated' 
+                    ? '오늘도 멘토들과 함께 성장해보세요' 
+                    : '멘토들과 함께 커리어 성장의 여정을 시작하세요'
+                  }
+                </p>
               </div>
-              <div className="bg-white p-4 rounded-xl border border-gray-200 text-center">
-                <MessageCircle className="w-6 h-6 text-green-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-900">{userStats.answersGiven}</p>
-                <p className="text-sm text-gray-600">작성한 답변</p>
-              </div>
-              <div className="bg-white p-4 rounded-xl border border-gray-200 text-center">
-                <User className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-gray-900">{userStats.mentoringSessions}</p>
-                <p className="text-sm text-gray-600">멘토링 세션</p>
+              <div className="hidden md:block p-4">
+                {status === 'authenticated' ? (
+                  <Link href="/questions/new">
+                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-lg transform hover:-translate-y-1">
+                      <Plus className="w-5 h-5 mr-2" />
+                      질문하기
+                    </button>
+                  </Link>
+                ) : (
+                  <Link href="/auth/login">
+                    <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-lg transform hover:-translate-y-1">
+                      <Plus className="w-5 h-5 mr-2" />
+                      시작하기
+                    </button>
+                  </Link>
+                )}
               </div>
             </div>
-          )}
+          </div>
         </div>
 
         {/* Trending Questions Section */}
-        <div className="mb-8">
+        <div id="trending-questions-section" className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900 flex items-center">
-              <TrendingUp className="w-5 h-5 mr-2 text-orange-500" />
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              <TrendingUp className="w-5 h-5 text-purple-500 mr-2" />
               인기 질문
-            </h3>
+            </h2>
+            <Link href="/questions/trending" className="text-purple-600 hover:text-purple-700 font-medium">
+              더보기 →
+            </Link>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-4">
-            {trendingQuestions.map((question, index) => (
-              <Link key={question.id} href={`/questions/${question.id}`}>
-                <div className="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition-shadow cursor-pointer">
-                  {/* 날짜를 카드 우측 상단에 배치 */}
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-                      {getCategoryDisplayName(question.category) || '기술개발'}
+          <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
+            {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
+              <Link key={question.id} href={`/questions/${question.id}`} className="group block">
+                  <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative h-48 flex flex-col">
+                    {/* 날짜를 카드 우측 상단에 배치 */}
+                    <div className="absolute top-4 right-4">
+                      <span className="text-xs text-gray-500">{formatTimeAgo(question.created_at)}</span>
+                    </div>
+                    
+                    <div className="mb-3 overflow-hidden">
+                      <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                        {getCategoryDisplayName(question.category) || '기술개발'}
+                      </span>
+                    </div>
+                    
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
+                      {question.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-1">
+                      {question.content}
+                    </p>
+                    
+                    <div className="flex items-center justify-between text-sm text-gray-500 mt-auto">
+                      <div className="flex items-center space-x-3">
+                        <span className="flex items-center">
+                          <MessageCircle className="w-4 h-4 mr-1" />
+                          {getAnswerCount(question)}
+                        </span>
+                        <span className="flex items-center">
+                          <Eye className="w-4 h-4 mr-1" />
+                          {question.views || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+            )) : questions.slice(0, 3).map((question, index) => (
+              <Link key={question.id} href={`/questions/${question.id}`} className="group">
+                <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
+                  <div className="flex items-start justify-between mb-3">
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
+                      최신
                     </span>
                     <span className="text-xs text-gray-500">{formatTimeAgo(question.created_at)}</span>
                   </div>
-                  <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2">{question.title}</h4>
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{question.content}</p>
-                  <div className="flex items-center justify-between text-xs text-gray-500">
+                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors">
+                    {question.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    {question.content}
+                  </p>
+                  <div className="flex items-center justify-between text-sm text-gray-500">
+                    <span className="flex items-center">
+                      <User className="w-4 h-4 mr-1" />
+                      {getUserDisplayName(question)}
+                    </span>
                     <div className="flex items-center space-x-3">
                       <span className="flex items-center">
-                        <MessageCircle className="w-3 h-3 mr-1" />
+                        <MessageCircle className="w-4 h-4 mr-1" />
                         {getAnswerCount(question)}
                       </span>
                       <span className="flex items-center">
-                        <Eye className="w-3 h-3 mr-1" />
+                        <Eye className="w-4 h-4 mr-1" />
                         {question.views || 0}
                       </span>
                     </div>
@@ -474,72 +585,87 @@ export default function QuestionsPage() {
               </h3>
               <p className="text-gray-600 mb-6">
                 {searchTerm || selectedCategory 
-                  ? '다른 검색어나 카테고리를 시도해보세요.' 
+                  ? '다른 검색어나 카테고리를 시도해보세요'
                   : '첫 번째 질문을 작성해보세요!'
                 }
               </p>
-              {(!searchTerm && !selectedCategory) && (
-                <Link href="/questions/new">
-                  <button className="bg-purple-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-600 transition-colors flex items-center mx-auto">
-                    <Plus className="w-5 h-5 mr-2" />
-                    질문 작성하기
-                  </button>
-                </Link>
+              {!searchTerm && !selectedCategory && (
+                status === 'authenticated' ? (
+                  <Link href="/questions/new">
+                    <button id="create-question-button" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all">
+                      질문 작성하기
+                    </button>
+                  </Link>
+                ) : (
+                  <Link href="/auth/login">
+                    <button id="login-required-button" className="bg-gray-400 text-white px-6 py-3 rounded-lg font-medium transition-all opacity-60">
+                      로그인 후 질문 작성
+                    </button>
+                  </Link>
+                )
               )}
             </div>
           ) : (
-            <div id="questions-grid" className="space-y-6">
+            <div id="questions-container" className="space-y-12 py-12 w-full overflow-visible">
               {filteredQuestions.map((question, index) => (
-                <div key={question.id} className="flex flex-col space-y-3">
+                <div key={question.id} className="relative flex flex-col py-4 overflow-visible">
                   {/* 프로필 영역 - 카드 밖 */}
-                  <div className="flex items-center space-x-3 px-1">
+                  <div className="flex items-center mb-2 overflow-visible">
                     {(() => {
                       const profileInfo = getUserProfileInfo(question)
                       return (
                         <>
-                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden relative">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm mr-3 overflow-hidden ${
+                            profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-500'
+                          }`}>
                             {profileInfo.avatarUrl ? (
                               <img 
                                 src={profileInfo.avatarUrl} 
                                 alt={profileInfo.displayName}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                  console.error('❌ [Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
+                                  console.error('❌ [Questions Page] 이미지 로드 실패:', profileInfo.avatarUrl)
                                   const target = e.target as HTMLImageElement;
                                   target.style.display = 'none';
+                                  const sibling = target.nextElementSibling as HTMLElement;
+                                  if (sibling) sibling.style.display = 'flex';
                                 }}
                                 onLoad={() => {
-                                  console.log('✅ [Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)
+                                  console.log('✅ [Questions Page] 이미지 로드 성공:', profileInfo.avatarUrl)
                                 }}
                               />
                             ) : null}
-                            <div className={`w-full h-full ${profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-400'} text-white text-xs font-bold flex items-center justify-center`}>
+                            <span className={`${profileInfo.avatarUrl ? 'hidden' : 'flex'} w-full h-full items-center justify-center`}>
                               {profileInfo.isDeleted ? '?' : profileInfo.displayName.charAt(0)}
-                            </div>
-                          </div>
-                          {profileInfo.showProfile ? (
-                            <a 
-                              href={profileInfo.linkedinUrl || '#'}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-sm font-medium text-gray-900 hover:text-purple-600 transition-colors"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {profileInfo.displayName}
-                            </a>
-                          ) : (
-                            <span className="text-sm font-medium text-gray-500">
-                              {profileInfo.displayName}
                             </span>
-                          )}
+                          </div>
+                          <div className="flex items-center h-10">
+                            {profileInfo.showProfile ? (
+                              <a 
+                                href={profileInfo.linkedinUrl || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm font-medium text-gray-900 hover:text-purple-700 transition-colors"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {profileInfo.displayName}
+                              </a>
+                            ) : (
+                              <span className={`text-sm font-medium ${
+                                profileInfo.isDeleted ? 'text-gray-500' : 'text-gray-900'
+                              }`}>
+                                {profileInfo.displayName}
+                              </span>
+                            )}
+                          </div>
                         </>
                       )
                     })()}
                   </div>
                   
                   {/* 카드 영역 - 프로필 이름과 시작점 맞춤, 전체 width 사용 */}
-                  <div className="w-full">
-                    <Link href={`/questions/${question.id}`} className="block">
+                  <div className="ml-[52px] w-[calc(100%-52px)] py-2 px-1">
+                    <Link href={`/questions/${question.id}`} className="block group">
                       <div id={`question-item-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative">
                       {/* 날짜를 카드 우측 상단에 배치 */}
                       <div className="absolute top-4 right-4 overflow-hidden">
@@ -588,6 +714,7 @@ export default function QuestionsPage() {
                           />
                           {likes[question.id]?.count || 0}개 좋아요
                         </button>
+                        </div>
                       </div>
                     </Link>
                   </div>
