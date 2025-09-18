@@ -206,6 +206,78 @@ export default function QuestionsPage() {
             현재 페이지: {currentPage}
           </p>
         </div>
+
+        {/* 단계 6: 복잡한 질문 리스트 JSX */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {questions.length > 0 ? (
+            questions.map((question) => {
+              const likeData = likes[question.id] || { count: 0, isLiked: false }
+              const isLiking = likingQuestions.has(question.id)
+              
+              return (
+                <div key={question.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 flex-1">
+                      {question.title}
+                    </h3>
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm mb-6 line-clamp-2 flex-1">
+                    {question.content}
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <span className="flex items-center">
+                        <Eye className="w-4 h-4 mr-1" />
+                        {(question as any).answerCount || 0}개 답변
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleLikeToggle(question.id)
+                      }}
+                      disabled={isLiking}
+                      className={`flex items-center text-sm transition-colors ${
+                        likeData.isLiked 
+                          ? 'text-purple-500 hover:text-purple-600' 
+                          : 'text-gray-500 hover:text-purple-500'
+                      } ${isLiking ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    >
+                      <ThumbsUp 
+                        className={`w-4 h-4 mr-1 ${
+                          likeData.isLiked ? 'fill-current' : ''
+                        }`} 
+                      />
+                      {likeData.count}개 좋아요
+                    </button>
+                  </div>
+                </div>
+              )
+            })
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500">아직 질문이 없습니다.</p>
+            </div>
+          )}
+        </div>
+
+        {/* 무한 스크롤 로딩 표시 */}
+        {loadingMore && (
+          <div className="text-center py-8">
+            <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+            <p className="text-gray-600">더 많은 질문을 불러오는 중...</p>
+          </div>
+        )}
+        
+        {!hasMoreQuestions && questions.length > 0 && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">모든 질문을 확인하셨습니다.</p>
+          </div>
+        )}
       </div>
 
       <div id="mobile-bottom-nav">
