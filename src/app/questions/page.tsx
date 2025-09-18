@@ -161,6 +161,34 @@ export default function QuestionsPage() {
 
   console.log('✅ 단계 4: handleLikeToggle 함수 정의 완료')
 
+  // 단계 7: useEffect 훅들 추가 (완전한 기능)
+  useEffect(() => {
+    console.log('🔄 초기 데이터 로딩 시작')
+    loadQuestions(0, false)
+  }, [status, user?.id, loadQuestions])
+
+  // 무한 스크롤을 위한 스크롤 이벤트 리스너
+  const loadMoreQuestions = useCallback(async () => {
+    if (loadingMore || !hasMoreQuestions) return
+    console.log('🔄 더 많은 질문 로딩 시작', { currentPage })
+    const nextPage = currentPage + 1
+    setCurrentPage(nextPage)
+    await loadQuestions(nextPage, true)
+  }, [currentPage, loadQuestions, loadingMore, hasMoreQuestions])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1000) {
+        loadMoreQuestions()
+      }
+    }
+    
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [loadMoreQuestions])
+
+  console.log('✅ 단계 7: 모든 useEffect 훅 정의 완료')
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
