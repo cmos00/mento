@@ -714,6 +714,7 @@ export default function QuestionsPage() {
                           />
                           {likes[question.id]?.count || 0}개 좋아요
                         </button>
+                        </div>
                       </div>
                     </Link>
                   </div>
