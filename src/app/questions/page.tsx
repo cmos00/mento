@@ -20,6 +20,8 @@ export default function QuestionsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [votedQuestions, setVotedQuestions] = useState<Set<string>>(new Set())
+  const [likes, setLikes] = useState<{[key: string]: {count: number, isLiked: boolean}}>({})
+  const [likingQuestions, setLikingQuestions] = useState<Set<string>>(new Set())
   const [userStats, setUserStats] = useState({
     questionsAsked: 0,
     answersGiven: 0,
@@ -65,6 +67,10 @@ export default function QuestionsPage() {
       setQuestions(result.data || [])
       setFilteredQuestions(result.data || [])
       
+      // 좋아요 데이터 로딩
+      const questionIds = (result.data || []).map(q => q.id)
+      await loadLikesData(questionIds)
+      
       // 로그인한 사용자의 통계 조회
       if (status === 'authenticated' && user?.id) {
         const statsResult = await getUserStats(user.id)
@@ -84,7 +90,7 @@ export default function QuestionsPage() {
     } finally {
       setLoading(false)
     }
-  }, [status, user?.id])
+  }, [status, user?.id, loadLikesData])
 
   useEffect(() => {
     loadQuestions()
@@ -229,6 +235,94 @@ export default function QuestionsPage() {
   const getAnswerCount = (question: Question) => {
     // 질문 객체에 answerCount가 포함되어 있으면 사용, 없으면 0
     return (question as any).answerCount || 0
+  }
+
+  // 좋아요 데이터 로딩
+  const loadLikesData = useCallback(async (questionIds: string[]) => {
+    if (!questionIds.length) return
+
+    try {
+      const likesData: {[key: string]: {count: number, isLiked: boolean}} = {}
+      
+      for (const questionId of questionIds) {
+        const params = new URLSearchParams({
+          questionId,
+          ...(session?.user ? { userId: (session.user as any).id } : {})
+        })
+        
+        const response = await fetch(`/api/questions/like?${params.toString()}`)
+        if (response.ok) {
+          const data = await response.json()
+          likesData[questionId] = {
+            count: data.likeCount || 0,
+            isLiked: data.isLiked || false
+          }
+        }
+      }
+      
+      setLikes(prev => ({ ...prev, ...likesData }))
+    } catch (error) {
+      console.error('좋아요 데이터 로딩 오류:', error)
+    }
+  }, [session?.user])
+
+  // 좋아요 토글 함수
+  const handleLikeToggle = async (questionId: string, event: React.MouseEvent) => {
+    event.preventDefault() // Link 클릭 방지
+    event.stopPropagation()
+
+    if (!session?.user) {
+      alert('로그인이 필요합니다.')
+      return
+    }
+
+    if (likingQuestions.has(questionId)) {
+      return // 이미 처리 중
+    }
+
+    setLikingQuestions(prev => new Set(prev).add(questionId))
+
+    try {
+      const currentLike = likes[questionId]
+      const isCurrentlyLiked = currentLike?.isLiked || false
+      const action = isCurrentlyLiked ? 'unlike' : 'like'
+
+      const response = await fetch('/api/questions/like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionId,
+          userId: (session.user as any).id,
+          action
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setLikes(prev => ({
+          ...prev,
+          [questionId]: {
+            count: data.likeCount,
+            isLiked: !isCurrentlyLiked
+          }
+        }))
+      } else {
+        const errorData = await response.json()
+        console.error('좋아요 처리 오류:', errorData.error)
+        alert('좋아요 처리에 실패했습니다.')
+      }
+    } catch (error) {
+      console.error('좋아요 처리 중 오류:', error)
+      alert('좋아요 처리 중 오류가 발생했습니다.')
+    } finally {
+      setLikingQuestions(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(questionId)
+        return newSet
+      })
+    }
   }
 
   if (loading) {
@@ -565,10 +659,22 @@ export default function QuestionsPage() {
                             {question.views || 0}회 조회
                           </span>
                         </div>
-                        <span className="flex items-center text-sm text-gray-500">
-                          <ThumbsUp className="w-4 h-4 mr-1" />
-                          0개 좋아요
-                        </span>
+                        <button
+                          onClick={(e) => handleLikeToggle(question.id, e)}
+                          disabled={likingQuestions.has(question.id)}
+                          className={`flex items-center text-sm transition-colors ${
+                            likes[question.id]?.isLiked 
+                              ? 'text-red-500 hover:text-red-600' 
+                              : 'text-gray-500 hover:text-red-500'
+                          } ${likingQuestions.has(question.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        >
+                          <ThumbsUp 
+                            className={`w-4 h-4 mr-1 ${
+                              likes[question.id]?.isLiked ? 'fill-current' : ''
+                            }`} 
+                          />
+                          {likes[question.id]?.count || 0}개 좋아요
+                        </button>
                         </div>
                       </div>
                     </Link>

@@ -181,3 +181,32 @@ CREATE POLICY "Users can create their own votes" ON question_votes
 -- 투표 삭제 정책
 CREATE POLICY "Users can delete their own votes" ON question_votes
   FOR DELETE USING (true);
+
+-- 좋아요 테이블
+CREATE TABLE IF NOT EXISTS question_likes (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  question_id UUID NOT NULL REFERENCES questions(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(question_id, user_id)
+);
+
+-- 좋아요 테이블 인덱스
+CREATE INDEX IF NOT EXISTS idx_question_likes_question_id ON question_likes(question_id);
+CREATE INDEX IF NOT EXISTS idx_question_likes_user_id ON question_likes(user_id);
+CREATE INDEX IF NOT EXISTS idx_question_likes_created_at ON question_likes(created_at);
+
+-- 좋아요 테이블 RLS 활성화
+ALTER TABLE question_likes ENABLE ROW LEVEL SECURITY;
+
+-- 좋아요 조회 정책
+CREATE POLICY "Anyone can view likes" ON question_likes
+  FOR SELECT USING (true);
+
+-- 좋아요 생성 정책  
+CREATE POLICY "Users can create their own likes" ON question_likes
+  FOR INSERT WITH CHECK (true);
+
+-- 좋아요 삭제 정책
+CREATE POLICY "Users can delete their own likes" ON question_likes
+  FOR DELETE USING (true);
