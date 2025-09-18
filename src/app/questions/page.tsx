@@ -29,6 +29,70 @@ export default function QuestionsPage() {
   console.log('✅ 단계 1: 기본 상태 관리 설정 완료')
   console.log('✅ 단계 2: 페이지네이션 상태 설정 완료', { currentPage, hasMoreQuestions, loadingMore })
 
+  // 단계 3: useCallback 함수들 추가
+  const loadLikesData = useCallback(async (questionIds: string[]) => {
+    console.log('🔄 loadLikesData 호출됨', { questionIds })
+    if (!questionIds.length || !user?.id) return
+    
+    try {
+      const likesData: {[key: string]: {count: number, isLiked: boolean}} = {}
+      
+      for (const questionId of questionIds) {
+        const response = await fetch(`/api/questions/like?questionId=${questionId}&userId=${user.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          likesData[questionId] = data
+        }
+      }
+      
+      setLikes(prev => ({ ...prev, ...likesData }))
+      console.log('✅ 좋아요 데이터 로드 완료', likesData)
+    } catch (error) {
+      console.error('❌ 좋아요 데이터 로드 실패:', error)
+    }
+  }, [user?.id])
+
+  const loadQuestions = useCallback(async (pageNum: number = 0, append: boolean = false) => {
+    console.log('🔄 loadQuestions 호출됨', { pageNum, append })
+    try {
+      if (!append) {
+        setLoading(true)
+        setError('')
+      } else {
+        setLoadingMore(true)
+      }
+
+      const result = await getQuestionsWithPagination(pageNum, 10)
+      if (result.error) {
+        throw new Error(result.error.message)
+      }
+
+      const newQuestions = result.data || []
+      console.log('✅ 질문 데이터 로드 완료', { count: newQuestions.length, pageNum })
+      
+      if (append) {
+        setQuestions(prev => [...prev, ...newQuestions])
+      } else {
+        setQuestions(newQuestions)
+      }
+      
+      setHasMoreQuestions(newQuestions.length === 10)
+      
+      // 좋아요 데이터 로드
+      const questionIds = newQuestions.map(q => q.id)
+      await loadLikesData(questionIds)
+
+    } catch (err) {
+      console.error('❌ 질문 로딩 실패:', err)
+      setError('질문을 불러오는데 실패했습니다.')
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
+    }
+  }, [loadLikesData])
+
+  console.log('✅ 단계 3: useCallback 함수 정의 완료')
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
