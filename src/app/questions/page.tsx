@@ -10,8 +10,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 
 export default function QuestionsPage() {
-  console.log('🔄 QuestionsPage 컴포넌트 렌더링 시작')
-  
   const { data: session, status } = useSession()
   const user = session?.user
   const [questions, setQuestions] = useState<Question[]>([])
@@ -25,13 +23,8 @@ export default function QuestionsPage() {
   const [currentPage, setCurrentPage] = useState(0)
   const [hasMoreQuestions, setHasMoreQuestions] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
-  
-  console.log('✅ 단계 1: 기본 상태 관리 설정 완료')
-  console.log('✅ 단계 2: 페이지네이션 상태 설정 완료', { currentPage, hasMoreQuestions, loadingMore })
 
-  // 단계 3: useCallback 함수들 추가
   const loadLikesData = useCallback(async (questionIds: string[]) => {
-    console.log('🔄 loadLikesData 호출됨', { questionIds })
     if (!questionIds.length || !user?.id) return
     
     try {
@@ -46,14 +39,12 @@ export default function QuestionsPage() {
       }
       
       setLikes(prev => ({ ...prev, ...likesData }))
-      console.log('✅ 좋아요 데이터 로드 완료', likesData)
     } catch (error) {
       console.error('❌ 좋아요 데이터 로드 실패:', error)
     }
   }, [user?.id])
 
   const loadQuestions = useCallback(async (pageNum: number = 0, append: boolean = false) => {
-    console.log('🔄 loadQuestions 호출됨', { pageNum, append })
     try {
       if (!append) {
         setLoading(true)
@@ -68,7 +59,6 @@ export default function QuestionsPage() {
       }
 
       const newQuestions = result.data || []
-      console.log('✅ 질문 데이터 로드 완료', { count: newQuestions.length, pageNum })
       
       if (append) {
         setQuestions(prev => [...prev, ...newQuestions])
@@ -91,14 +81,8 @@ export default function QuestionsPage() {
     }
   }, [loadLikesData])
 
-  console.log('✅ 단계 3: useCallback 함수 정의 완료')
-
-  // 단계 4: handleLikeToggle 함수 추가 (가장 복잡한 함수)
   const handleLikeToggle = useCallback(async (questionId: string) => {
-    console.log('🔄 handleLikeToggle 호출됨', { questionId, userId: user?.id })
-    
     if (!user?.id || likingQuestions.has(questionId)) {
-      console.log('⚠️ 좋아요 처리 중단', { noUser: !user?.id, alreadyLiking: likingQuestions.has(questionId) })
       return
     }
 
@@ -113,7 +97,6 @@ export default function QuestionsPage() {
       const currentLikeData = likes[questionId] || { count: 0, isLiked: false }
       const action = currentLikeData.isLiked ? 'unlike' : 'like'
       
-      console.log('🔄 API 호출 준비', { action, currentLikeData })
 
       const response = await fetch('/api/questions/like', {
         method: 'POST',
@@ -132,7 +115,6 @@ export default function QuestionsPage() {
       }
 
       const result = await response.json()
-      console.log('✅ API 응답 수신', result)
 
       // 상태 업데이트
       setLikes(prev => ({
@@ -143,7 +125,6 @@ export default function QuestionsPage() {
         }
       }))
 
-      console.log('✅ 좋아요 처리 완료', { questionId, newState: result })
 
     } catch (error) {
       console.error('❌ 좋아요 처리 실패:', error)
@@ -155,22 +136,16 @@ export default function QuestionsPage() {
         newSet.delete(questionId)
         return newSet
       })
-      console.log('🏁 좋아요 처리 종료')
     }
   }, [user?.id, likes, likingQuestions])
 
-  console.log('✅ 단계 4: handleLikeToggle 함수 정의 완료')
-
-  // 단계 7: useEffect 훅들 추가 (완전한 기능)
   useEffect(() => {
-    console.log('🔄 초기 데이터 로딩 시작')
     loadQuestions(0, false)
   }, [status, user?.id, loadQuestions])
 
   // 무한 스크롤을 위한 스크롤 이벤트 리스너
   const loadMoreQuestions = useCallback(async () => {
     if (loadingMore || !hasMoreQuestions) return
-    console.log('🔄 더 많은 질문 로딩 시작', { currentPage })
     const nextPage = currentPage + 1
     setCurrentPage(nextPage)
     await loadQuestions(nextPage, true)
@@ -187,7 +162,6 @@ export default function QuestionsPage() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [loadMoreQuestions])
 
-  console.log('✅ 단계 7: 모든 useEffect 훅 정의 완료')
 
   if (loading) {
     return (
@@ -221,21 +195,7 @@ export default function QuestionsPage() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            질문 목록 (단계 5: 기본 JSX)
-          </h1>
-          <p className="text-gray-600">
-            기본 헤더와 레이아웃이 추가되었습니다.
-          </p>
-          <p className="text-sm text-purple-600 mt-2">
-            로딩 상태: {loading ? '로딩 중' : '완료'} | 
-            질문 수: {questions.length}개 |
-            현재 페이지: {currentPage}
-          </p>
-        </div>
-
-        {/* 단계 6: 복잡한 질문 리스트 JSX */}
+        {/* 질문 리스트 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {questions.length > 0 ? (
             questions.map((question) => {
