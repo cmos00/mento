@@ -336,52 +336,6 @@ export async function getAllQuestionsWithStats() {
   }
 }
 
-// 페이지네이션을 지원하는 질문 조회 (무한스크롤용)
-export async function getQuestionsWithPagination(page: number = 0, limit: number = 10) {
-  try {
-    const offset = page * limit
-
-    const { data: questions, error } = await supabase
-      .from('questions')
-      .select(`
-        *,
-        users!questions_user_id_fkey (
-          id,
-          name,
-          avatar_url,
-          image,
-          company,
-          position,
-          linkedin_url
-        )
-      `)
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
-
-    if (error) {
-      console.error('페이지네이션 질문 조회 오류:', error)
-      throw new Error(error.message)
-    }
-
-    // 각 질문별로 답변 수 조회
-    const questionsWithStats = await Promise.all(
-      (questions || []).map(async (question) => {
-        const { data: answerCount } = await getAnswerCountByQuestionId(question.id)
-        return {
-          ...question,
-          answerCount: answerCount || 0
-        }
-      })
-    )
-
-    return { data: questionsWithStats, error: null }
-  } catch (error) {
-    console.error('페이지네이션 질문 조회 중 예외 발생:', error)
-    return { data: null, error: error as Error }
-  }
-}
-
 // 인기 질문 조회 (120시간 기준 트렌딩 스코어로 정렬)
 export async function getTrendingQuestions(limit: number = 3) {
   try {

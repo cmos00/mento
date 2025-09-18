@@ -35,8 +35,14 @@ export async function POST(request: NextRequest) {
 
       if (insertError) {
         console.error('좋아요 추가 오류:', insertError)
+        if (insertError.code === '42P01') {
+          return NextResponse.json(
+            { error: 'question_likes 테이블이 존재하지 않습니다. 데이터베이스 설정을 확인해주세요.' },
+            { status: 500 }
+          )
+        }
         return NextResponse.json(
-          { error: '좋아요 추가에 실패했습니다.' },
+          { error: `좋아요 추가에 실패했습니다: ${insertError.message}` },
           { status: 500 }
         )
       }

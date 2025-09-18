@@ -3,12 +3,12 @@
 import MobileBottomNav from '@/components/MobileBottomNav'
 import { FeedbackWithAuthor, getFeedbacksByQuestionId } from '@/lib/feedbacks'
 import { Question, getQuestionById, incrementQuestionViews } from '@/lib/questions'
-import { ArrowLeft, Bookmark, Clock, Eye, MessageCircle, Send, Share2, Tag, ThumbsUp, User } from 'lucide-react'
+import { formatTimeAgo, getDisplayName } from '@/lib/utils'
+import { ArrowLeft, Bookmark, Clock, Eye, MessageCircle, Send, Share2, Tag } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 
 export default function QuestionDetailPage() {
   const params = useParams()
@@ -23,7 +23,7 @@ export default function QuestionDetailPage() {
   const [answerContent, setAnswerContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [likeData, setLikeData] = useState<{count: number, isLiked: boolean}>({count: 0, isLiked: false})
-  const [likingInProgress, setLikingInProgress] = useState(false)
+  const [isLiking, setIsLiking] = useState(false)
 
   const questionId = params.id as string
 
@@ -99,11 +99,9 @@ export default function QuestionDetailPage() {
       return
     }
 
-    if (likingInProgress) {
-      return
-    }
+    if (isLiking) return
 
-    setLikingInProgress(true)
+    setIsLiking(true)
 
     try {
       const action = likeData.isLiked ? 'unlike' : 'like'
@@ -135,7 +133,7 @@ export default function QuestionDetailPage() {
       console.error('좋아요 처리 중 오류:', error)
       alert('좋아요 처리 중 오류가 발생했습니다.')
     } finally {
-      setLikingInProgress(false)
+      setIsLiking(false)
     }
   }
 
@@ -349,18 +347,6 @@ export default function QuestionDetailPage() {
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* 질문 카드 */}
         <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
-          {/* 카테고리 */}
-          <div className="mb-3 overflow-hidden">
-            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-              {question.category}
-            </span>
-          </div>
-
-          {/* 질문 제목 */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            {question.title}
-          </h1>
-
           {/* 질문 헤더 */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-3">
@@ -404,6 +390,18 @@ export default function QuestionDetailPage() {
             </div>
           </div>
 
+          {/* 카테고리 */}
+          <div className="mb-3 overflow-hidden">
+            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+              {question.category}
+            </span>
+          </div>
+
+          {/* 질문 제목 */}
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            {question.title}
+          </h1>
+
           {/* 질문 내용 */}
           <div className="prose max-w-none mb-6">
             <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
@@ -440,12 +438,12 @@ export default function QuestionDetailPage() {
             </div>
             <button
               onClick={handleLikeToggle}
-              disabled={likingInProgress}
+              disabled={isLiking}
               className={`flex items-center text-sm transition-colors ${
                 likeData.isLiked 
                   ? 'text-purple-500 hover:text-purple-600' 
                   : 'text-gray-500 hover:text-purple-500'
-              } ${likingInProgress ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              } ${isLiking ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <ThumbsUp 
                 className={`w-4 h-4 mr-2 ${

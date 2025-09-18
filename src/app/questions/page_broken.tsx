@@ -22,14 +22,14 @@ export default function QuestionsPage() {
   const [votedQuestions, setVotedQuestions] = useState<Set<string>>(new Set())
   const [likes, setLikes] = useState<{[key: string]: {count: number, isLiked: boolean}}>({})
   const [likingQuestions, setLikingQuestions] = useState<Set<string>>(new Set())
+  const [currentPage, setCurrentPage] = useState(0)
+  const [hasMoreQuestions, setHasMoreQuestions] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [userStats, setUserStats] = useState({
     questionsAsked: 0,
     answersGiven: 0,
     mentoringSessions: 0,
   })
-  const [currentPage, setCurrentPage] = useState(0)
-  const [hasMoreQuestions, setHasMoreQuestions] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
 
   const categories = [
     '커리어 전환',
@@ -88,14 +88,11 @@ export default function QuestionsPage() {
 
   const loadQuestions = useCallback(async (pageNum: number = 0, append: boolean = false) => {
     try {
-      if (!append) {
-        setLoading(true)
-        setError('')
-      } else {
-        setLoadingMore(true)
-      }
+      if (!append) setLoading(true)
+      else setLoadingMore(true)
+      setError('')
       
-      // 질문과 답변 수를 함께 조회 (페이지네이션)
+      // 페이지네이션을 지원하는 질문 조회
       const result = await getQuestionsWithPagination(pageNum, 10)
       if (result.error) {
         throw new Error(result.error.message)
@@ -105,18 +102,20 @@ export default function QuestionsPage() {
       
       if (append) {
         setQuestions(prev => [...prev, ...newQuestions])
+        setFilteredQuestions(prev => [...prev, ...newQuestions])
       } else {
         setQuestions(newQuestions)
+        setFilteredQuestions(newQuestions)
       }
       
-      // 더 불러올 질문이 있는지 확인
+      // 더 로딩할 질문이 있는지 확인 (10개 미만이면 끝)
       setHasMoreQuestions(newQuestions.length === 10)
       
       // 좋아요 데이터 로딩
       const questionIds = newQuestions.map(q => q.id)
       await loadLikesData(questionIds)
       
-      // 첫 페이지 로딩시에만 사용자 통계와 인기 질문 조회
+      // 첫 로딩 시에만 사용자 통계와 인기 질문 조회
       if (!append) {
         // 로그인한 사용자의 통계 조회
         if (status === 'authenticated' && user?.id) {
@@ -136,32 +135,31 @@ export default function QuestionsPage() {
       console.error('질문 로딩 실패:', err)
       setError('질문을 불러오는데 실패했습니다.')
     } finally {
-      setLoading(false)
-      setLoadingMore(false)
+      if (!append) setLoading(false)
+      else setLoadingMore(false)
     }
   }, [status, user?.id, loadLikesData])
 
-  useEffect(() => {
-    loadQuestions()
-    setCurrentPage(0)
-  }, [status, user?.id])
-
-  // 무한스크롤을 위한 함수
   const loadMoreQuestions = useCallback(async () => {
     if (loadingMore || !hasMoreQuestions) return
+    
     const nextPage = currentPage + 1
     setCurrentPage(nextPage)
     await loadQuestions(nextPage, true)
   }, [currentPage, loadQuestions, loadingMore, hasMoreQuestions])
 
-  // 스크롤 이벤트 리스너
+  useEffect(() => {
+    loadQuestions()
+  }, [loadQuestions])
+
+  // 무한스크롤 이벤트 처리
   useEffect(() => {
     const handleScroll = () => {
       if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 1000) {
         loadMoreQuestions()
       }
     }
-    
+
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [loadMoreQuestions])
@@ -685,9 +683,9 @@ export default function QuestionsPage() {
                       <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
                         {question.title}
                       </h3>
-                       <p className="text-gray-600 text-sm mb-6 line-clamp-3 leading-relaxed">
-                         {question.content}
-                       </p>
+                      <p className="text-gray-600 text-sm mb-6 line-clamp-2 flex-1">
+                        {question.content}
+                      </p>
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
@@ -700,46 +698,46 @@ export default function QuestionsPage() {
                             {question.views || 0}회 조회
                           </span>
                         </div>
-                         <button
-                           onClick={(e) => handleLikeToggle(question.id, e)}
-                           disabled={likingQuestions.has(question.id)}
-                           className={`flex items-center text-sm transition-colors ${
-                             likes[question.id]?.isLiked 
-                               ? 'text-purple-500 hover:text-purple-600' 
-                               : 'text-gray-500 hover:text-purple-500'
-                           } ${likingQuestions.has(question.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                         >
-                           <ThumbsUp 
-                             className={`w-4 h-4 mr-1 ${
-                               likes[question.id]?.isLiked ? 'fill-current' : ''
-                             }`} 
-                           />
-                           {likes[question.id]?.count || 0}개 좋아요
-                         </button>
-                        </div>
+                        <button
+                          onClick={(e) => handleLikeToggle(question.id, e)}
+                          disabled={likingQuestions.has(question.id)}
+                          className={`flex items-center text-sm transition-colors ${
+                            likes[question.id]?.isLiked 
+                              ? 'text-purple-500 hover:text-purple-600' 
+                              : 'text-gray-500 hover:text-purple-500'
+                          } ${likingQuestions.has(question.id) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                        >
+                          <ThumbsUp 
+                            className={`w-4 h-4 mr-1 ${
+                              likes[question.id]?.isLiked ? 'fill-current' : ''
+                            }`} 
+                          />
+                          {likes[question.id]?.count || 0}개 좋아요
+                        </button>
                       </div>
                     </Link>
                   </div>
                 </div>
-               ))}
-             </div>
-           )}
-           
-           {/* 무한스크롤 로딩 표시 */}
-           {loadingMore && (
-             <div className="text-center py-8">
-               <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-               <p className="text-gray-600">더 많은 질문을 불러오는 중...</p>
-             </div>
-           )}
-           
-           {!hasMoreQuestions && questions.length > 0 && (
-             <div className="text-center py-8">
-               <p className="text-gray-500">모든 질문을 확인하셨습니다.</p>
-             </div>
-           )}
-         </div>
-       </div>
+              ))}
+            </div>
+            
+            {/* 무한스크롤 로딩 인디케이터 */}
+            {loadingMore && (
+              <div className="text-center py-8">
+                <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-600">더 많은 질문을 불러오는 중...</p>
+              </div>
+            )}
+            
+            {/* 더 이상 로딩할 질문이 없을 때 */}
+            {!hasMoreQuestions && questions.length > 0 && (
+              <div className="text-center py-8">
+                <p className="text-gray-500">모든 질문을 확인하셨습니다.</p>
+              </div>
+            )}
+          )}
+        </div>
+      </div>
 
       <div id="mobile-bottom-nav">
         <MobileBottomNav />
