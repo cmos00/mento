@@ -392,10 +392,43 @@ export default function QuestionDetailPage() {
           {showAnswerForm && (
             <div className="mb-6 bg-gray-50 border border-gray-200 rounded-xl p-4">
               <div className="flex items-center mb-4">
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
-                  <User className="w-4 h-4 text-purple-600" />
-                </div>
-                <span className="font-medium text-gray-900">{session?.user?.name || '사용자'}</span>
+                {(() => {
+                  // 현재 로그인한 사용자의 프로필 정보 생성
+                  const userImage = (session?.user as any)?.image || session?.user?.image
+                  let avatarUrl = userImage
+                  
+                  // LinkedIn 이미지인 경우 proxy 사용
+                  if (avatarUrl && avatarUrl.includes('media.licdn.com')) {
+                    avatarUrl = `/api/image-proxy?url=${encodeURIComponent(avatarUrl)}`
+                  }
+                  
+                  const userName = session?.user?.name || '사용자'
+                  
+                  return (
+                    <>
+                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3 overflow-hidden relative">
+                        {avatarUrl && (
+                          <img 
+                            src={avatarUrl} 
+                            alt={userName}
+                            className="w-full h-full object-cover absolute inset-0 z-10"
+                            onError={(e) => {
+                              console.error('❌ [Answer Form Profile] 이미지 로드 실패:', avatarUrl)
+                              e.currentTarget.style.display = 'none'
+                            }}
+                            onLoad={() => {
+                              console.log('✅ [Answer Form Profile] 이미지 로드 성공:', avatarUrl)
+                            }}
+                          />
+                        )}
+                        <div className="fallback-text w-full h-full bg-purple-400 text-white text-sm font-bold flex items-center justify-center absolute inset-0">
+                          {userName.charAt(0)}
+                        </div>
+                      </div>
+                      <span className="font-medium text-gray-900">{userName}</span>
+                    </>
+                  )
+                })()}
               </div>
               
               <textarea
