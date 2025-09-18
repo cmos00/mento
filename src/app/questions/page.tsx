@@ -93,6 +93,74 @@ export default function QuestionsPage() {
 
   console.log('✅ 단계 3: useCallback 함수 정의 완료')
 
+  // 단계 4: handleLikeToggle 함수 추가 (가장 복잡한 함수)
+  const handleLikeToggle = useCallback(async (questionId: string) => {
+    console.log('🔄 handleLikeToggle 호출됨', { questionId, userId: user?.id })
+    
+    if (!user?.id || likingQuestions.has(questionId)) {
+      console.log('⚠️ 좋아요 처리 중단', { noUser: !user?.id, alreadyLiking: likingQuestions.has(questionId) })
+      return
+    }
+
+    try {
+      // 로딩 상태 추가
+      setLikingQuestions(prev => {
+        const newSet = new Set(prev)
+        newSet.add(questionId)
+        return newSet
+      })
+
+      const currentLikeData = likes[questionId] || { count: 0, isLiked: false }
+      const action = currentLikeData.isLiked ? 'unlike' : 'like'
+      
+      console.log('🔄 API 호출 준비', { action, currentLikeData })
+
+      const response = await fetch('/api/questions/like', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionId,
+          userId: user.id,
+          action
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API 호출 실패: ${response.status}`)
+      }
+
+      const result = await response.json()
+      console.log('✅ API 응답 수신', result)
+
+      // 상태 업데이트
+      setLikes(prev => ({
+        ...prev,
+        [questionId]: {
+          count: result.likeCount,
+          isLiked: result.isLiked
+        }
+      }))
+
+      console.log('✅ 좋아요 처리 완료', { questionId, newState: result })
+
+    } catch (error) {
+      console.error('❌ 좋아요 처리 실패:', error)
+      alert('좋아요 처리에 실패했습니다.')
+    } finally {
+      // 로딩 상태 제거
+      setLikingQuestions(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(questionId)
+        return newSet
+      })
+      console.log('🏁 좋아요 처리 종료')
+    }
+  }, [user?.id, likes, likingQuestions])
+
+  console.log('✅ 단계 4: handleLikeToggle 함수 정의 완료')
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
