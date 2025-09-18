@@ -198,7 +198,7 @@ export default function QuestionsPage() {
     }
     
     // 일반 사용자인 경우
-    const displayName = user?.name || '사용자' // DB의 실제 이름 사용
+    const displayName = getDisplayName(user?.name || '사용자') // DB의 실제 이름 사용하고 형식 변환
     const originalImageUrl = user?.image || user?.avatar_url // DB의 이미지 우선 사용
     
     // LinkedIn 이미지인 경우 프록시를 통해 제공
@@ -224,15 +224,6 @@ export default function QuestionsPage() {
     }
   }
 
-  const getDisplayName = (name: string) => {
-    if (!name || name === '사용자') return name
-    const parts = name.split(' ')
-    if (parts.length >= 2) {
-      // 성과 이름을 바꿔서 표시 (예: "동현 김" -> "김 동현")
-      return `${parts[parts.length - 1]} ${parts.slice(0, -1).join(' ')}`
-    }
-    return name
-  }
 
   // 답변 수 계산 함수
   const getAnswerCount = (question: Question) => {

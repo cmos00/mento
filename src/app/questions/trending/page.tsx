@@ -56,14 +56,6 @@ export default function TrendingQuestionsPage() {
     return getDisplayName((question as any).users?.name || '사용자')
   }
 
-  const getDisplayName = (name: string) => {
-    if (!name || name === '사용자') return name
-    const parts = name.split(' ')
-    if (parts.length >= 2) {
-      return `${parts[parts.length - 1]} ${parts.slice(0, -1).join(' ')}`
-    }
-    return name
-  }
 
   const getAnswerCount = (question: Question) => {
     return (question as any).answerCount || 0
