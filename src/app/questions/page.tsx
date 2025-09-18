@@ -144,7 +144,7 @@ export default function QuestionsPage() {
   useEffect(() => {
     loadQuestions()
     setCurrentPage(0)
-  }, [status, user?.id])
+  }, [status, user?.id, loadQuestions])
 
   // 무한스크롤을 위한 함수
   const loadMoreQuestions = useCallback(async () => {

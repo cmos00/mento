@@ -293,6 +293,51 @@ export async function getUserStats(userId: string) {
   }
 }
 
+// 페이지네이션으로 질문 조회
+export async function getQuestionsWithPagination(page: number = 0, limit: number = 10) {
+  try {
+    const offset = page * limit
+    
+    const { data: questions, error } = await supabase
+      .from('questions')
+      .select(`
+        *,
+        users!questions_user_id_fkey (
+          id,
+          name,
+          avatar_url,
+          image,
+          company,
+          position,
+          is_deleted
+        )
+      `)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    if (error) {
+      console.error('페이지네이션 질문 조회 오류:', error)
+      return { data: null, error }
+    }
+
+    // 각 질문의 답변 수 조회
+    const questionsWithStats = await Promise.all(
+      (questions || []).map(async (question) => {
+        const { count } = await getAnswerCountByQuestionId(question.id)
+        return {
+          ...question,
+          answerCount: count || 0
+        }
+      })
+    )
+
+    return { data: questionsWithStats, error: null }
+  } catch (error) {
+    console.error('페이지네이션 질문 조회 중 예외 발생:', error)
+    return { data: null, error: error as Error }
+  }
+}
+
 // 질문과 답변 수를 함께 조회
 export async function getAllQuestionsWithStats() {
   try {
