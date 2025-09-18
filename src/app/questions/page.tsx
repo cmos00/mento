@@ -10,9 +10,17 @@ import { useCallback, useEffect, useState } from 'react'
 import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 
 export default function QuestionsPage() {
+  console.log('🔄 QuestionsPage 컴포넌트 렌더링 시작')
+  
   const { data: session, status } = useSession()
+  const user = session?.user
   const [questions, setQuestions] = useState<Question[]>([])
+  const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
+  
+  console.log('✅ 단계 1: 기본 상태 관리 설정 완료')
 
   if (loading) {
     return (
