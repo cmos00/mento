@@ -437,7 +437,11 @@ export default function QuestionDetailPage() {
                 onChange={(e) => setAnswerContent(e.target.value)}
                 placeholder="도움이 되는 답변을 작성해주세요..."
                 className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                maxLength={2000}
               />
+              <div className="text-right text-sm text-gray-500 mt-2">
+                {answerContent.length}/2000
+              </div>
               
               <div className="flex items-center justify-between mt-4">
                 <button
