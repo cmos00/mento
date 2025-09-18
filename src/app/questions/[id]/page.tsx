@@ -269,31 +269,23 @@ export default function QuestionDetailPage() {
                 const profileInfo = getUserProfileInfo(question)
                 return (
                   <>
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden">
-                      {profileInfo.avatarUrl ? (
+                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden relative">
+                      {profileInfo.avatarUrl && (
                         <img 
                           src={profileInfo.avatarUrl} 
                           alt={profileInfo.displayName}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover absolute inset-0 z-10"
                           onError={(e) => {
-                            console.log('❌ [Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
+                            console.error('❌ [Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
                             e.currentTarget.style.display = 'none'
-                            const parent = e.currentTarget.parentElement
-                            if (parent) {
-                              const fallback = parent.querySelector('.fallback-text')
-                              if (fallback) {
-                                (fallback as HTMLElement).style.display = 'flex'
-                              }
-                            }
                           }}
                           onLoad={() => {
                             console.log('✅ [Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)
                           }}
                         />
-                      ) : null}
+                      )}
                       <div 
-                        className={`fallback-text w-full h-full ${profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-400'} text-white text-sm font-bold flex items-center justify-center ${profileInfo.avatarUrl ? 'hidden' : 'flex'}`}
-                        style={{ display: profileInfo.avatarUrl ? 'none' : 'flex' }}
+                        className={`fallback-text w-full h-full ${profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-400'} text-white text-sm font-bold flex items-center justify-center absolute inset-0`}
                       >
                         {profileInfo.isDeleted ? '?' : profileInfo.displayName.charAt(0)}
                       </div>
@@ -468,31 +460,23 @@ export default function QuestionDetailPage() {
                       const profileInfo = getFeedbackUserProfileInfo(feedback)
                       return (
                         <>
-                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden">
-                            {profileInfo.avatarUrl ? (
+                          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden relative">
+                            {profileInfo.avatarUrl && (
                               <img 
                                 src={profileInfo.avatarUrl} 
                                 alt={profileInfo.displayName}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover absolute inset-0 z-10"
                                 onError={(e) => {
-                                  console.log('❌ [Feedback Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
+                                  console.error('❌ [Feedback Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
                                   e.currentTarget.style.display = 'none'
-                                  const parent = e.currentTarget.parentElement
-                                  if (parent) {
-                                    const fallback = parent.querySelector('.fallback-text')
-                                    if (fallback) {
-                                      (fallback as HTMLElement).style.display = 'flex'
-                                    }
-                                  }
                                 }}
                                 onLoad={() => {
                                   console.log('✅ [Feedback Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)
                                 }}
                               />
-                            ) : null}
+                            )}
                             <div 
-                              className={`fallback-text w-full h-full ${profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-400'} text-white text-sm font-bold flex items-center justify-center ${profileInfo.avatarUrl ? 'hidden' : 'flex'}`}
-                              style={{ display: profileInfo.avatarUrl ? 'none' : 'flex' }}
+                              className={`fallback-text w-full h-full ${profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-400'} text-white text-sm font-bold flex items-center justify-center absolute inset-0`}
                             >
                               {profileInfo.isDeleted ? '?' : profileInfo.displayName.charAt(0)}
                             </div>
