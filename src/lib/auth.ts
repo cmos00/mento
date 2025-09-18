@@ -66,14 +66,25 @@ export const authOptions: NextAuthOptions = {
           
           const userId = generateUUID()
           
-          // 이름 처리 - 더 안전한 방식
+          // 이름 처리 - 한국식 성 이름 순으로 변환
           let userName = 'LinkedIn 사용자'
           if (profile.name && typeof profile.name === 'string') {
+            // 만약 이미 완전한 이름이 제공된다면 그대로 사용
             userName = profile.name.trim()
           } else if (profile.given_name || profile.family_name) {
             const givenName = profile.given_name || ''
             const familyName = profile.family_name || ''
+            
+            // 한국식 이름 순서: 성 + 이름 (family_name + given_name)
+            // LinkedIn: first_name="동현", last_name="김" → "김 동현"
             userName = `${familyName} ${givenName}`.trim()
+            
+            console.log('👤 [LinkedIn Profile] 이름 변환:', {
+              given_name: givenName,
+              family_name: familyName,
+              result: userName,
+              description: '한국식 성 이름 순으로 변환 완료'
+            })
           }
           
           // 이메일 처리 - 더 안전한 방식
