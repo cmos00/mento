@@ -54,6 +54,35 @@ export default function QuestionsPage() {
     return categoryMap[category] || category
   }
 
+  // 좋아요 데이터 로딩
+  const loadLikesData = useCallback(async (questionIds: string[]) => {
+    if (!questionIds.length) return
+
+    try {
+      const likesData: {[key: string]: {count: number, isLiked: boolean}} = {}
+      
+      for (const questionId of questionIds) {
+        const params = new URLSearchParams({
+          questionId,
+          ...(session?.user ? { userId: (session.user as any).id } : {})
+        })
+        
+        const response = await fetch(`/api/questions/like?${params.toString()}`)
+        if (response.ok) {
+          const data = await response.json()
+          likesData[questionId] = {
+            count: data.likeCount || 0,
+            isLiked: data.isLiked || false
+          }
+        }
+      }
+      
+      setLikes(prev => ({ ...prev, ...likesData }))
+    } catch (error) {
+      console.error('좋아요 데이터 로딩 오류:', error)
+    }
+  }, [session?.user])
+
   const loadQuestions = useCallback(async () => {
     try {
       setLoading(true)
@@ -236,35 +265,6 @@ export default function QuestionsPage() {
     // 질문 객체에 answerCount가 포함되어 있으면 사용, 없으면 0
     return (question as any).answerCount || 0
   }
-
-  // 좋아요 데이터 로딩
-  const loadLikesData = useCallback(async (questionIds: string[]) => {
-    if (!questionIds.length) return
-
-    try {
-      const likesData: {[key: string]: {count: number, isLiked: boolean}} = {}
-      
-      for (const questionId of questionIds) {
-        const params = new URLSearchParams({
-          questionId,
-          ...(session?.user ? { userId: (session.user as any).id } : {})
-        })
-        
-        const response = await fetch(`/api/questions/like?${params.toString()}`)
-        if (response.ok) {
-          const data = await response.json()
-          likesData[questionId] = {
-            count: data.likeCount || 0,
-            isLiked: data.isLiked || false
-          }
-        }
-      }
-      
-      setLikes(prev => ({ ...prev, ...likesData }))
-    } catch (error) {
-      console.error('좋아요 데이터 로딩 오류:', error)
-    }
-  }, [session?.user])
 
   // 좋아요 토글 함수
   const handleLikeToggle = async (questionId: string, event: React.MouseEvent) => {
