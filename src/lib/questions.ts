@@ -83,6 +83,10 @@ export async function getQuestionById(id: string) {
 
     if (basicError) {
       console.error('❌ [DEBUG] 기본 질문 조회 실패:', basicError)
+      // PGRST116 (not found) 에러도 정상적으로 처리
+      if (basicError.code === 'PGRST116') {
+        return { data: null, error: new Error('질문을 찾을 수 없습니다.') }
+      }
       throw new Error(`기본 질문 조회 실패: ${basicError.message}`)
     }
 
@@ -102,7 +106,6 @@ export async function getQuestionById(id: string) {
         )
       `)
       .eq('id', id)
-      .eq('status', 'active')
       .single()
 
     console.log('🔍 [DEBUG] 조인 질문 조회 결과:', { data, error })
