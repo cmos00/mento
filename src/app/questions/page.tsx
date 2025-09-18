@@ -147,7 +147,7 @@ export default function QuestionsPage() {
 
     } catch (error) {
       console.error('❌ 좋아요 처리 실패:', error)
-      alert('좋아요 처리에 실패했습니다.')
+      console.error('좋아요 처리에 실패했습니다. 다시 시도해주세요.')
     } finally {
       // 로딩 상태 제거
       setLikingQuestions(prev => {
@@ -250,7 +250,7 @@ export default function QuestionsPage() {
                     </h3>
                   </div>
                   
-                  <p className="text-gray-600 text-sm mb-6 line-clamp-2 flex-1">
+                  <p className="text-gray-600 text-sm mb-8 line-clamp-3 flex-1">
                     {question.content}
                   </p>
 
