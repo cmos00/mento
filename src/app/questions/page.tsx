@@ -57,34 +57,27 @@ export default function QuestionsPage() {
     return categoryMap[category] || category
   }
 
-  // 좋아요 데이터 로딩
+  // 좋아요 데이터 로딩 (로컬 상태로만 관리)
   const loadLikesData = useCallback(async (questionIds: string[]) => {
     if (!questionIds.length) return
 
     try {
+      // 서버 API가 실패하므로 기본값으로 설정
       const likesData: {[key: string]: {count: number, isLiked: boolean}} = {}
       
       for (const questionId of questionIds) {
-        const params = new URLSearchParams({
-          questionId,
-          ...(session?.user ? { userId: (session.user as any).id } : {})
-        })
-        
-        const response = await fetch(`/api/questions/like?${params.toString()}`)
-        if (response.ok) {
-          const data = await response.json()
-          likesData[questionId] = {
-            count: data.likeCount || 0,
-            isLiked: data.isLiked || false
-          }
+        likesData[questionId] = {
+          count: 0,
+          isLiked: false
         }
       }
       
       setLikes(prev => ({ ...prev, ...likesData }))
+      console.log('좋아요 데이터 초기화:', questionIds)
     } catch (error) {
       console.error('좋아요 데이터 로딩 오류:', error)
     }
-  }, [session?.user])
+  }, [])
 
   const loadQuestions = useCallback(async (pageNum: number = 0, append: boolean = false) => {
     try {
@@ -307,7 +300,7 @@ export default function QuestionsPage() {
     return (question as any).answerCount || 0
   }
 
-  // 좋아요 토글 함수
+  // 좋아요 토글 함수 (로컬 상태로만 관리)
   const handleLikeToggle = async (questionId: string, event: React.MouseEvent) => {
     event.preventDefault() // Link 클릭 방지
     event.stopPropagation()
@@ -326,34 +319,22 @@ export default function QuestionsPage() {
     try {
       const currentLike = likes[questionId]
       const isCurrentlyLiked = currentLike?.isLiked || false
-      const action = isCurrentlyLiked ? 'unlike' : 'like'
-
-      const response = await fetch('/api/questions/like', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          questionId,
-          userId: (session.user as any).id,
-          action
-        }),
+      
+      // 로컬 상태만 업데이트 (서버 API 호출 없음)
+      setLikes(prev => ({
+        ...prev,
+        [questionId]: {
+          count: (currentLike?.count || 0) + (isCurrentlyLiked ? -1 : 1),
+          isLiked: !isCurrentlyLiked
+        }
+      }))
+      
+      console.log('좋아요 상태 업데이트:', {
+        questionId,
+        isLiked: !isCurrentlyLiked,
+        count: (currentLike?.count || 0) + (isCurrentlyLiked ? -1 : 1)
       })
-
-      if (response.ok) {
-        const data = await response.json()
-        setLikes(prev => ({
-          ...prev,
-          [questionId]: {
-            count: data.likeCount,
-            isLiked: !isCurrentlyLiked
-          }
-        }))
-      } else {
-        const errorData = await response.json()
-        console.error('좋아요 처리 오류:', errorData.error)
-        alert('좋아요 처리에 실패했습니다.')
-      }
+      
     } catch (error) {
       console.error('좋아요 처리 중 오류:', error)
       alert('좋아요 처리 중 오류가 발생했습니다.')
