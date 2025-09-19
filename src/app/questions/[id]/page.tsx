@@ -75,13 +75,28 @@ export default function QuestionDetailPage() {
 
   const loadLikeData = useCallback(async () => {
     try {
-      // 서버 API가 실패하므로 기본값으로 설정
-      setLikeData({
-        count: 0,
-        isLiked: false
+      // 서버에서 좋아요 데이터 로딩 시도
+      const params = new URLSearchParams({
+        questionId,
+        ...(session?.user ? { userId: (session.user as any).id } : {})
       })
       
-      console.log('좋아요 데이터 초기화:', { questionId })
+      const response = await fetch(`/api/questions/like?${params.toString()}`)
+      if (response.ok) {
+        const data = await response.json()
+        setLikeData({
+          count: data.likeCount || 0,
+          isLiked: data.isLiked || false
+        })
+        console.log('서버 좋아요 데이터 로딩 성공:', data)
+      } else {
+        // 서버 오류 시 기본값 설정
+        setLikeData({
+          count: 0,
+          isLiked: false
+        })
+        console.log('서버 오류로 기본값 설정')
+      }
     } catch (error) {
       console.error('좋아요 데이터 로딩 오류:', error)
       // 오류가 발생해도 기본값으로 설정
@@ -90,7 +105,7 @@ export default function QuestionDetailPage() {
         isLiked: false
       })
     }
-  }, [questionId])
+  }, [questionId, session?.user])
 
   const handleLikeToggle = async () => {
     if (!session?.user) {
@@ -103,17 +118,45 @@ export default function QuestionDetailPage() {
     setIsLiking(true)
 
     try {
-      // 로컬 상태만 업데이트 (서버 API 호출 없음)
-      setLikeData(prev => ({
-        count: prev.count + (prev.isLiked ? -1 : 1),
-        isLiked: !prev.isLiked
-      }))
+      const action = likeData.isLiked ? 'unlike' : 'like'
       
-      console.log('좋아요 상태 업데이트:', {
-        questionId,
-        isLiked: !likeData.isLiked,
-        count: likeData.count + (likeData.isLiked ? -1 : 1)
-      })
+      // 서버에 좋아요 상태 업데이트 시도
+      try {
+        const response = await fetch('/api/questions/like', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            questionId,
+            userId: (session.user as any).id,
+            action
+          }),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setLikeData({
+            count: data.likeCount,
+            isLiked: !likeData.isLiked
+          })
+          console.log('서버 좋아요 상태 업데이트 성공:', data)
+        } else {
+          // 서버 오류 시 로컬 상태만 업데이트
+          setLikeData(prev => ({
+            count: prev.count + (prev.isLiked ? -1 : 1),
+            isLiked: !prev.isLiked
+          }))
+          console.log('서버 오류로 로컬 상태만 업데이트')
+        }
+      } catch (apiError) {
+        // API 호출 실패 시 로컬 상태만 업데이트
+        setLikeData(prev => ({
+          count: prev.count + (prev.isLiked ? -1 : 1),
+          isLiked: !prev.isLiked
+        }))
+        console.log('API 호출 실패로 로컬 상태만 업데이트')
+      }
       
     } catch (error) {
       console.error('좋아요 처리 중 오류:', error)

@@ -57,27 +57,49 @@ export default function QuestionsPage() {
     return categoryMap[category] || category
   }
 
-  // 좋아요 데이터 로딩 (로컬 상태로만 관리)
+  // 좋아요 데이터 로딩 (서버 연동 시도, 실패 시 기본값)
   const loadLikesData = useCallback(async (questionIds: string[]) => {
     if (!questionIds.length) return
 
     try {
-      // 서버 API가 실패하므로 기본값으로 설정
       const likesData: {[key: string]: {count: number, isLiked: boolean}} = {}
       
       for (const questionId of questionIds) {
-        likesData[questionId] = {
-          count: 0,
-          isLiked: false
+        try {
+          const params = new URLSearchParams({
+            questionId,
+            ...(session?.user ? { userId: (session.user as any).id } : {})
+          })
+          
+          const response = await fetch(`/api/questions/like?${params.toString()}`)
+          if (response.ok) {
+            const data = await response.json()
+            likesData[questionId] = {
+              count: data.likeCount || 0,
+              isLiked: data.isLiked || false
+            }
+          } else {
+            // 서버 오류 시 기본값 사용
+            likesData[questionId] = {
+              count: 0,
+              isLiked: false
+            }
+          }
+        } catch (error) {
+          // 네트워크 오류 시 기본값 사용
+          likesData[questionId] = {
+            count: 0,
+            isLiked: false
+          }
         }
       }
       
       setLikes(prev => ({ ...prev, ...likesData }))
-      console.log('좋아요 데이터 초기화:', questionIds)
+      console.log('좋아요 데이터 로딩 완료:', likesData)
     } catch (error) {
       console.error('좋아요 데이터 로딩 오류:', error)
     }
-  }, [])
+  }, [session?.user])
 
   const loadQuestions = useCallback(async (pageNum: number = 0, append: boolean = false) => {
     try {
@@ -300,7 +322,7 @@ export default function QuestionsPage() {
     return (question as any).answerCount || 0
   }
 
-  // 좋아요 토글 함수 (로컬 상태로만 관리)
+  // 좋아요 토글 함수 (서버 연동 시도, 실패 시 로컬 상태만 업데이트)
   const handleLikeToggle = async (questionId: string, event: React.MouseEvent) => {
     event.preventDefault() // Link 클릭 방지
     event.stopPropagation()
@@ -319,21 +341,54 @@ export default function QuestionsPage() {
     try {
       const currentLike = likes[questionId]
       const isCurrentlyLiked = currentLike?.isLiked || false
+      const action = isCurrentlyLiked ? 'unlike' : 'like'
       
-      // 로컬 상태만 업데이트 (서버 API 호출 없음)
-      setLikes(prev => ({
-        ...prev,
-        [questionId]: {
-          count: (currentLike?.count || 0) + (isCurrentlyLiked ? -1 : 1),
-          isLiked: !isCurrentlyLiked
+      // 서버에 좋아요 상태 업데이트 시도
+      try {
+        const response = await fetch('/api/questions/like', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            questionId,
+            userId: (session.user as any).id,
+            action
+          }),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setLikes(prev => ({
+            ...prev,
+            [questionId]: {
+              count: data.likeCount,
+              isLiked: !isCurrentlyLiked
+            }
+          }))
+          console.log('서버 좋아요 상태 업데이트 성공:', data)
+        } else {
+          // 서버 오류 시 로컬 상태만 업데이트
+          setLikes(prev => ({
+            ...prev,
+            [questionId]: {
+              count: (currentLike?.count || 0) + (isCurrentlyLiked ? -1 : 1),
+              isLiked: !isCurrentlyLiked
+            }
+          }))
+          console.log('서버 오류로 로컬 상태만 업데이트')
         }
-      }))
-      
-      console.log('좋아요 상태 업데이트:', {
-        questionId,
-        isLiked: !isCurrentlyLiked,
-        count: (currentLike?.count || 0) + (isCurrentlyLiked ? -1 : 1)
-      })
+      } catch (apiError) {
+        // API 호출 실패 시 로컬 상태만 업데이트
+        setLikes(prev => ({
+          ...prev,
+          [questionId]: {
+            count: (currentLike?.count || 0) + (isCurrentlyLiked ? -1 : 1),
+            isLiked: !isCurrentlyLiked
+          }
+        }))
+        console.log('API 호출 실패로 로컬 상태만 업데이트')
+      }
       
     } catch (error) {
       console.error('좋아요 처리 중 오류:', error)
@@ -459,10 +514,10 @@ export default function QuestionsPage() {
                       </span>
                     </div>
                     
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-3 group-hover:text-purple-700 transition-colors pr-16">
                       {question.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2 flex-1">
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-4 flex-1">
                       {question.content}
                     </p>
                     
@@ -489,10 +544,10 @@ export default function QuestionsPage() {
                     </span>
                     <span className="text-xs text-gray-500">{formatTimeAgo(question.created_at)}</span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors">
+                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-3 group-hover:text-purple-700 transition-colors">
                     {question.title}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-4">
                     {question.content}
                   </p>
                   <div className="flex items-center justify-between text-sm text-gray-500">
@@ -663,10 +718,10 @@ export default function QuestionsPage() {
                         )}
                       </div>
                       
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-3 group-hover:text-purple-700 transition-colors pr-16">
                         {question.title}
                       </h3>
-                       <p className="text-gray-600 text-sm mb-6 line-clamp-3 leading-relaxed">
+                       <p className="text-gray-600 text-sm mb-6 line-clamp-5 leading-relaxed">
                          {question.content}
                        </p>
 
