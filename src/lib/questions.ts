@@ -300,18 +300,17 @@ export async function getQuestionsWithPagination(page: number = 0, limit: number
     
     const { data: questions, error } = await supabase
       .from('questions')
-      .select(`
-        *,
-        users!questions_user_id_fkey (
-          id,
-          name,
-          avatar_url,
-          image,
-          company,
-          position,
-          is_deleted
-        )
-      `)
+              .select(`
+                *,
+                users!questions_user_id_fkey (
+                  id,
+                  name,
+                  avatar_url,
+                  image,
+                  company,
+                  position
+                )
+              `)
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 

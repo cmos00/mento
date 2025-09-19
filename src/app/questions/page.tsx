@@ -240,9 +240,9 @@ export default function QuestionsPage() {
     const user = (question as any).users
     
     // 탈퇴한 사용자인 경우 (컬럼이 존재할 때만 체크)
-    if (user?.is_deleted === true) {
-      return '탈퇴한 사용자'
-    }
+    // if (user?.is_deleted === true) {
+    //   return '탈퇴한 사용자'
+    // }
     
     // users 테이블과 조인된 데이터가 있다면 사용
     return getDisplayName(user?.name || '사용자')
@@ -263,15 +263,15 @@ export default function QuestionsPage() {
     }
     
     // 탈퇴한 사용자인 경우 (컬럼이 존재할 때만 체크)
-    if (user?.is_deleted === true) {
-      return {
-        displayName: '탈퇴한 사용자',
-        avatarUrl: null,
-        linkedinUrl: null,
-        isDeleted: true,
-        showProfile: false
-      }
-    }
+    // if (user?.is_deleted === true) {
+    //   return {
+    //     displayName: '탈퇴한 사용자',
+    //     avatarUrl: null,
+    //     linkedinUrl: null,
+    //     isDeleted: true,
+    //     showProfile: false
+    //   }
+    // }
     
     // 일반 사용자인 경우
     const displayName = getDisplayName(user?.name || '사용자') // DB의 실제 이름 사용하고 형식 변환

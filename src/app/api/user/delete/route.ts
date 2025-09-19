@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     // 기존 사용자 찾기
     const { data: existingUser } = await supabaseAdmin
       .from('users')
-      .select('id, is_deleted')
+      .select('id, name')
       .eq('email', session.user.email)
       .single()
 
@@ -52,19 +52,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (existingUser.is_deleted) {
+    // 이미 탈퇴한 사용자인지 확인 (이름으로 판단)
+    if (existingUser.name === '탈퇴한 사용자') {
       return NextResponse.json(
         { error: '이미 탈퇴한 사용자입니다.' },
         { status: 400 }
       )
     }
 
-    // 사용자를 탈퇴 처리 (실제 삭제하지 않고 플래그만 설정)
+    // 사용자를 탈퇴 처리 (실제 삭제하지 않고 개인정보만 제거)
     const { error: deleteError } = await supabaseAdmin
       .from('users')
       .update({
-        is_deleted: true,
-        deleted_at: new Date().toISOString(),
         // 개인정보 제거
         name: '탈퇴한 사용자',
         email: `deleted_${existingUser.id}@deleted.local`,

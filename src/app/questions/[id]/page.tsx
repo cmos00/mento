@@ -207,13 +207,13 @@ export default function QuestionDetailPage() {
     const user = (question as any).users
     
     // 탈퇴한 사용자인 경우 (타입 안전성을 위해 any로 캐스팅)
-    if ((user as any)?.is_deleted === true) {
-      return {
-        displayName: '탈퇴한 사용자',
-        avatarUrl: null,
-        isDeleted: true
-      }
-    }
+    // if ((user as any)?.is_deleted === true) {
+    //   return {
+    //     displayName: '탈퇴한 사용자',
+    //     avatarUrl: null,
+    //     isDeleted: true
+    //   }
+    // }
     
     // 익명 사용자인 경우
     if (question.is_anonymous) {
@@ -257,13 +257,13 @@ export default function QuestionDetailPage() {
     const user = feedback.users
     
     // 탈퇴한 사용자인 경우 (타입 안전성을 위해 any로 캐스팅)
-    if ((user as any)?.is_deleted === true) {
-      return {
-        displayName: '탈퇴한 사용자',
-        avatarUrl: null,
-        isDeleted: true
-      }
-    }
+    // if ((user as any)?.is_deleted === true) {
+    //   return {
+    //     displayName: '탈퇴한 사용자',
+    //     avatarUrl: null,
+    //     isDeleted: true
+    //   }
+    // }
     
     const displayName = getDisplayName(user?.name || '익명 사용자')
     let avatarUrl = (user as any)?.image || user?.avatar_url
