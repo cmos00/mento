@@ -323,10 +323,10 @@ export async function getQuestionsWithPagination(page: number = 0, limit: number
     // 각 질문의 답변 수 조회
     const questionsWithStats = await Promise.all(
       (questions || []).map(async (question) => {
-        const { count } = await getAnswerCountByQuestionId(question.id)
+        const result = await getAnswerCountByQuestionId(question.id)
         return {
           ...question,
-          answerCount: count || 0
+          answerCount: result.data || 0
         }
       })
     )
