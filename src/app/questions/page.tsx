@@ -66,6 +66,7 @@ export default function QuestionsPage() {
       
       for (const questionId of questionIds) {
         try {
+          // 로그인 상태와 관계없이 좋아요 카운트는 항상 조회
           const params = new URLSearchParams({
             questionId,
             ...(session?.user ? { userId: (session.user as any).id } : {})
@@ -76,9 +77,13 @@ export default function QuestionsPage() {
             const data = await response.json()
             likesData[questionId] = {
               count: data.likeCount || 0,
-              isLiked: data.isLiked || false
+              isLiked: session?.user ? (data.isLiked || false) : false // 로그인하지 않은 사용자는 항상 false
             }
-            console.log(`좋아요 데이터 로딩 성공 - ${questionId}:`, data)
+            console.log(`좋아요 데이터 로딩 성공 - ${questionId}:`, {
+              likeCount: data.likeCount,
+              isLiked: data.isLiked,
+              userLoggedIn: !!session?.user
+            })
           } else {
             // 서버 오류 시 기본값 사용
             likesData[questionId] = {
@@ -520,7 +525,7 @@ export default function QuestionsPage() {
                     <h3 className="font-semibold text-gray-900 mb-2 line-clamp-3 group-hover:text-purple-700 transition-colors pr-16">
                       {question.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-6 line-clamp-4 flex-1">
+                    <p className="text-sm text-gray-600 mb-6 line-clamp-2 flex-1">
                       {question.content}
                     </p>
                     
