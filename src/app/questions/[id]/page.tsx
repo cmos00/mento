@@ -63,7 +63,7 @@ export default function QuestionDetailPage() {
     } catch (err) {
       console.error('❌ [USER ID] 실제 사용자 ID 조회 오류:', err)
     }
-  }, [user?.email, user?.id])
+  }, [user?.email])
 
   const loadQuestion = useCallback(async () => {
     try {
@@ -430,12 +430,12 @@ export default function QuestionDetailPage() {
     }
   }, [questionId, loadQuestion, loadFeedbacks])
 
-  // 실제 사용자 ID 로드
+  // 실제 사용자 ID 로드 (한 번만 실행)
   useEffect(() => {
-    if (status === 'authenticated' && user?.email) {
+    if (status === 'authenticated' && user?.email && !actualUserId) {
       loadActualUserId()
     }
-  }, [status, user?.email, loadActualUserId])
+  }, [status, user?.email, actualUserId])
 
   // 세션이 로드된 후 좋아요 데이터 로드 (중복 제거)
   useEffect(() => {
