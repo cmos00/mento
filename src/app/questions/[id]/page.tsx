@@ -601,7 +601,16 @@ export default function QuestionDetailPage() {
                 {formatTimeAgo(question.created_at)}
               </div>
               {/* 본인이 작성한 질문인 경우 수정/삭제 버튼 표시 */}
-              {user?.id && question.user_id === user.id && (
+              {(() => {
+                console.log('🔍 [DEBUG] 수정 버튼 표시 조건 확인:', {
+                  userId: user?.id,
+                  questionUserId: question.user_id,
+                  isMatch: user?.id && question.user_id === user.id,
+                  userType: typeof user?.id,
+                  questionUserType: typeof question.user_id
+                })
+                return user?.id && question.user_id === user.id
+              })() && (
                 <div className="flex items-center space-x-1 ml-4">
                   <button
                     onClick={initializeEditForm}
@@ -900,7 +909,16 @@ export default function QuestionDetailPage() {
                       {formatTimeAgo(feedback.created_at)}
                     </span>
                     {/* 본인이 작성한 답변인 경우 수정/삭제 버튼 표시 */}
-                    {user?.id && feedback.user_id === user.id && (
+                    {(() => {
+                      console.log('🔍 [DEBUG] 답변 수정 버튼 표시 조건 확인:', {
+                        userId: user?.id,
+                        feedbackUserId: feedback.user_id,
+                        isMatch: user?.id && feedback.user_id === user.id,
+                        userType: typeof user?.id,
+                        feedbackUserType: typeof feedback.user_id
+                      })
+                      return user?.id && feedback.user_id === user.id
+                    })() && (
                       <div className="flex items-center space-x-1">
                         <button
                           onClick={() => handleEditFeedback(feedback.id)}
