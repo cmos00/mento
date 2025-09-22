@@ -310,18 +310,24 @@ export default function QuestionDetailPage() {
           console.log('서버 좋아요 상태 업데이트 성공:', data)
         } else {
           // 서버 오류 시 로컬 상태만 업데이트
-          setLikeData(prev => ({
-            count: prev.count + (prev.isLiked ? -1 : 1),
-            isLiked: !prev.isLiked
-          }))
+          setLikeData(prev => {
+            if (!prev) return { count: 0, isLiked: false }
+            return {
+              count: prev.count + (prev.isLiked ? -1 : 1),
+              isLiked: !prev.isLiked
+            }
+          })
           console.log('서버 오류로 로컬 상태만 업데이트')
         }
       } catch (apiError) {
         // API 호출 실패 시 로컬 상태만 업데이트
-        setLikeData(prev => ({
-          count: prev.count + (prev.isLiked ? -1 : 1),
-          isLiked: !prev.isLiked
-        }))
+        setLikeData(prev => {
+          if (!prev) return { count: 0, isLiked: false }
+          return {
+            count: prev.count + (prev.isLiked ? -1 : 1),
+            isLiked: !prev.isLiked
+          }
+        })
         console.log('API 호출 실패로 로컬 상태만 업데이트')
       }
       
