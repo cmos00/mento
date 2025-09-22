@@ -69,7 +69,7 @@ export default function QuestionsPage() {
         try {
           const params = new URLSearchParams({
             questionId,
-            ...(session?.user ? { userId: (session.user as any).id } : {})
+            ...(user?.id ? { userId: user.id } : {})
           })
           
           const response = await fetch(`/api/questions/like?${params.toString()}`)
@@ -79,7 +79,7 @@ export default function QuestionsPage() {
               questionId,
               data: {
                 count: data.likeCount || 0,
-                isLiked: session?.user ? (data.isLiked || false) : false
+                isLiked: user?.id ? (data.isLiked || false) : false
               }
             }
           } else {
@@ -106,7 +106,7 @@ export default function QuestionsPage() {
     } catch (error) {
       console.error('좋아요 데이터 로딩 중 전체 오류:', error)
     }
-  }, [session?.user])
+  }, [user?.id])
 
   const loadQuestions = useCallback(async (pageNum: number = 0, append: boolean = false) => {
     try {
@@ -170,6 +170,14 @@ export default function QuestionsPage() {
     loadQuestions()
     setCurrentPage(0)
   }, [status, user?.id, loadQuestions])
+
+  // 세션이 로드된 후 기존 질문들의 좋아요 데이터 다시 로드
+  useEffect(() => {
+    if (status === 'authenticated' && user?.id && questions.length > 0) {
+      const questionIds = questions.map(q => q.id)
+      loadLikesData(questionIds)
+    }
+  }, [status, user?.id, questions.length, loadLikesData])
 
   // 무한스크롤을 위한 함수
   const loadMoreQuestions = useCallback(async () => {
@@ -337,7 +345,7 @@ export default function QuestionsPage() {
     event.preventDefault() // Link 클릭 방지
     event.stopPropagation()
 
-    if (!session?.user) {
+    if (!user?.id) {
       alert('로그인이 필요합니다.')
       return
     }
@@ -362,7 +370,7 @@ export default function QuestionsPage() {
           },
           body: JSON.stringify({
             questionId,
-            userId: (session.user as any).id,
+            userId: user.id,
             action
           }),
         })

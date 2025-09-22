@@ -78,7 +78,7 @@ export default function QuestionDetailPage() {
       // 서버에서 좋아요 데이터 로딩 시도
       const params = new URLSearchParams({
         questionId,
-        ...(session?.user ? { userId: (session.user as any).id } : {})
+        ...(user?.id ? { userId: user.id } : {})
       })
       
       const response = await fetch(`/api/questions/like?${params.toString()}`)
@@ -86,7 +86,7 @@ export default function QuestionDetailPage() {
         const data = await response.json()
         setLikeData({
           count: data.likeCount || 0,
-          isLiked: data.isLiked || false
+          isLiked: user?.id ? (data.isLiked || false) : false
         })
         console.log('서버 좋아요 데이터 로딩 성공:', data)
       } else {
@@ -105,10 +105,10 @@ export default function QuestionDetailPage() {
         isLiked: false
       })
     }
-  }, [questionId, session?.user])
+  }, [questionId, user?.id])
 
   const handleLikeToggle = async () => {
-    if (!session?.user) {
+    if (!user?.id) {
       alert('로그인이 필요합니다.')
       return
     }
@@ -129,7 +129,7 @@ export default function QuestionDetailPage() {
           },
           body: JSON.stringify({
             questionId,
-            userId: (session.user as any).id,
+            userId: user.id,
             action
           }),
         })
@@ -224,6 +224,13 @@ export default function QuestionDetailPage() {
       loadLikeData()
     }
   }, [questionId, loadQuestion, loadFeedbacks, loadLikeData])
+
+  // 세션이 로드된 후 좋아요 데이터 다시 로드
+  useEffect(() => {
+    if (status === 'authenticated' && user?.id && questionId) {
+      loadLikeData()
+    }
+  }, [status, user?.id, questionId, loadLikeData])
 
   const getUserDisplayName = (question: Question) => {
     if (question.is_anonymous) {
