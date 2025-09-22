@@ -64,9 +64,9 @@ export default function QuestionsPage() {
     try {
       const likesData: {[key: string]: {count: number, isLiked: boolean}} = {}
       
-      for (const questionId of questionIds) {
+      // 병렬로 모든 질문의 좋아요 데이터를 조회
+      const promises = questionIds.map(async (questionId) => {
         try {
-          // 로그인 상태와 관계없이 좋아요 카운트는 항상 조회
           const params = new URLSearchParams({
             questionId,
             ...(session?.user ? { userId: (session.user as any).id } : {})
@@ -75,37 +75,36 @@ export default function QuestionsPage() {
           const response = await fetch(`/api/questions/like?${params.toString()}`)
           if (response.ok) {
             const data = await response.json()
-            likesData[questionId] = {
-              count: data.likeCount || 0,
-              isLiked: session?.user ? (data.isLiked || false) : false // 로그인하지 않은 사용자는 항상 false
+            return {
+              questionId,
+              data: {
+                count: data.likeCount || 0,
+                isLiked: session?.user ? (data.isLiked || false) : false
+              }
             }
-            console.log(`좋아요 데이터 로딩 성공 - ${questionId}:`, {
-              likeCount: data.likeCount,
-              isLiked: data.isLiked,
-              userLoggedIn: !!session?.user
-            })
           } else {
-            // 서버 오류 시 기본값 사용
-            likesData[questionId] = {
-              count: 0,
-              isLiked: false
-            }
-            console.log(`서버 오류로 기본값 사용 - ${questionId}`)
+            throw new Error(`HTTP ${response.status}`)
           }
         } catch (error) {
-          // 네트워크 오류 시 기본값 사용
-          likesData[questionId] = {
-            count: 0,
-            isLiked: false
+          console.log(`좋아요 데이터 로딩 실패 - ${questionId}:`, error)
+          return {
+            questionId,
+            data: { count: 0, isLiked: false }
           }
-          console.log(`네트워크 오류로 기본값 사용 - ${questionId}:`, error)
         }
-      }
+      })
+      
+      const results = await Promise.all(promises)
+      
+      // 결과를 likesData 객체로 변환
+      results.forEach(({ questionId, data }) => {
+        likesData[questionId] = data
+      })
       
       setLikes(prev => ({ ...prev, ...likesData }))
       console.log('좋아요 데이터 로딩 완료:', likesData)
     } catch (error) {
-      console.error('좋아요 데이터 로딩 오류:', error)
+      console.error('좋아요 데이터 로딩 중 전체 오류:', error)
     }
   }, [session?.user])
 
@@ -135,9 +134,12 @@ export default function QuestionsPage() {
       // 더 불러올 질문이 있는지 확인
       setHasMoreQuestions(newQuestions.length === 10)
       
-      // 좋아요 데이터 로딩
+      // 좋아요 데이터 로딩 (별도 처리)
       const questionIds = newQuestions.map(q => q.id)
-      await loadLikesData(questionIds)
+      // 비동기로 처리하여 질문 로딩을 방해하지 않음
+      loadLikesData(questionIds).catch(error => {
+        console.error('좋아요 데이터 로딩 실패:', error)
+      })
       
       // 첫 페이지 로딩시에만 사용자 통계와 인기 질문 조회
       if (!append) {
@@ -162,7 +164,7 @@ export default function QuestionsPage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [status, user?.id, loadLikesData])
+  }, [status, user?.id])
 
   useEffect(() => {
     loadQuestions()
@@ -553,14 +555,14 @@ export default function QuestionsPage() {
                 <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1">
                   <div className="flex items-start justify-between mb-3">
                     <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
-                      최신
+                      인기 급상승
                     </span>
                     <span className="text-xs text-gray-500">{formatTimeAgo(question.created_at)}</span>
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-2 line-clamp-3 group-hover:text-purple-700 transition-colors">
                     {question.title}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-4 line-clamp-4">
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                     {question.content}
                   </p>
                   <div className="flex items-center justify-between text-sm text-gray-500">
