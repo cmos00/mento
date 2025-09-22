@@ -53,8 +53,10 @@ export default function QuestionDetailPage() {
       if (data) {
         console.log('✅ [DEBUG] 질문 로딩 성공:', data.title)
         setQuestion(data)
-        // 조회수 증가
-        incrementQuestionViews(questionId)
+        // 조회수 증가 (비동기로 처리하여 로딩을 방해하지 않음)
+        incrementQuestionViews(questionId).catch(err => {
+          console.warn('조회수 증가 실패 (무시됨):', err)
+        })
       } else {
         console.error('❌ [DEBUG] 질문 데이터 없음')
         setError('해당 질문을 찾을 수 없습니다.')
@@ -602,20 +604,16 @@ export default function QuestionDetailPage() {
               </div>
               {/* 본인이 작성한 질문인 경우 수정/삭제 버튼 표시 */}
               {(() => {
-                const shouldShow = status !== 'loading' && user?.id && question.user_id === user.id
-                console.log('🔍 [DEBUG] 수정 버튼 표시 조건 확인:', {
-                  userId: user?.id,
-                  questionUserId: question.user_id,
-                  status: status,
-                  shouldShow: shouldShow,
-                  isMatch: user?.id && question.user_id === user.id,
-                  userType: typeof user?.id,
-                  questionUserType: typeof question.user_id,
-                  userString: String(user?.id),
-                  questionString: String(question.user_id),
-                  strictEqual: user?.id === question.user_id
-                })
-                return shouldShow
+                const canEdit = status === 'authenticated' && user?.id && question.user_id === user.id
+                if (status === 'authenticated') {
+                  console.log('🔍 [EDIT BUTTON] 조건 확인:', {
+                    status,
+                    userId: user?.id,
+                    questionUserId: question.user_id,
+                    canEdit
+                  })
+                }
+                return canEdit
               })() && (
                 <div className="flex items-center space-x-1 ml-4">
                   <button
@@ -915,18 +913,7 @@ export default function QuestionDetailPage() {
                       {formatTimeAgo(feedback.created_at)}
                     </span>
                     {/* 본인이 작성한 답변인 경우 수정/삭제 버튼 표시 */}
-                    {(() => {
-                      console.log('🔍 [DEBUG] 답변 수정 버튼 표시 조건 확인:', {
-                        userId: user?.id,
-                        feedbackUserId: feedback.user_id,
-                        status: status,
-                        isMatch: user?.id && feedback.user_id === user.id,
-                        userType: typeof user?.id,
-                        feedbackUserType: typeof feedback.user_id
-                      })
-                      // 세션이 로딩 중이 아니고, 사용자 ID가 있고, 답변 작성자와 일치하는 경우에만 표시
-                      return status !== 'loading' && user?.id && feedback.user_id === user.id
-                    })() && (
+                    {status === 'authenticated' && user?.id && feedback.user_id === user.id && (
                       <div className="flex items-center space-x-1">
                         <button
                           onClick={() => handleEditFeedback(feedback.id)}
