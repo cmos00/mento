@@ -15,6 +15,7 @@ export default function QuestionDetailPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const user = session?.user
+  const [actualUserId, setActualUserId] = useState<string | null>(null)
   const [question, setQuestion] = useState<Question | null>(null)
   const [feedbacks, setFeedbacks] = useState<FeedbackWithAuthor[]>([])
   const [loading, setLoading] = useState(true)
@@ -33,6 +34,36 @@ export default function QuestionDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false)
 
   const questionId = params.id as string
+
+  // 실제 사용자 ID 조회
+  const loadActualUserId = useCallback(async () => {
+    if (!user?.email) return
+    
+    try {
+      const response = await fetch('/api/user/get', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: user.email }),
+      })
+      
+      const result = await response.json()
+      
+      if (response.ok && result.user) {
+        console.log('🔍 [USER ID] 실제 사용자 ID 조회 성공:', {
+          nextAuthId: user.id,
+          actualId: result.user.id,
+          email: user.email
+        })
+        setActualUserId(result.user.id)
+      } else {
+        console.warn('⚠️ [USER ID] 실제 사용자 ID 조회 실패:', result)
+      }
+    } catch (err) {
+      console.error('❌ [USER ID] 실제 사용자 ID 조회 오류:', err)
+    }
+  }, [user?.email, user?.id])
 
   const loadQuestion = useCallback(async () => {
     try {
@@ -399,6 +430,13 @@ export default function QuestionDetailPage() {
     }
   }, [questionId, loadQuestion, loadFeedbacks])
 
+  // 실제 사용자 ID 로드
+  useEffect(() => {
+    if (status === 'authenticated' && user?.email) {
+      loadActualUserId()
+    }
+  }, [status, user?.email, loadActualUserId])
+
   // 세션이 로드된 후 좋아요 데이터 로드 (중복 제거)
   useEffect(() => {
     if (questionId && status !== 'loading') {
@@ -605,15 +643,17 @@ export default function QuestionDetailPage() {
               {/* 수정/삭제 버튼 (디버깅용으로 항상 표시) */}
               <div className="flex items-center space-x-1 ml-4">
                 {(() => {
-                  const canEdit = status === 'authenticated' && user?.id && question.user_id === user.id
+                  const canEdit = status === 'authenticated' && actualUserId && question.user_id === actualUserId
                   console.log('🔍 [EDIT BUTTON] 디버깅 정보:', {
                     status,
-                    userId: user?.id,
+                    nextAuthUserId: user?.id,
+                    actualUserId: actualUserId,
                     questionUserId: question.user_id,
                     canEdit,
                     userType: typeof user?.id,
+                    actualUserType: typeof actualUserId,
                     questionUserType: typeof question.user_id,
-                    strictEqual: user?.id === question.user_id
+                    strictEqual: actualUserId === question.user_id
                   })
                   return canEdit
                 })() ? (
@@ -920,7 +960,7 @@ export default function QuestionDetailPage() {
                       {formatTimeAgo(feedback.created_at)}
                     </span>
                     {/* 본인이 작성한 답변인 경우 수정/삭제 버튼 표시 */}
-                    {status === 'authenticated' && user?.id && feedback.user_id === user.id && (
+                    {status === 'authenticated' && actualUserId && feedback.user_id === actualUserId && (
                       <div className="flex items-center space-x-1">
                         <button
                           onClick={() => handleEditFeedback(feedback.id)}
