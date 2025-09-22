@@ -82,6 +82,8 @@ export default function QuestionDetailPage() {
         ...(user?.id ? { userId: user.id } : {})
       })
       
+      console.log('좋아요 데이터 로딩 시도:', { questionId, userId: user?.id })
+      
       const response = await fetch(`/api/questions/like?${params.toString()}`)
       if (response.ok) {
         const data = await response.json()
@@ -91,12 +93,31 @@ export default function QuestionDetailPage() {
         })
         console.log('서버 좋아요 데이터 로딩 성공:', data)
       } else {
-        // 서버 오류 시 기본값 설정
-        setLikeData({
-          count: 0,
-          isLiked: false
-        })
-        console.log('서버 오류로 기본값 설정')
+        console.log('서버 오류 응답:', response.status, response.statusText)
+        // 서버 오류 시에도 좋아요 수는 조회해보기
+        const errorData = await response.json().catch(() => ({}))
+        console.log('서버 오류 상세:', errorData)
+        
+        // 좋아요 수만이라도 조회해보기
+        try {
+          const countResponse = await fetch(`/api/questions/like?questionId=${questionId}`)
+          if (countResponse.ok) {
+            const countData = await countResponse.json()
+            setLikeData({
+              count: countData.likeCount || 0,
+              isLiked: false
+            })
+            console.log('좋아요 수만 조회 성공:', countData)
+          } else {
+            throw new Error('좋아요 수 조회도 실패')
+          }
+        } catch (countError) {
+          console.log('좋아요 수 조회 실패:', countError)
+          setLikeData({
+            count: 0,
+            isLiked: false
+          })
+        }
       }
     } catch (error) {
       console.error('좋아요 데이터 로딩 오류:', error)
@@ -106,7 +127,7 @@ export default function QuestionDetailPage() {
         isLiked: false
       })
     }
-  }, [questionId])
+  }, [questionId, user?.id])
 
   const handleLikeToggle = async () => {
     if (!user?.id) {
@@ -222,9 +243,12 @@ export default function QuestionDetailPage() {
     if (questionId) {
       loadQuestion()
       loadFeedbacks()
-      loadLikeData()
+      // 세션이 로드된 후에만 좋아요 데이터 로드
+      if (status !== 'loading') {
+        loadLikeData()
+      }
     }
-  }, [questionId, loadQuestion, loadFeedbacks, loadLikeData])
+  }, [questionId, loadQuestion, loadFeedbacks, loadLikeData, status])
 
   // 세션이 로드된 후 좋아요 데이터 다시 로드
   useEffect(() => {

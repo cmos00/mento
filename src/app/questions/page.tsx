@@ -64,6 +64,8 @@ export default function QuestionsPage() {
     try {
       const likesData: {[key: string]: {count: number, isLiked: boolean}} = {}
       
+      console.log('좋아요 데이터 로딩 시도:', { questionIds, userId: user?.id })
+      
       // 병렬로 모든 질문의 좋아요 데이터를 조회
       const promises = questionIds.map(async (questionId) => {
         try {
@@ -83,6 +85,23 @@ export default function QuestionsPage() {
               }
             }
           } else {
+            console.log(`좋아요 데이터 조회 실패 - ${questionId}:`, response.status, response.statusText)
+            // 좋아요 수만이라도 조회해보기
+            try {
+              const countResponse = await fetch(`/api/questions/like?questionId=${questionId}`)
+              if (countResponse.ok) {
+                const countData = await countResponse.json()
+                return {
+                  questionId,
+                  data: {
+                    count: countData.likeCount || 0,
+                    isLiked: false
+                  }
+                }
+              }
+            } catch (countError) {
+              console.log(`좋아요 수 조회 실패 - ${questionId}:`, countError)
+            }
             throw new Error(`HTTP ${response.status}`)
           }
         } catch (error) {
@@ -134,12 +153,14 @@ export default function QuestionsPage() {
       // 더 불러올 질문이 있는지 확인
       setHasMoreQuestions(newQuestions.length === 10)
       
-      // 좋아요 데이터 로딩 (별도 처리)
+      // 좋아요 데이터 로딩 (세션이 로드된 후에만)
       const questionIds = newQuestions.map(q => q.id)
-      // 비동기로 처리하여 질문 로딩을 방해하지 않음
-      loadLikesData(questionIds).catch(error => {
-        console.error('좋아요 데이터 로딩 실패:', error)
-      })
+      if (status !== 'loading') {
+        // 비동기로 처리하여 질문 로딩을 방해하지 않음
+        loadLikesData(questionIds).catch(error => {
+          console.error('좋아요 데이터 로딩 실패:', error)
+        })
+      }
       
       // 첫 페이지 로딩시에만 사용자 통계와 인기 질문 조회
       if (!append) {
