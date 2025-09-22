@@ -510,7 +510,7 @@ export default function QuestionsPage() {
           <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
             {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
               <Link key={question.id} href={`/questions/${question.id}`} className="group block">
-                  <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative min-h-56 flex flex-col">
+                  <div id={`trending-question-${index}`} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 transform group-hover:-translate-y-1 relative h-64 flex flex-col">
                     {/* 날짜를 카드 우측 상단에 배치 */}
                     <div className="absolute top-4 right-4">
                       <span className="text-xs text-gray-500">{formatTimeAgo(question.created_at)}</span>
@@ -522,10 +522,10 @@ export default function QuestionsPage() {
                       </span>
                     </div>
                     
-                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-3 group-hover:text-purple-700 transition-colors pr-16">
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
                       {question.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-6 line-clamp-2 flex-1">
+                    <p className="text-sm text-gray-600 mb-6 line-clamp-2 h-10 flex items-start">
                       {question.content}
                     </p>
                     
