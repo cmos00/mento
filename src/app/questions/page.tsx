@@ -525,7 +525,12 @@ export default function QuestionsPage() {
                     <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-purple-700 transition-colors pr-16">
                       {question.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-6 line-clamp-2 h-10 flex items-start">
+                    <p className="text-sm text-gray-600 mb-6 h-12 overflow-hidden" style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      lineHeight: '1.5rem'
+                    }}>
                       {question.content}
                     </p>
                     
