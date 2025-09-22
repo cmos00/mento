@@ -534,3 +534,86 @@ export async function updateQuestionStats(questionId: string, type: 'view' | 'an
     return { data: false, error: error as Error }
   }
 }
+
+// 질문 수정
+export async function updateQuestion(questionId: string, updates: Partial<QuestionUpdate>, userId: string) {
+  try {
+    // 먼저 질문이 존재하고 사용자가 작성자인지 확인
+    const { data: question, error: fetchError } = await supabase
+      .from('questions')
+      .select('user_id')
+      .eq('id', questionId)
+      .single()
+
+    if (fetchError) {
+      console.error('질문 조회 오류:', fetchError)
+      return { success: false, error: '질문을 찾을 수 없습니다.' }
+    }
+
+    if (question.user_id !== userId) {
+      return { success: false, error: '본인이 작성한 질문만 수정할 수 있습니다.' }
+    }
+
+    // 질문 업데이트
+    const { error: updateError } = await supabase
+      .from('questions')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', questionId)
+      .eq('user_id', userId) // 추가 보안: 사용자 ID도 확인
+
+    if (updateError) {
+      console.error('질문 수정 오류:', updateError)
+      return { success: false, error: '질문 수정에 실패했습니다.' }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('질문 수정 실패:', error)
+    return { success: false, error: '질문 수정 중 오류가 발생했습니다.' }
+  }
+}
+
+// 질문 삭제 (소프트 삭제)
+export async function deleteQuestion(questionId: string, userId: string) {
+  try {
+    // 먼저 질문이 존재하고 사용자가 작성자인지 확인
+    const { data: question, error: fetchError } = await supabase
+      .from('questions')
+      .select('user_id')
+      .eq('id', questionId)
+      .single()
+
+    if (fetchError) {
+      console.error('질문 조회 오류:', fetchError)
+      return { success: false, error: '질문을 찾을 수 없습니다.' }
+    }
+
+    if (question.user_id !== userId) {
+      return { success: false, error: '본인이 작성한 질문만 삭제할 수 있습니다.' }
+    }
+
+    // 소프트 삭제: 제목과 내용을 삭제 메시지로 변경
+    const { error: updateError } = await supabase
+      .from('questions')
+      .update({
+        title: '삭제된 질문입니다.',
+        content: '삭제된 질문입니다.',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', questionId)
+      .eq('user_id', userId) // 추가 보안: 사용자 ID도 확인
+
+    if (updateError) {
+      console.error('질문 삭제 오류:', updateError)
+      return { success: false, error: '질문 삭제에 실패했습니다.' }
+    }
+
+    return { success: true }
+  } catch (error) {
+    console.error('질문 삭제 실패:', error)
+    return { success: false, error: '질문 삭제 중 오류가 발생했습니다.' }
+  }
+}

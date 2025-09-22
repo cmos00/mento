@@ -4,7 +4,7 @@ import MobileBottomNav from '@/components/MobileBottomNav'
 import { FeedbackWithAuthor, getFeedbacksByQuestionId } from '@/lib/feedbacks'
 import { Question, getQuestionById, incrementQuestionViews } from '@/lib/questions'
 import { formatTimeAgo, getDisplayName } from '@/lib/utils'
-import { ArrowLeft, Bookmark, Clock, Eye, MessageCircle, Send, Share2, Tag, ThumbsUp } from 'lucide-react'
+import { ArrowLeft, Bookmark, Clock, Eye, MessageCircle, Send, Share2, Tag, ThumbsUp, Edit3, Trash2 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
@@ -25,6 +25,12 @@ export default function QuestionDetailPage() {
   const [submitting, setSubmitting] = useState(false)
   const [likeData, setLikeData] = useState<{count: number, isLiked: boolean} | null>(null)
   const [isLiking, setIsLiking] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [editContent, setEditContent] = useState('')
+  const [editCategory, setEditCategory] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const questionId = params.id as string
 
@@ -132,6 +138,141 @@ export default function QuestionDetailPage() {
       })
     }
   }, [questionId, user?.id])
+
+  // 질문 수정 함수
+  const handleEditQuestion = async () => {
+    if (!user?.id || !question) return
+
+    setIsEditing(true)
+    try {
+      const response = await fetch(`/api/questions/${questionId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: editTitle,
+          content: editContent,
+          category: editCategory
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || '질문 수정 중 오류가 발생했습니다.')
+      }
+
+      // 성공 시 질문 다시 로드
+      await loadQuestion()
+      setShowEditForm(false)
+      alert('질문이 수정되었습니다.')
+    } catch (err) {
+      console.error('질문 수정 오류:', err)
+      alert(err instanceof Error ? err.message : '질문 수정 중 오류가 발생했습니다.')
+    } finally {
+      setIsEditing(false)
+    }
+  }
+
+  // 질문 삭제 함수
+  const handleDeleteQuestion = async () => {
+    if (!user?.id || !question) return
+
+    if (!confirm('정말로 이 질문을 삭제하시겠습니까?')) {
+      return
+    }
+
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/questions/${questionId}`, {
+        method: 'DELETE',
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || '질문 삭제 중 오류가 발생했습니다.')
+      }
+
+      // 성공 시 질문 다시 로드
+      await loadQuestion()
+      alert('질문이 삭제되었습니다.')
+    } catch (err) {
+      console.error('질문 삭제 오류:', err)
+      alert(err instanceof Error ? err.message : '질문 삭제 중 오류가 발생했습니다.')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  // 수정 폼 초기화
+  const initializeEditForm = () => {
+    if (question) {
+      setEditTitle(question.title)
+      setEditContent(question.content)
+      setEditCategory(question.category || '')
+      setShowEditForm(true)
+    }
+  }
+
+  // 답변 수정 함수
+  const handleEditFeedback = async (feedbackId: string) => {
+    const feedback = feedbacks.find(f => f.id === feedbackId)
+    if (!feedback) return
+
+    const newContent = prompt('답변 내용을 수정하세요:', feedback.content)
+    if (!newContent || newContent.trim() === feedback.content.trim()) return
+
+    try {
+      const response = await fetch(`/api/feedbacks/${feedbackId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: newContent }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || '답변 수정 중 오류가 발생했습니다.')
+      }
+
+      // 성공 시 답변 목록 다시 로드
+      await loadFeedbacks()
+      alert('답변이 수정되었습니다.')
+    } catch (err) {
+      console.error('답변 수정 오류:', err)
+      alert(err instanceof Error ? err.message : '답변 수정 중 오류가 발생했습니다.')
+    }
+  }
+
+  // 답변 삭제 함수
+  const handleDeleteFeedback = async (feedbackId: string) => {
+    if (!confirm('정말로 이 답변을 삭제하시겠습니까?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/feedbacks/${feedbackId}`, {
+        method: 'DELETE',
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || '답변 삭제 중 오류가 발생했습니다.')
+      }
+
+      // 성공 시 답변 목록 다시 로드
+      await loadFeedbacks()
+      alert('답변이 삭제되었습니다.')
+    } catch (err) {
+      console.error('답변 삭제 오류:', err)
+      alert(err instanceof Error ? err.message : '답변 삭제 중 오류가 발생했습니다.')
+    }
+  }
 
   const handleLikeToggle = async () => {
     if (!user?.id) {
@@ -448,9 +589,31 @@ export default function QuestionDetailPage() {
                 )
               })()}
             </div>
-            <div className="flex items-center text-sm text-gray-500">
-              <Clock className="w-4 h-4 mr-2" />
-              {formatTimeAgo(question.created_at)}
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center text-sm text-gray-500">
+                <Clock className="w-4 h-4 mr-2" />
+                {formatTimeAgo(question.created_at)}
+              </div>
+              {/* 본인이 작성한 질문인 경우 수정/삭제 버튼 표시 */}
+              {user?.id && question.user_id === user.id && (
+                <div className="flex items-center space-x-1 ml-4">
+                  <button
+                    onClick={initializeEditForm}
+                    className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
+                    title="수정"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleDeleteQuestion}
+                    disabled={isDeleting}
+                    className="p-1 text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
+                    title="삭제"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -472,6 +635,75 @@ export default function QuestionDetailPage() {
               {question.content}
             </p>
           </div>
+
+          {/* 질문 수정 폼 */}
+          {showEditForm && (
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">질문 수정</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    제목
+                  </label>
+                  <input
+                    type="text"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="질문 제목을 입력하세요"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    카테고리
+                  </label>
+                  <select
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  >
+                    <option value="">카테고리 선택</option>
+                    <option value="커리어">커리어</option>
+                    <option value="리더십">리더십</option>
+                    <option value="기술">기술</option>
+                    <option value="비즈니스">비즈니스</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    내용
+                  </label>
+                  <textarea
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    rows={6}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="질문 내용을 입력하세요"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setShowEditForm(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleEditQuestion}
+                  disabled={!editTitle.trim() || !editContent.trim() || isEditing}
+                  className="px-6 py-2 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isEditing ? '수정 중...' : '수정 완료'}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 태그 */}
           {question.tags && question.tags.length > 0 && (
@@ -656,9 +888,30 @@ export default function QuestionDetailPage() {
             <div className="space-y-6">
               {feedbacks.map((feedback) => (
                 <div key={feedback.id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0 relative">
-                  {/* 답변 시점 정보 (우측 상단) */}
-                  <div className="absolute top-0 right-0 text-xs text-gray-500">
-                    {formatTimeAgo(feedback.created_at)}
+                  {/* 답변 시점 정보 및 수정/삭제 버튼 (우측 상단) */}
+                  <div className="absolute top-0 right-0 flex items-center space-x-2">
+                    <span className="text-xs text-gray-500">
+                      {formatTimeAgo(feedback.created_at)}
+                    </span>
+                    {/* 본인이 작성한 답변인 경우 수정/삭제 버튼 표시 */}
+                    {user?.id && feedback.user_id === user.id && (
+                      <div className="flex items-center space-x-1">
+                        <button
+                          onClick={() => handleEditFeedback(feedback.id)}
+                          className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                          title="수정"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFeedback(feedback.id)}
+                          className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                          title="삭제"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                   
                   {/* 답변자 정보 */}

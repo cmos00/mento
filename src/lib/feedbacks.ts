@@ -157,26 +157,47 @@ export async function updateFeedback(id: string, updates: Partial<Feedback>): Pr
 }
 
 // 피드백 삭제
-export async function deleteFeedback(id: string): Promise<boolean> {
+export async function deleteFeedback(id: string, userId: string): Promise<{ success: boolean; error?: string }> {
   if (!supabase) {
     console.error('Supabase client가 초기화되지 않았습니다.')
-    return false
+    return { success: false, error: '데이터베이스 연결 오류' }
   }
 
   try {
-    const { error } = await supabase
+    // 먼저 답변이 존재하고 사용자가 작성자인지 확인
+    const { data: feedback, error: fetchError } = await supabase
       .from('feedbacks')
-      .delete()
+      .select('user_id')
       .eq('id', id)
+      .single()
 
-    if (error) {
-      console.error('피드백 삭제 오류:', error)
-      return false
+    if (fetchError) {
+      console.error('답변 조회 오류:', fetchError)
+      return { success: false, error: '답변을 찾을 수 없습니다.' }
     }
 
-    return true
+    if (feedback.user_id !== userId) {
+      return { success: false, error: '본인이 작성한 답변만 삭제할 수 있습니다.' }
+    }
+
+    // 소프트 삭제: 내용을 삭제 메시지로 변경
+    const { error } = await supabase
+      .from('feedbacks')
+      .update({
+        content: '삭제된 답변입니다.',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .eq('user_id', userId) // 추가 보안: 사용자 ID도 확인
+
+    if (error) {
+      console.error('답변 삭제 오류:', error)
+      return { success: false, error: '답변 삭제에 실패했습니다.' }
+    }
+
+    return { success: true }
   } catch (err) {
-    console.error('피드백 삭제 중 예외:', err)
-    return false
+    console.error('답변 삭제 중 예외:', err)
+    return { success: false, error: '답변 삭제 중 오류가 발생했습니다.' }
   }
 }
