@@ -70,9 +70,13 @@ export default function QuestionsPage() {
       const promises = questionIds.map(async (questionId) => {
         try {
           const params = new URLSearchParams({
-            questionId,
-            ...(user?.id ? { userId: user.id } : {})
+            questionId
           })
+          
+          // 사용자 ID가 있으면 추가 (로그인한 사용자의 좋아요 상태 확인용)
+          if (user?.id) {
+            params.append('userId', user.id)
+          }
           
           const response = await fetch(`/api/questions/like?${params.toString()}`)
           if (response.ok) {
@@ -196,6 +200,7 @@ export default function QuestionsPage() {
   useEffect(() => {
     if (status !== 'loading' && questions.length > 0) {
       const questionIds = questions.map(q => q.id)
+      console.log('좋아요 데이터 로딩 조건 확인:', { status, questionsCount: questions.length, userId: user?.id })
       loadLikesData(questionIds)
     }
   }, [status, questions.length, loadLikesData])

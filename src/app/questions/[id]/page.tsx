@@ -78,9 +78,13 @@ export default function QuestionDetailPage() {
     try {
       // 서버에서 좋아요 데이터 로딩 시도
       const params = new URLSearchParams({
-        questionId,
-        ...(user?.id ? { userId: user.id } : {})
+        questionId
       })
+      
+      // 사용자 ID가 있으면 추가 (로그인한 사용자의 좋아요 상태 확인용)
+      if (user?.id) {
+        params.append('userId', user.id)
+      }
       
       console.log('좋아요 데이터 로딩 시도:', { questionId, userId: user?.id })
       
@@ -249,6 +253,9 @@ export default function QuestionDetailPage() {
   // 세션이 로드된 후 좋아요 데이터 로드 (중복 제거)
   useEffect(() => {
     if (questionId && status !== 'loading') {
+      // 로그인하지 않은 사용자도 좋아요 수는 볼 수 있어야 함
+      // 하지만 세션이 완전히 로드된 후에만 실행
+      console.log('좋아요 데이터 로딩 조건 확인:', { questionId, status, userId: user?.id })
       loadLikeData()
     }
   }, [questionId, status, loadLikeData])
