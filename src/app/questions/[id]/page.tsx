@@ -23,7 +23,7 @@ export default function QuestionDetailPage() {
   const [showAnswerForm, setShowAnswerForm] = useState(false)
   const [answerContent, setAnswerContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [likeData, setLikeData] = useState<{count: number, isLiked: boolean}>({count: 0, isLiked: false})
+  const [likeData, setLikeData] = useState<{count: number, isLiked: boolean} | null>(null)
   const [isLiking, setIsLiking] = useState(false)
 
   const questionId = params.id as string
@@ -135,7 +135,7 @@ export default function QuestionDetailPage() {
       return
     }
 
-    if (isLiking) return
+    if (isLiking || !likeData) return
 
     setIsLiking(true)
 
@@ -243,19 +243,15 @@ export default function QuestionDetailPage() {
     if (questionId) {
       loadQuestion()
       loadFeedbacks()
-      // 세션이 로드된 후에만 좋아요 데이터 로드
-      if (status !== 'loading') {
-        loadLikeData()
-      }
     }
-  }, [questionId, loadQuestion, loadFeedbacks, loadLikeData, status])
+  }, [questionId, loadQuestion, loadFeedbacks])
 
-  // 세션이 로드된 후 좋아요 데이터 다시 로드
+  // 세션이 로드된 후 좋아요 데이터 로드 (중복 제거)
   useEffect(() => {
-    if (status === 'authenticated' && user?.id && questionId) {
+    if (questionId && status !== 'loading') {
       loadLikeData()
     }
-  }, [status, user?.id, questionId])
+  }, [questionId, status, loadLikeData])
 
   const getUserDisplayName = (question: Question) => {
     if (question.is_anonymous) {
@@ -499,19 +495,19 @@ export default function QuestionDetailPage() {
             </div>
             <button
               onClick={handleLikeToggle}
-              disabled={isLiking}
+              disabled={isLiking || likeData === null}
               className={`flex items-center text-sm transition-colors ${
-                likeData.isLiked 
+                likeData?.isLiked 
                   ? 'text-purple-500 hover:text-purple-600' 
                   : 'text-gray-500 hover:text-purple-500'
-              } ${isLiking ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              } ${isLiking || likeData === null ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <ThumbsUp 
                 className={`w-4 h-4 mr-2 ${
-                  likeData.isLiked ? 'fill-current' : ''
+                  likeData?.isLiked ? 'fill-current' : ''
                 }`} 
               />
-              {likeData.count}개 좋아요
+              {likeData ? `${likeData.count}개 좋아요` : '로딩 중...'}
             </button>
           </div>
         </div>

@@ -192,13 +192,13 @@ export default function QuestionsPage() {
     setCurrentPage(0)
   }, [status, user?.id, loadQuestions])
 
-  // 세션이 로드된 후 기존 질문들의 좋아요 데이터 다시 로드
+  // 세션이 로드된 후 기존 질문들의 좋아요 데이터 로드 (중복 제거)
   useEffect(() => {
-    if (status === 'authenticated' && user?.id && questions.length > 0) {
+    if (status !== 'loading' && questions.length > 0) {
       const questionIds = questions.map(q => q.id)
       loadLikesData(questionIds)
     }
-  }, [status, user?.id, questions.length])
+  }, [status, questions.length, loadLikesData])
 
   // 무한스크롤을 위한 함수
   const loadMoreQuestions = useCallback(async () => {
