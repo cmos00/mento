@@ -412,12 +412,128 @@ export default function QuestionsPage() {
     }
   }
 
+  // Skeleton UI 컴포넌트
+  const QuestionSkeleton = () => (
+    <div className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-24"></div>
+            <div className="h-3 bg-gray-200 rounded w-16"></div>
+          </div>
+        </div>
+        <div className="h-3 bg-gray-200 rounded w-12"></div>
+      </div>
+      
+      <div className="mb-3">
+        <div className="h-3 bg-gray-200 rounded w-16"></div>
+      </div>
+      
+      <div className="mb-4">
+        <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
+        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1">
+            <div className="w-4 h-4 bg-gray-200 rounded"></div>
+            <div className="h-3 bg-gray-200 rounded w-6"></div>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div className="w-4 h-4 bg-gray-200 rounded"></div>
+            <div className="h-3 bg-gray-200 rounded w-8"></div>
+          </div>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-4 h-4 bg-gray-200 rounded"></div>
+          <div className="h-3 bg-gray-200 rounded w-8"></div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const TrendingSkeleton = () => (
+    <div className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
+      <div className="flex items-start justify-between mb-3">
+        <div className="h-6 bg-gray-200 rounded w-20"></div>
+        <div className="h-3 bg-gray-200 rounded w-12"></div>
+      </div>
+      
+      <div className="mb-2">
+        <div className="h-5 bg-gray-200 rounded w-3/4 mb-1"></div>
+        <div className="h-5 bg-gray-200 rounded w-1/2"></div>
+      </div>
+      
+      <div className="mb-6">
+        <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
+        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+      </div>
+      
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-1">
+            <div className="w-4 h-4 bg-gray-200 rounded"></div>
+            <div className="h-3 bg-gray-200 rounded w-6"></div>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div className="w-4 h-4 bg-gray-200 rounded"></div>
+            <div className="h-3 bg-gray-200 rounded w-8"></div>
+          </div>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-4 h-4 bg-gray-200 rounded"></div>
+          <div className="h-3 bg-gray-200 rounded w-8"></div>
+        </div>
+      </div>
+    </div>
+  )
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">질문을 불러오는 중...</p>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          {/* 헤더 Skeleton */}
+          <div className="mb-8">
+            <div className="h-8 bg-gray-200 rounded w-48 mb-4 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 rounded w-96 animate-pulse"></div>
+          </div>
+
+          {/* 인기 질문 섹션 Skeleton */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+              <div className="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
+              {[1, 2, 3].map((i) => (
+                <TrendingSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+
+          {/* 검색바 Skeleton */}
+          <div className="mb-6">
+            <div className="h-12 bg-gray-200 rounded-lg animate-pulse"></div>
+          </div>
+
+          {/* 카테고리 태그 Skeleton */}
+          <div className="mb-8">
+            <div className="flex flex-wrap gap-2">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div key={i} className="h-8 bg-gray-200 rounded-full w-20 animate-pulse"></div>
+              ))}
+            </div>
+          </div>
+
+          {/* 질문 리스트 Skeleton */}
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <QuestionSkeleton key={i} />
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -778,9 +894,10 @@ export default function QuestionsPage() {
            
            {/* 무한스크롤 로딩 표시 */}
            {loadingMore && (
-             <div className="text-center py-8">
-               <div className="w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-               <p className="text-gray-600">더 많은 질문을 불러오는 중...</p>
+             <div className="space-y-4">
+               {[1, 2, 3].map((i) => (
+                 <QuestionSkeleton key={`loading-${i}`} />
+               ))}
              </div>
            )}
            
