@@ -605,11 +605,13 @@ export default function QuestionDetailPage() {
                 console.log('🔍 [DEBUG] 수정 버튼 표시 조건 확인:', {
                   userId: user?.id,
                   questionUserId: question.user_id,
+                  status: status,
                   isMatch: user?.id && question.user_id === user.id,
                   userType: typeof user?.id,
                   questionUserType: typeof question.user_id
                 })
-                return user?.id && question.user_id === user.id
+                // 세션이 로딩 중이 아니고, 사용자 ID가 있고, 질문 작성자와 일치하는 경우에만 표시
+                return status !== 'loading' && user?.id && question.user_id === user.id
               })() && (
                 <div className="flex items-center space-x-1 ml-4">
                   <button
@@ -913,11 +915,13 @@ export default function QuestionDetailPage() {
                       console.log('🔍 [DEBUG] 답변 수정 버튼 표시 조건 확인:', {
                         userId: user?.id,
                         feedbackUserId: feedback.user_id,
+                        status: status,
                         isMatch: user?.id && feedback.user_id === user.id,
                         userType: typeof user?.id,
                         feedbackUserType: typeof feedback.user_id
                       })
-                      return user?.id && feedback.user_id === user.id
+                      // 세션이 로딩 중이 아니고, 사용자 ID가 있고, 답변 작성자와 일치하는 경우에만 표시
+                      return status !== 'loading' && user?.id && feedback.user_id === user.id
                     })() && (
                       <div className="flex items-center space-x-1">
                         <button
