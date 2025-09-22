@@ -602,16 +602,20 @@ export default function QuestionDetailPage() {
               </div>
               {/* 본인이 작성한 질문인 경우 수정/삭제 버튼 표시 */}
               {(() => {
+                const shouldShow = status !== 'loading' && user?.id && question.user_id === user.id
                 console.log('🔍 [DEBUG] 수정 버튼 표시 조건 확인:', {
                   userId: user?.id,
                   questionUserId: question.user_id,
                   status: status,
+                  shouldShow: shouldShow,
                   isMatch: user?.id && question.user_id === user.id,
                   userType: typeof user?.id,
-                  questionUserType: typeof question.user_id
+                  questionUserType: typeof question.user_id,
+                  userString: String(user?.id),
+                  questionString: String(question.user_id),
+                  strictEqual: user?.id === question.user_id
                 })
-                // 세션이 로딩 중이 아니고, 사용자 ID가 있고, 질문 작성자와 일치하는 경우에만 표시
-                return status !== 'loading' && user?.id && question.user_id === user.id
+                return shouldShow
               })() && (
                 <div className="flex items-center space-x-1 ml-4">
                   <button

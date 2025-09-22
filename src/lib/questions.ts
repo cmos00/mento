@@ -217,8 +217,8 @@ export async function incrementQuestionViews(id: string) {
       throw new Error(error.message)
     }
 
-    // 통계 업데이트 (조회수 증가)
-    updateQuestionStats(id, 'view')
+    // 통계 업데이트는 현재 사용하지 않음 (question_stats 테이블 없음)
+    // updateQuestionStats(id, 'view')
 
     return { data, error: null }
   } catch (error) {
