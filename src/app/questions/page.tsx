@@ -177,7 +177,7 @@ export default function QuestionsPage() {
       const questionIds = questions.map(q => q.id)
       loadLikesData(questionIds)
     }
-  }, [status, user?.id, questions.length, loadLikesData])
+  }, [status, user?.id, questions.length])
 
   // 무한스크롤을 위한 함수
   const loadMoreQuestions = useCallback(async () => {

@@ -14,6 +14,7 @@ export default function QuestionDetailPage() {
   const params = useParams()
   const router = useRouter()
   const { data: session, status } = useSession()
+  const user = session?.user
   const [question, setQuestion] = useState<Question | null>(null)
   const [feedbacks, setFeedbacks] = useState<FeedbackWithAuthor[]>([])
   const [loading, setLoading] = useState(true)
@@ -105,7 +106,7 @@ export default function QuestionDetailPage() {
         isLiked: false
       })
     }
-  }, [questionId, user?.id])
+  }, [questionId])
 
   const handleLikeToggle = async () => {
     if (!user?.id) {
@@ -230,7 +231,7 @@ export default function QuestionDetailPage() {
     if (status === 'authenticated' && user?.id && questionId) {
       loadLikeData()
     }
-  }, [status, user?.id, questionId, loadLikeData])
+  }, [status, user?.id, questionId])
 
   const getUserDisplayName = (question: Question) => {
     if (question.is_anonymous) {
