@@ -602,37 +602,44 @@ export default function QuestionDetailPage() {
                 <Clock className="w-4 h-4 mr-2" />
                 {formatTimeAgo(question.created_at)}
               </div>
-              {/* 본인이 작성한 질문인 경우 수정/삭제 버튼 표시 */}
-              {(() => {
-                const canEdit = status === 'authenticated' && user?.id && question.user_id === user.id
-                if (status === 'authenticated') {
-                  console.log('🔍 [EDIT BUTTON] 조건 확인:', {
+              {/* 수정/삭제 버튼 (디버깅용으로 항상 표시) */}
+              <div className="flex items-center space-x-1 ml-4">
+                {(() => {
+                  const canEdit = status === 'authenticated' && user?.id && question.user_id === user.id
+                  console.log('🔍 [EDIT BUTTON] 디버깅 정보:', {
                     status,
                     userId: user?.id,
                     questionUserId: question.user_id,
-                    canEdit
+                    canEdit,
+                    userType: typeof user?.id,
+                    questionUserType: typeof question.user_id,
+                    strictEqual: user?.id === question.user_id
                   })
-                }
-                return canEdit
-              })() && (
-                <div className="flex items-center space-x-1 ml-4">
-                  <button
-                    onClick={initializeEditForm}
-                    className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
-                    title="수정"
-                  >
+                  return canEdit
+                })() ? (
+                  <>
+                    <button
+                      onClick={initializeEditForm}
+                      className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
+                      title="수정"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={handleDeleteQuestion}
+                      disabled={isDeleting}
+                      className="p-1 text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
+                      title="삭제"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </>
+                ) : (
+                  <div className="p-1 text-gray-300" title="수정 권한 없음">
                     <Edit3 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={handleDeleteQuestion}
-                    disabled={isDeleting}
-                    className="p-1 text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
-                    title="삭제"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
