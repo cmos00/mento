@@ -251,7 +251,7 @@ export default function QuestionsPage() {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!session?.user) {
+    if (!user) {
       alert('로그인이 필요합니다.')
       return
     }

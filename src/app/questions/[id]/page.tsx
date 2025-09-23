@@ -460,7 +460,7 @@ export default function QuestionDetailPage() {
   }
 
   const handleSubmitAnswer = async () => {
-    if (!answerContent.trim() || !session?.user) {
+    if (!answerContent.trim() || !user) {
       return
     }
 
@@ -470,14 +470,14 @@ export default function QuestionDetailPage() {
       const feedbackData = {
         question_id: questionId,
         content: answerContent.trim(),
-        user_id: (session.user as any).id
+        user_id: user.id
       }
 
       const userInfo = {
-        id: (session.user as any).id,
-        email: session.user.email!,
-        name: session.user.name!,
-        isLinkedIn: (session.user as any)?.provider === 'linkedin'
+        id: user.id,
+        email: user.email!,
+        name: user.user_metadata?.full_name || user.user_metadata?.name || 'Unknown User',
+        isLinkedIn: true // Supabase Auth에서는 LinkedIn으로 로그인
       }
 
       const response = await fetch('/api/feedbacks/create', {
@@ -913,7 +913,7 @@ export default function QuestionDetailPage() {
               <div className="flex items-center mb-4">
                 {(() => {
                   // 현재 로그인한 사용자의 프로필 정보 생성
-                  const userImage = (session?.user as any)?.image || session?.user?.image
+                  const userImage = user?.user_metadata?.avatar_url
                   let avatarUrl = userImage
                   
                   // LinkedIn 이미지인 경우 proxy 사용
@@ -921,7 +921,7 @@ export default function QuestionDetailPage() {
                     avatarUrl = `/api/image-proxy?url=${encodeURIComponent(avatarUrl)}`
                   }
                   
-                  const userName = session?.user?.name || '사용자'
+                  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || '사용자'
                   const displayName = getDisplayName(userName)
                   
                   return (
