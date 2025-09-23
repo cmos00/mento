@@ -168,7 +168,7 @@ export default function QuestionsPage() {
       // 첫 페이지 로딩시에만 사용자 통계와 인기 질문 조회
       if (!append) {
         // 로그인한 사용자의 통계 조회
-        if (status === 'authenticated' && user?.id) {
+        if (!authLoading && user?.id) {
           const statsResult = await getUserStats(user.id)
           if (statsResult.data) {
             setUserStats(statsResult.data)
@@ -303,7 +303,7 @@ export default function QuestionsPage() {
     // }
     
     // users 테이블과 조인된 데이터가 있다면 사용
-    return getDisplayName(user?.name || '사용자')
+    return getDisplayName(user?.user_metadata?.full_name || user?.user_metadata?.name || '사용자')
   }
 
   const getUserProfileInfo = (question: Question) => {
@@ -332,7 +332,7 @@ export default function QuestionsPage() {
     // }
     
     // 일반 사용자인 경우
-    const displayName = getDisplayName(user?.name || '사용자') // DB의 실제 이름 사용하고 형식 변환
+    const displayName = getDisplayName(user?.user_metadata?.full_name || user?.user_metadata?.name || '사용자') // DB의 실제 이름 사용하고 형식 변환
     const originalImageUrl = user?.image || user?.avatar_url // DB의 이미지 우선 사용
     
     // LinkedIn 이미지인 경우 프록시를 통해 제공
@@ -343,7 +343,7 @@ export default function QuestionsPage() {
     // 디버깅을 위한 로그
     console.log('🖼️ [Questions Page] 사용자 이미지 정보:', {
       userId: user?.id,
-      userName: user?.name,
+      userName: user?.user_metadata?.full_name || user?.user_metadata?.name,
       originalImage: originalImageUrl,
       proxyImage: avatarUrl,
       isLinkedInImage: originalImageUrl?.includes('media.licdn.com')
@@ -592,7 +592,7 @@ export default function QuestionsPage() {
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
           </div>
-          {status === 'authenticated' ? (
+          {!authLoading && user ? (
             <Link href="/questions/new">
               <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center">
                 <Plus className="w-4 h-4 mr-2" />
@@ -617,17 +617,17 @@ export default function QuestionsPage() {
             <div className="flex items-center justify-between min-h-[60px]">
               <div className="flex flex-col justify-center flex-1 ml-6">
                 <h1 className="text-xl font-bold text-gray-900 mb-1">
-                  {status === 'authenticated' ? `안녕하세요, ${getDisplayName(user?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
+                  {!authLoading && user ? `안녕하세요, ${getDisplayName(user?.user_metadata?.full_name || user?.user_metadata?.name || '사용자')}님!` : 'CareerTalk에 오신 것을 환영합니다!'}
                 </h1>
                 <p className="text-base text-gray-600">
-                  {status === 'authenticated' 
+                  {!authLoading && user 
                     ? '오늘도 멘토들과 함께 성장해보세요' 
                     : '멘토들과 함께 커리어 성장의 여정을 시작하세요'
                   }
                 </p>
               </div>
               <div className="hidden md:block p-4">
-                {status === 'authenticated' ? (
+                {!authLoading && user ? (
                   <Link href="/questions/new">
                     <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-4 rounded-xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all flex items-center shadow-lg hover:shadow-lg transform hover:-translate-y-1">
                       <Plus className="w-5 h-5 mr-2" />
@@ -792,7 +792,7 @@ export default function QuestionsPage() {
                 }
               </p>
               {!searchTerm && !selectedCategory && (
-                status === 'authenticated' ? (
+                !authLoading && user ? (
                   <Link href="/questions/new">
                     <button id="create-question-button" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all">
                       질문 작성하기
