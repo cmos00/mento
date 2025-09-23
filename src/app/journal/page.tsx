@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { BookOpen, Plus, Calendar, Clock, MessageSquare, ThumbsUp, TrendingUp, Filter, Eye, User, Star, Award } from 'lucide-react'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
@@ -305,9 +306,11 @@ export default function JournalPage() {
                         {/* 이미지 */}
                         {article.image && (
                           <div className="h-56 w-full overflow-hidden">
-                            <img 
+                            <Image 
                               src={article.image} 
                               alt={article.title}
+                              width={400}
+                              height={224}
                               className="w-full h-full object-cover"
                             />
                           </div>
@@ -408,9 +411,11 @@ export default function JournalPage() {
                     {/* 이미지 섹션 */}
                     {article.image && (
                       <div className="w-64 h-40 flex-shrink-0 overflow-hidden rounded-lg">
-                        <img 
+                        <Image 
                           src={article.image} 
                           alt={article.title}
+                          width={256}
+                          height={160}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -514,9 +519,11 @@ export default function JournalPage() {
                       <div className="flex items-start space-x-4">
                         {article.image && (
                           <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg">
-                            <img 
+                            <Image 
                               src={article.image} 
                               alt={article.title}
+                              width={96}
+                              height={96}
                               className="w-full h-full object-cover"
                             />
                           </div>

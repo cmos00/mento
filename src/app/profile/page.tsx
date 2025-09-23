@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { getDisplayName } from '@/lib/utils'
 
@@ -228,9 +229,11 @@ export default function ProfilePage() {
                   })
                   
                   return imageUrl ? (
-                    <img 
+                    <Image 
                       src={imageUrl} 
                       alt={user?.name || '프로필'} 
+                      width={80}
+                      height={80}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         console.error('❌ [Profile Image] 이미지 로드 실패:', imageUrl)

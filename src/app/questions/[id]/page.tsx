@@ -7,6 +7,7 @@ import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 import { ArrowLeft, Bookmark, Clock, Eye, MessageCircle, Send, Share2, Tag, ThumbsUp, Edit3, Trash2 } from 'lucide-react'
 import { useSupabaseAuth } from '@/components/SupabaseAuthProvider'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -681,9 +682,11 @@ export default function QuestionDetailPage() {
                   <>
                     <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden relative">
                       {profileInfo.avatarUrl && (
-                        <img 
+                        <Image 
                           src={profileInfo.avatarUrl} 
                           alt={profileInfo.displayName}
+                          width={40}
+                          height={40}
                           className="w-full h-full object-cover absolute inset-0 z-10"
                           onError={(e) => {
                             console.error('❌ [Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
@@ -928,9 +931,11 @@ export default function QuestionDetailPage() {
                     <>
                       <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3 overflow-hidden relative">
                         {avatarUrl && (
-                          <img 
+                          <Image 
                             src={avatarUrl} 
                             alt={displayName}
+                            width={32}
+                            height={32}
                             className="w-full h-full object-cover absolute inset-0 z-10"
                             onError={(e) => {
                               console.error('❌ [Answer Form Profile] 이미지 로드 실패:', avatarUrl)
@@ -1072,9 +1077,11 @@ export default function QuestionDetailPage() {
                         <>
                           <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden relative">
                             {profileInfo.avatarUrl && (
-                              <img 
+                              <Image 
                                 src={profileInfo.avatarUrl} 
                                 alt={profileInfo.displayName}
+                                width={40}
+                                height={40}
                                 className="w-full h-full object-cover absolute inset-0 z-10"
                                 onError={(e) => {
                                   console.error('❌ [Feedback Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)

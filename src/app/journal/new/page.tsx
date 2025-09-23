@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { BookOpen, ArrowLeft, Upload, X, Save, Eye } from 'lucide-react'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
@@ -187,9 +188,11 @@ export default function JournalWritePage() {
               </label>
               {imagePreview ? (
                 <div className="relative">
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Preview"
+                    width={800}
+                    height={256}
                     className="w-full h-64 object-cover rounded-xl"
                   />
                   <button

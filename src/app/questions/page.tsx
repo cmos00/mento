@@ -7,6 +7,7 @@ import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 import { Eye, MessageCircle, MessageSquare, Plus, RefreshCw, Search, ThumbsUp, TrendingUp, User } from 'lucide-react'
 import { useSupabaseAuth } from '@/components/SupabaseAuthProvider'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useCallback, useEffect, useState } from 'react'
 
 export default function QuestionsPage() {
@@ -188,12 +189,12 @@ export default function QuestionsPage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [authLoading, user?.id])
+  }, [authLoading, user?.id, loadLikesData])
 
   useEffect(() => {
     loadQuestions()
     setCurrentPage(0)
-  }, [authLoading, user?.id, loadQuestions])
+  }, [authLoading, user?.id, loadQuestions, questions])
 
   // 세션이 로드된 후 기존 질문들의 좋아요 데이터 로드 (중복 제거)
   useEffect(() => {
@@ -821,9 +822,11 @@ export default function QuestionsPage() {
                             profileInfo.isDeleted ? 'bg-gray-400' : 'bg-purple-500'
                           }`}>
                             {profileInfo.avatarUrl ? (
-                              <img 
+                              <Image 
                                 src={profileInfo.avatarUrl} 
                                 alt={profileInfo.displayName}
+                                width={40}
+                                height={40}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
                                   console.error('❌ [Questions Page] 이미지 로드 실패:', profileInfo.avatarUrl)

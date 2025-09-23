@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import { BookOpen, ArrowLeft, Calendar, Clock, MessageSquare, ThumbsUp, Eye, User, Share2, Heart } from 'lucide-react'
 import MobileBottomNav from '@/components/MobileBottomNav'
@@ -274,9 +275,11 @@ export default function JournalDetailPage() {
           {/* Featured Image */}
           {article.image && (
             <div className="h-64 md:h-80 w-full overflow-hidden">
-              <img 
+              <Image 
                 src={article.image} 
                 alt={article.title}
+                width={800}
+                height={320}
                 className="w-full h-full object-cover"
               />
             </div>

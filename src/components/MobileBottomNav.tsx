@@ -7,7 +7,8 @@ import { useSession } from 'next-auth/react'
 
 export default function MobileBottomNav() {
   const pathname = usePathname()
-  const { data: session, status } = useSession()
+  const sessionResult = useSession()
+  const { data: session, status } = sessionResult || { data: null, status: 'loading' }
 
   const navItems = [
     { href: '/questions', icon: Home, label: '홈', requireAuth: false },
