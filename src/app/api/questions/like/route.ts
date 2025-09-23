@@ -13,7 +13,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Supabase Auth로 사용자 인증
-    const supabase = createClient()
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {
@@ -118,7 +121,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Supabase Auth로 사용자 인증 (선택적)
-    const supabase = createClient()
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
     const { data: { user } } = await supabase.auth.getUser()
     const userId = user?.id
 
