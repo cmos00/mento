@@ -21,7 +21,8 @@ import { useState, useEffect } from 'react'
 import { getDisplayName } from '@/lib/utils'
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession()
+  const sessionResult = useSession()
+  const { data: session, status } = sessionResult || { data: null, status: 'loading' }
   const [activeTab, setActiveTab] = useState('overview')
   const [dbUser, setDbUser] = useState<any>(null)
   const user = dbUser || session?.user

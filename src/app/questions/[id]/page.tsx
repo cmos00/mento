@@ -526,7 +526,7 @@ export default function QuestionDetailPage() {
       console.log('좋아요 데이터 로딩 조건 확인:', { questionId, authLoading, userId: user?.id })
       loadLikeData()
     }
-  }, [questionId, authLoading, loadLikeData])
+  }, [questionId, authLoading, loadLikeData, user?.id])
 
   const getUserDisplayName = (question: Question) => {
     if (question.is_anonymous) {

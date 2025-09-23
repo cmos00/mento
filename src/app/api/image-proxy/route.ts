@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const imageUrl = searchParams.get('url')
+    const imageUrl = request.nextUrl.searchParams.get('url')
 
     if (!imageUrl) {
       return NextResponse.json(

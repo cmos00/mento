@@ -202,7 +202,7 @@ export default function QuestionsPage() {
       console.log('좋아요 데이터 로딩 조건 확인:', { authLoading, questionsCount: questions.length, userId: user?.id })
       loadLikesData(questionIds)
     }
-  }, [authLoading, questions.length, loadLikesData])
+  }, [authLoading, questions.length, loadLikesData, user?.id])
 
   // 무한스크롤을 위한 함수
   const loadMoreQuestions = useCallback(async () => {

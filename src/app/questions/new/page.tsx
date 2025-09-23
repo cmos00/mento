@@ -9,7 +9,8 @@ import { useState } from 'react'
 
 export default function NewQuestionPage() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const sessionResult = useSession()
+  const { data: session, status } = sessionResult || { data: null, status: 'loading' }
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [category, setCategory] = useState('')

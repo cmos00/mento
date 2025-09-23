@@ -10,7 +10,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 
 export default function TrendingQuestionsPage() {
-  const { data: session, status } = useSession()
+  const sessionResult = useSession()
+  const { data: session, status } = sessionResult || { data: null, status: 'loading' }
   const [trendingQuestions, setTrendingQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

@@ -2,9 +2,11 @@
 
 import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 export default function DebugProfilePage() {
-  const { data: session, status } = useSession()
+  const sessionResult = useSession()
+  const { data: session, status } = sessionResult || { data: null, status: 'loading' }
   const [dbUser, setDbUser] = useState<any>(null)
   const [logs, setLogs] = useState<string[]>([])
 
@@ -116,9 +118,11 @@ export default function DebugProfilePage() {
               <h3 className="text-sm font-medium mb-2">세션 이미지</h3>
               <div className="w-16 h-16 rounded-full border-2 border-gray-300 overflow-hidden">
                 {session?.user?.image ? (
-                  <img 
+                  <Image 
                     src={session.user.image} 
                     alt="세션 이미지"
+                    width={64}
+                    height={64}
                     className="w-full h-full object-cover"
                     onError={() => addLog('❌ 세션 이미지 로딩 실패')}
                     onLoad={() => addLog('✅ 세션 이미지 로딩 성공')}
@@ -136,9 +140,11 @@ export default function DebugProfilePage() {
               <h3 className="text-sm font-medium mb-2">DB 이미지</h3>
               <div className="w-16 h-16 rounded-full border-2 border-gray-300 overflow-hidden">
                 {dbUser?.image ? (
-                  <img 
+                  <Image 
                     src={dbUser.image} 
                     alt="DB 이미지"
+                    width={64}
+                    height={64}
                     className="w-full h-full object-cover"
                     onError={() => addLog('❌ DB 이미지 로딩 실패')}
                     onLoad={() => addLog('✅ DB 이미지 로딩 성공')}
@@ -156,9 +162,11 @@ export default function DebugProfilePage() {
               <h3 className="text-sm font-medium mb-2">DB Avatar URL</h3>
               <div className="w-16 h-16 rounded-full border-2 border-gray-300 overflow-hidden">
                 {dbUser?.avatar_url ? (
-                  <img 
+                  <Image 
                     src={dbUser.avatar_url} 
                     alt="DB Avatar"
+                    width={64}
+                    height={64}
                     className="w-full h-full object-cover"
                     onError={() => addLog('❌ DB Avatar URL 로딩 실패')}
                     onLoad={() => addLog('✅ DB Avatar URL 로딩 성공')}
