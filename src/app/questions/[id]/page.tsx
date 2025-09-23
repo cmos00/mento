@@ -162,7 +162,7 @@ export default function QuestionDetailPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email: user.email }),
+        // body에 email을 보내지 않음 - API에서 세션에서 직접 가져옴
       })
       
       const result = await response.json()
