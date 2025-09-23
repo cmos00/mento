@@ -32,9 +32,9 @@ export async function PUT(
 
     const result = await updateFeedback(feedbackId, { content }, user.id)
 
-    if (!result) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: '답변 수정에 실패했습니다.' },
+        { error: result.error || '답변 수정에 실패했습니다.' },
         { status: 400 }
       )
     }
