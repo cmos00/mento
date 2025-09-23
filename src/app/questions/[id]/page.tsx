@@ -691,6 +691,7 @@ export default function QuestionDetailPage() {
                           onError={(e) => {
                             console.error('❌ [Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
                             e.currentTarget.style.display = 'none'
+                            e.stopPropagation()
                           }}
                           onLoad={() => {
                             console.log('✅ [Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)
@@ -940,6 +941,7 @@ export default function QuestionDetailPage() {
                             onError={(e) => {
                               console.error('❌ [Answer Form Profile] 이미지 로드 실패:', avatarUrl)
                               e.currentTarget.style.display = 'none'
+                              e.stopPropagation()
                             }}
                             onLoad={() => {
                               console.log('✅ [Answer Form Profile] 이미지 로드 성공:', avatarUrl)
@@ -1086,6 +1088,7 @@ export default function QuestionDetailPage() {
                                 onError={(e) => {
                                   console.error('❌ [Feedback Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
                                   e.currentTarget.style.display = 'none'
+                                  e.stopPropagation()
                                 }}
                                 onLoad={() => {
                                   console.log('✅ [Feedback Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)

@@ -241,6 +241,7 @@ export default function ProfilePage() {
                         target.style.display = 'none';
                         const sibling = target.nextElementSibling as HTMLElement;
                         if (sibling) sibling.style.display = 'flex';
+                        e.stopPropagation();
                       }}
                       onLoad={() => {
                         console.log('✅ [Profile Image] 이미지 로드 성공:', imageUrl)

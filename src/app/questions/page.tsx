@@ -834,6 +834,8 @@ export default function QuestionsPage() {
                                   target.style.display = 'none';
                                   const sibling = target.nextElementSibling as HTMLElement;
                                   if (sibling) sibling.style.display = 'flex';
+                                  // 무한 루프 방지를 위해 이벤트 전파 중단
+                                  e.stopPropagation();
                                 }}
                                 onLoad={() => {
                                   console.log('✅ [Questions Page] 이미지 로드 성공:', profileInfo.avatarUrl)
