@@ -35,6 +35,123 @@ export default function QuestionDetailPage() {
 
   const questionId = params.id as string
 
+  // Skeleton UI 컴포넌트
+  const QuestionDetailSkeleton = () => (
+    <div className="min-h-screen bg-gray-50 pb-20">
+      {/* Header Skeleton */}
+      <header className="bg-white border-b border-gray-200 px-4 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center animate-pulse">
+            <div className="w-5 h-5 bg-gray-200 rounded mr-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-8"></div>
+          </div>
+          <div className="flex items-center space-x-3">
+            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+            <div className="w-5 h-5 bg-gray-200 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* 질문 카드 Skeleton */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 animate-pulse">
+          {/* 질문 헤더 Skeleton */}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-24"></div>
+                <div className="h-3 bg-gray-200 rounded w-16"></div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="h-3 bg-gray-200 rounded w-12"></div>
+              <div className="w-4 h-4 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+
+          {/* 카테고리 Skeleton */}
+          <div className="mb-3">
+            <div className="h-6 bg-gray-200 rounded w-16"></div>
+          </div>
+
+          {/* 질문 제목 Skeleton */}
+          <div className="mb-4">
+            <div className="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-6 bg-gray-200 rounded w-full mb-1"></div>
+            <div className="h-6 bg-gray-200 rounded w-2/3"></div>
+          </div>
+
+          {/* 질문 내용 Skeleton */}
+          <div className="mb-6">
+            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          </div>
+
+          {/* 태그 Skeleton */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            <div className="h-6 bg-gray-200 rounded w-12"></div>
+            <div className="h-6 bg-gray-200 rounded w-16"></div>
+          </div>
+
+          {/* 질문 통계 Skeleton */}
+          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                <div className="h-3 bg-gray-200 rounded w-8"></div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                <div className="h-3 bg-gray-200 rounded w-8"></div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 bg-gray-200 rounded"></div>
+              <div className="h-3 bg-gray-200 rounded w-12"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* 답변 섹션 Skeleton */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="h-6 bg-gray-200 rounded w-12"></div>
+            <div className="h-4 bg-gray-200 rounded w-16"></div>
+          </div>
+
+          {/* 답변 작성 버튼 Skeleton */}
+          <div className="mb-6">
+            <div className="h-12 bg-gray-200 rounded w-full"></div>
+          </div>
+
+          {/* 답변 목록 Skeleton */}
+          <div className="space-y-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0 animate-pulse">
+                <div className="absolute top-0 right-0">
+                  <div className="h-3 bg-gray-200 rounded w-12"></div>
+                </div>
+                
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full mr-3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-24"></div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   // 실제 사용자 ID 조회
   const loadActualUserId = useCallback(async () => {
     if (!user?.email) return
@@ -546,14 +663,7 @@ export default function QuestionDetailPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">질문을 불러오는 중...</p>
-        </div>
-      </div>
-    )
+    return <QuestionDetailSkeleton />
   }
 
   if (error || !question) {
@@ -640,46 +750,45 @@ export default function QuestionDetailPage() {
                 <Clock className="w-4 h-4 mr-2" />
                 {formatTimeAgo(question.created_at)}
               </div>
-              {/* 수정/삭제 버튼 (디버깅용으로 항상 표시) */}
-              <div className="flex items-center space-x-1 ml-4">
-                {(() => {
-                  const canEdit = status === 'authenticated' && actualUserId && question.user_id === actualUserId
-                  console.log('🔍 [EDIT BUTTON] 디버깅 정보:', {
-                    status,
-                    nextAuthUserId: user?.id,
-                    actualUserId: actualUserId,
-                    questionUserId: question.user_id,
-                    canEdit,
-                    userType: typeof user?.id,
-                    actualUserType: typeof actualUserId,
-                    questionUserType: typeof question.user_id,
-                    strictEqual: actualUserId === question.user_id
-                  })
-                  return canEdit
-                })() ? (
-                  <>
-                    <button
-                      onClick={initializeEditForm}
-                      className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
-                      title="수정"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={handleDeleteQuestion}
-                      disabled={isDeleting}
-                      className="p-1 text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
-                      title="삭제"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </>
-                ) : (
-                  <div className="p-1 text-gray-300" title="수정 권한 없음">
-                    <Edit3 className="w-4 h-4" />
-                  </div>
-                )}
-              </div>
+              {/* 수정/삭제 버튼 (본인 작성 질문인 경우에만 표시) */}
+              {(() => {
+                const canEdit = status === 'authenticated' && actualUserId && question.user_id === actualUserId
+                console.log('🔍 [EDIT BUTTON] 디버깅 정보:', {
+                  status,
+                  nextAuthUserId: user?.id,
+                  actualUserId: actualUserId,
+                  questionUserId: question.user_id,
+                  canEdit,
+                  userType: typeof user?.id,
+                  actualUserType: typeof actualUserId,
+                  questionUserType: typeof question.user_id,
+                  strictEqual: actualUserId === question.user_id
+                })
+                
+                // 본인이 작성한 질문인 경우에만 버튼 표시
+                if (canEdit) {
+                  return (
+                    <div className="flex items-center space-x-1 ml-4">
+                      <button
+                        onClick={initializeEditForm}
+                        className="p-1 text-gray-500 hover:text-blue-600 transition-colors"
+                        title="수정"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={handleDeleteQuestion}
+                        disabled={isDeleting}
+                        className="p-1 text-gray-500 hover:text-red-600 transition-colors disabled:opacity-50"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )
+                }
+                return null
+              })()}
             </div>
           </div>
 
@@ -960,24 +1069,39 @@ export default function QuestionDetailPage() {
                       {formatTimeAgo(feedback.created_at)}
                     </span>
                     {/* 본인이 작성한 답변인 경우 수정/삭제 버튼 표시 */}
-                    {status === 'authenticated' && actualUserId && feedback.user_id === actualUserId && (
-                      <div className="flex items-center space-x-1">
-                        <button
-                          onClick={() => handleEditFeedback(feedback.id)}
-                          className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                          title="수정"
-                        >
-                          <Edit3 className="w-3 h-3" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteFeedback(feedback.id)}
-                          className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                          title="삭제"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-                    )}
+                    {(() => {
+                      const canEditAnswer = status === 'authenticated' && actualUserId && feedback.user_id === actualUserId
+                      console.log('🔍 [ANSWER EDIT BUTTON] 디버깅 정보:', {
+                        status,
+                        actualUserId: actualUserId,
+                        feedbackUserId: feedback.user_id,
+                        canEditAnswer,
+                        strictEqual: actualUserId === feedback.user_id
+                      })
+                      
+                      // 본인이 작성한 답변인 경우에만 버튼 표시
+                      if (canEditAnswer) {
+                        return (
+                          <div className="flex items-center space-x-1">
+                            <button
+                              onClick={() => handleEditFeedback(feedback.id)}
+                              className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                              title="수정"
+                            >
+                              <Edit3 className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteFeedback(feedback.id)}
+                              className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                              title="삭제"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        )
+                      }
+                      return null
+                    })()}
                   </div>
                   
                   {/* 답변자 정보 */}
