@@ -19,8 +19,74 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Supabase 클라이언트 생성
 export const supabase = createSupabaseClient(
   supabaseUrl || '',
-  supabaseAnonKey || ''
+  supabaseAnonKey || '',
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce'
+    }
+  }
 )
+
+// Supabase Auth 헬퍼 함수들
+export const auth = {
+  // 현재 사용자 가져오기
+  getCurrentUser: async () => {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (error) {
+      console.error('사용자 정보 조회 실패:', error)
+      return null
+    }
+    return user
+  },
+
+  // 세션 가져오기
+  getSession: async () => {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    if (error) {
+      console.error('세션 조회 실패:', error)
+      return null
+    }
+    return session
+  },
+
+  // LinkedIn으로 로그인
+  signInWithLinkedIn: async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'linkedin',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      }
+    })
+    
+    if (error) {
+      console.error('LinkedIn 로그인 실패:', error)
+      throw error
+    }
+    
+    return data
+  },
+
+  // 로그아웃
+  signOut: async () => {
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error('로그아웃 실패:', error)
+      throw error
+    }
+  },
+
+  // 인증 상태 변경 리스너
+  onAuthStateChange: (callback: (event: string, session: any) => void) => {
+    return supabase.auth.onAuthStateChange(callback)
+  }
+}
 
 // Database types
 export interface Database {

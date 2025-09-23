@@ -3,14 +3,27 @@ import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
   try {
-    const { questionId, userId, action } = await request.json()
+    const { questionId, action } = await request.json()
 
-    if (!questionId || !userId || !action) {
+    if (!questionId || !action) {
       return NextResponse.json(
         { error: '필수 정보가 누락되었습니다.' },
         { status: 400 }
       )
     }
+
+    // Supabase Auth로 사용자 인증
+    const supabase = createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: '로그인이 필요합니다.' },
+        { status: 401 }
+      )
+    }
+
+    const userId = user.id
 
     // Supabase 서비스 클라이언트 생성 (RLS 우회)
     const supabaseAdmin = createClient(
@@ -96,7 +109,6 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url)
     const questionId = url.searchParams.get('questionId')
-    const userId = url.searchParams.get('userId')
 
     if (!questionId) {
       return NextResponse.json(
@@ -104,6 +116,11 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // Supabase Auth로 사용자 인증 (선택적)
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    const userId = user?.id
 
     // Supabase 서비스 클라이언트 생성
     const supabaseAdmin = createClient(

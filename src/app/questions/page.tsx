@@ -5,13 +5,12 @@ import PCNavigation from '@/components/PCNavigation'
 import { Question, getQuestionsWithPagination, getTrendingQuestions, getUserStats } from '@/lib/questions'
 import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 import { Eye, MessageCircle, MessageSquare, Plus, RefreshCw, Search, ThumbsUp, TrendingUp, User } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useSupabaseAuth } from '@/components/SupabaseAuthProvider'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 
 export default function QuestionsPage() {
-  const { data: session, status } = useSession()
-  const user = session?.user
+  const { user, loading: authLoading } = useSupabaseAuth()
   const [questions, setQuestions] = useState<Question[]>([])
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([])
   const [trendingQuestions, setTrendingQuestions] = useState<Question[]>([])
@@ -159,7 +158,7 @@ export default function QuestionsPage() {
       
       // 좋아요 데이터 로딩 (세션이 로드된 후에만)
       const questionIds = newQuestions.map(q => q.id)
-      if (status !== 'loading') {
+      if (!authLoading) {
         // 비동기로 처리하여 질문 로딩을 방해하지 않음
         loadLikesData(questionIds).catch(error => {
           console.error('좋아요 데이터 로딩 실패:', error)
@@ -189,21 +188,21 @@ export default function QuestionsPage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [status, user?.id])
+  }, [authLoading, user?.id])
 
   useEffect(() => {
     loadQuestions()
     setCurrentPage(0)
-  }, [status, user?.id, loadQuestions])
+  }, [authLoading, user?.id, loadQuestions])
 
   // 세션이 로드된 후 기존 질문들의 좋아요 데이터 로드 (중복 제거)
   useEffect(() => {
-    if (status !== 'loading' && questions.length > 0) {
+    if (!authLoading && questions.length > 0) {
       const questionIds = questions.map(q => q.id)
-      console.log('좋아요 데이터 로딩 조건 확인:', { status, questionsCount: questions.length, userId: user?.id })
+      console.log('좋아요 데이터 로딩 조건 확인:', { authLoading, questionsCount: questions.length, userId: user?.id })
       loadLikesData(questionIds)
     }
-  }, [status, questions.length, loadLikesData])
+  }, [authLoading, questions.length, loadLikesData])
 
   // 무한스크롤을 위한 함수
   const loadMoreQuestions = useCallback(async () => {

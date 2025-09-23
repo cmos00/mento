@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { createClient } from '@/lib/supabase'
 import { updateQuestion, deleteQuestion } from '@/lib/questions'
 
 export async function PUT(
@@ -8,9 +7,10 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (!session?.user?.id) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
         { status: 401 }
@@ -30,7 +30,7 @@ export async function PUT(
     const result = await updateQuestion(
       questionId,
       { title, content, category },
-      session.user.id
+      user.id
     )
 
     if (!result.success) {
@@ -55,9 +55,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (!session?.user?.id) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
         { status: 401 }
@@ -66,7 +67,7 @@ export async function DELETE(
 
     const questionId = params.id
 
-    const result = await deleteQuestion(questionId, session.user.id)
+    const result = await deleteQuestion(questionId, user.id)
 
     if (!result.success) {
       return NextResponse.json(

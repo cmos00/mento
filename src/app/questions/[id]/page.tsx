@@ -5,7 +5,7 @@ import { FeedbackWithAuthor, getFeedbacksByQuestionId } from '@/lib/feedbacks'
 import { Question, getQuestionById, incrementQuestionViews } from '@/lib/questions'
 import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 import { ArrowLeft, Bookmark, Clock, Eye, MessageCircle, Send, Share2, Tag, ThumbsUp, Edit3, Trash2 } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useSupabaseAuth } from '@/components/SupabaseAuthProvider'
 import Link from 'next/link'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
@@ -13,9 +13,7 @@ import { useCallback, useEffect, useState } from 'react'
 export default function QuestionDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { data: session, status } = useSession()
-  const user = session?.user
-  const [actualUserId, setActualUserId] = useState<string | null>(null)
+  const { user, loading: authLoading } = useSupabaseAuth()
   const [question, setQuestion] = useState<Question | null>(null)
   const [feedbacks, setFeedbacks] = useState<FeedbackWithAuthor[]>([])
   const [loading, setLoading] = useState(true)
@@ -152,35 +150,7 @@ export default function QuestionDetailPage() {
     </div>
   )
 
-  // 실제 사용자 ID 조회
-  const loadActualUserId = useCallback(async () => {
-    if (!user?.email) return
-    
-    try {
-      const response = await fetch('/api/user/get', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: user.email }),
-      })
-      
-      const result = await response.json()
-      
-      if (response.ok && result.user) {
-        console.log('🔍 [USER ID] 실제 사용자 ID 조회 성공:', {
-          nextAuthId: user.id,
-          actualId: result.user.id,
-          email: user.email
-        })
-        setActualUserId(result.user.id)
-      } else {
-        console.warn('⚠️ [USER ID] 실제 사용자 ID 조회 실패:', result)
-      }
-    } catch (err) {
-      console.error('❌ [USER ID] 실제 사용자 ID 조회 오류:', err)
-    }
-  }, [user?.email])
+  // Supabase Auth에서는 user.id가 바로 Supabase 사용자 ID
 
   const loadQuestion = useCallback(async () => {
     try {
@@ -547,22 +517,16 @@ export default function QuestionDetailPage() {
     }
   }, [questionId, loadQuestion, loadFeedbacks])
 
-  // 실제 사용자 ID 로드 (한 번만 실행)
-  useEffect(() => {
-    if (status === 'authenticated' && user?.email && !actualUserId) {
-      loadActualUserId()
-    }
-  }, [status, user?.email, actualUserId])
+  // Supabase Auth에서는 별도의 ID 로드가 필요 없음
 
-  // 세션이 로드된 후 좋아요 데이터 로드 (중복 제거)
+  // 세션이 로드된 후 좋아요 데이터 로드
   useEffect(() => {
-    if (questionId && status !== 'loading') {
+    if (questionId && !authLoading) {
       // 로그인하지 않은 사용자도 좋아요 수는 볼 수 있어야 함
-      // 하지만 세션이 완전히 로드된 후에만 실행
-      console.log('좋아요 데이터 로딩 조건 확인:', { questionId, status, userId: user?.id })
+      console.log('좋아요 데이터 로딩 조건 확인:', { questionId, authLoading, userId: user?.id })
       loadLikeData()
     }
-  }, [questionId, status, loadLikeData])
+  }, [questionId, authLoading, loadLikeData])
 
   const getUserDisplayName = (question: Question) => {
     if (question.is_anonymous) {
@@ -752,17 +716,14 @@ export default function QuestionDetailPage() {
               </div>
               {/* 수정/삭제 버튼 (본인 작성 질문인 경우에만 표시) */}
               {(() => {
-                const canEdit = status === 'authenticated' && actualUserId && question.user_id === actualUserId
+                const canEdit = user && question.user_id === user.id
                 console.log('🔍 [EDIT BUTTON] 디버깅 정보:', {
-                  status,
-                  nextAuthUserId: user?.id,
-                  actualUserId: actualUserId,
+                  userId: user?.id,
                   questionUserId: question.user_id,
                   canEdit,
                   userType: typeof user?.id,
-                  actualUserType: typeof actualUserId,
                   questionUserType: typeof question.user_id,
-                  strictEqual: actualUserId === question.user_id
+                  strictEqual: user?.id === question.user_id
                 })
                 
                 // 본인이 작성한 질문인 경우에만 버튼 표시
@@ -1070,13 +1031,12 @@ export default function QuestionDetailPage() {
                     </span>
                     {/* 본인이 작성한 답변인 경우 수정/삭제 버튼 표시 */}
                     {(() => {
-                      const canEditAnswer = status === 'authenticated' && actualUserId && feedback.user_id === actualUserId
+                      const canEditAnswer = user && feedback.user_id === user.id
                       console.log('🔍 [ANSWER EDIT BUTTON] 디버깅 정보:', {
-                        status,
-                        actualUserId: actualUserId,
+                        userId: user?.id,
                         feedbackUserId: feedback.user_id,
                         canEditAnswer,
-                        strictEqual: actualUserId === feedback.user_id
+                        strictEqual: user?.id === feedback.user_id
                       })
                       
                       // 본인이 작성한 답변인 경우에만 버튼 표시

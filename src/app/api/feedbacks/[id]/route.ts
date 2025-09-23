@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { createClient } from '@/lib/supabase'
 import { updateFeedback, deleteFeedback } from '@/lib/feedbacks'
 
 export async function PUT(
@@ -8,9 +7,10 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (!session?.user?.id) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
         { status: 401 }
@@ -27,7 +27,7 @@ export async function PUT(
       )
     }
 
-    const result = await updateFeedback(feedbackId, { content })
+    const result = await updateFeedback(feedbackId, { content }, user.id)
 
     if (!result) {
       return NextResponse.json(
@@ -51,9 +51,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (!session?.user?.id) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
         { status: 401 }
@@ -62,7 +63,7 @@ export async function DELETE(
 
     const feedbackId = params.id
 
-    const result = await deleteFeedback(feedbackId, session.user.id)
+    const result = await deleteFeedback(feedbackId, user.id)
 
     if (!result.success) {
       return NextResponse.json(
