@@ -1,19 +1,16 @@
+import { authOptions } from '@/lib/auth'
+import { deleteFeedback, updateFeedback } from '@/lib/feedbacks'
+import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { updateFeedback, deleteFeedback } from '@/lib/feedbacks'
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const session = await getServerSession(authOptions)
     
-    if (authError || !user) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
         { status: 401 }
@@ -30,11 +27,11 @@ export async function PUT(
       )
     }
 
-    const result = await updateFeedback(feedbackId, { content }, user.id)
+    const result = await updateFeedback(feedbackId, { content })
 
-    if (!result.success) {
+    if (!result) {
       return NextResponse.json(
-        { error: result.error || '답변 수정에 실패했습니다.' },
+        { error: '답변 수정에 실패했습니다.' },
         { status: 400 }
       )
     }
@@ -54,13 +51,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const session = await getServerSession(authOptions)
     
-    if (authError || !user) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
         { status: 401 }
@@ -69,7 +62,7 @@ export async function DELETE(
 
     const feedbackId = params.id
 
-    const result = await deleteFeedback(feedbackId, user.id)
+    const result = await deleteFeedback(feedbackId, session.user.id)
 
     if (!result.success) {
       return NextResponse.json(

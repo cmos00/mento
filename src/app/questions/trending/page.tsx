@@ -3,15 +3,14 @@
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 import { Question, getTrendingQuestions } from '@/lib/questions'
+import { getDisplayName } from '@/lib/utils'
 import { ArrowLeft, Eye, MessageCircle, Star, ThumbsUp, TrendingUp } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { formatTimeAgo, getDisplayName } from '@/lib/utils'
 
 export default function TrendingQuestionsPage() {
-  const sessionResult = useSession()
-  const { data: session, status } = sessionResult || { data: null, status: 'loading' }
+  const { data: session, status } = useSession()
   const [trendingQuestions, setTrendingQuestions] = useState<Question[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')

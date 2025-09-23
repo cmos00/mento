@@ -1,72 +1,95 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
-import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 function AuthErrorContent() {
   const searchParams = useSearchParams()
-  const [error, setError] = useState<string>('')
+  const error = searchParams.get('error')
+  const callbackUrl = searchParams.get('callbackUrl')
 
-  useEffect(() => {
-    const errorParam = searchParams.get('error')
-    setError(errorParam || '알 수 없는 오류')
-  }, [searchParams])
-
-  const getErrorMessage = (error: string) => {
+  const getErrorMessage = (error: string | null) => {
     switch (error) {
-      case 'callback_error':
-        return '로그인 처리 중 오류가 발생했습니다.'
-      case 'callback_exception':
-        return '로그인 처리 중 예외가 발생했습니다.'
-      case 'no_code':
-        return '로그인 코드가 없습니다.'
-      case 'access_denied':
-        return '로그인이 거부되었습니다.'
+      case 'Callback':
+        return '로그인 중 문제가 발생했습니다. 다시 시도해주세요.'
+      case 'OAuthCallback':
+        alert('ddd');
+        return 'LinkedIn 인증 과정에서 오류가 발생했습니다. 브라우저 콘솔을 확인하거나 다시 시도해주세요.'
       default:
-        return '로그인 중 오류가 발생했습니다.'
+        return '인증 과정에서 오류가 발생했습니다.'
     }
   }
 
+  const getErrorDetails = (error: string | null) => {
+    if (error === 'OAuthCallback') {
+      return 'LinkedIn에서 사용자 정보를 가져오는 과정에서 문제가 발생했습니다. 이는 LinkedIn API 응답이나 사용자 정보 처리 중 오류일 수 있습니다.'
+    }
+    return null
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            로그인 오류
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            인증 오류
+          </h1>
+          
+          <p className="text-gray-600 mb-4">
             {getErrorMessage(error)}
           </p>
-        </div>
-        
-        <div className="mt-8 space-y-4">
-          <Link
-            href="/auth/login"
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-          >
-            다시 로그인하기
-          </Link>
           
-          <Link
-            href="/"
-            className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-          >
-            홈으로 돌아가기
-          </Link>
+          {getErrorDetails(error) && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-yellow-800">
+                {getErrorDetails(error)}
+              </p>
+            </div>
+          )}
+          
+          {/* 디버깅 정보 */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">디버깅 정보:</h3>
+            <div className="text-xs text-gray-600 space-y-1">
+              <div>오류 코드: {error || 'N/A'}</div>
+              <div>콜백 URL: {callbackUrl || 'N/A'}</div>
+              <div>타임스탬프: {new Date().toLocaleString()}</div>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <Link 
+              href="/auth/login" 
+              className="w-full bg-[#0077B5] hover:bg-[#006097] text-white font-medium py-3 px-6 rounded-xl transition-colors duration-200 block"
+            >
+              다시 로그인하기
+            </Link>
+            
+            <Link 
+              href="/" 
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-xl transition-colors duration-200 block"
+            >
+              홈으로 돌아가기
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export default function AuthErrorPage() {
+export default function AuthError() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h2 className="text-3xl font-extrabold text-gray-900">로딩 중...</h2>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
       </div>
     }>
       <AuthErrorContent />

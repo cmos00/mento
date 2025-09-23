@@ -2,28 +2,26 @@
 
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
+import { getDisplayName } from '@/lib/utils'
 import {
-  Award,
-  BookOpen,
-  Coffee,
-  LogOut,
-  MessageCircle,
-  MessageSquare,
-  Settings,
-  Star,
-  ThumbsUp,
-  TrendingUp,
-  Users
+    Award,
+    BookOpen,
+    Coffee,
+    LogOut,
+    MessageCircle,
+    MessageSquare,
+    Settings,
+    Star,
+    ThumbsUp,
+    TrendingUp,
+    Users
 } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { useState, useEffect } from 'react'
-import { getDisplayName } from '@/lib/utils'
+import { useEffect, useState } from 'react'
 
 export default function ProfilePage() {
-  const sessionResult = useSession()
-  const { data: session, status } = sessionResult || { data: null, status: 'loading' }
+  const { data: session, status } = useSession()
   const [activeTab, setActiveTab] = useState('overview')
   const [dbUser, setDbUser] = useState<any>(null)
   const user = dbUser || session?.user
@@ -229,11 +227,9 @@ export default function ProfilePage() {
                   })
                   
                   return imageUrl ? (
-                    <Image 
+                    <img 
                       src={imageUrl} 
                       alt={user?.name || '프로필'} 
-                      width={80}
-                      height={80}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         console.error('❌ [Profile Image] 이미지 로드 실패:', imageUrl)
@@ -241,7 +237,6 @@ export default function ProfilePage() {
                         target.style.display = 'none';
                         const sibling = target.nextElementSibling as HTMLElement;
                         if (sibling) sibling.style.display = 'flex';
-                        e.stopPropagation();
                       }}
                       onLoad={() => {
                         console.log('✅ [Profile Image] 이미지 로드 성공:', imageUrl)

@@ -1,0 +1,90 @@
+# Page snapshot
+
+```yaml
+- dialog "Unhandled Runtime Error" [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - navigation [ref=e7]:
+          - button "previous" [disabled] [ref=e8]:
+            - img "previous" [ref=e9]
+          - button "next" [disabled] [ref=e11]:
+            - img "next" [ref=e12]
+          - generic [ref=e14]:
+            - generic [ref=e15]: "1"
+            - text: of
+            - generic [ref=e16]: "1"
+            - text: error
+          - generic [ref=e17]:
+            - generic "An outdated version detected (latest is 15.5.3), upgrade is highly recommended!" [ref=e19]: Next.js (14.2.32) is outdated
+            - link "(learn more)" [ref=e20] [cursor=pointer]:
+              - /url: https://nextjs.org/docs/messages/version-staleness
+        - button "Close" [ref=e21] [cursor=pointer]:
+          - img [ref=e23] [cursor=pointer]
+      - heading "Unhandled Runtime Error" [level=1] [ref=e26]
+      - paragraph [ref=e27]: "Error: [next-auth]: `useSession` must be wrapped in a <SessionProvider />"
+    - generic [ref=e28]:
+      - heading "Source" [level=2] [ref=e29]
+      - generic [ref=e30]:
+        - link "src/app/questions/new/page.tsx (12:35) @ useSession" [ref=e32] [cursor=pointer]:
+          - generic [ref=e33] [cursor=pointer]: src/app/questions/new/page.tsx (12:35) @ useSession
+          - img [ref=e34] [cursor=pointer]
+        - generic [ref=e38]:
+          - generic [ref=e40]: 10 |
+          - generic [ref=e42]: export
+          - generic [ref=e44]: default
+          - generic [ref=e46]: function
+          - generic [ref=e48]: NewQuestionPage
+          - generic [ref=e49]: "() {"
+          - generic [ref=e51]: 11 |
+          - generic [ref=e53]: const
+          - generic [ref=e54]: router
+          - generic [ref=e55]: =
+          - generic [ref=e56]: useRouter()
+          - generic [ref=e57]: ">"
+          - generic [ref=e58]: 12 |
+          - generic [ref=e60]: const
+          - generic [ref=e61]: sessionResult
+          - generic [ref=e62]: =
+          - generic [ref=e63]: useSession()
+          - generic [ref=e65]: "|"
+          - generic [ref=e67]: ^
+          - generic [ref=e69]: 13 |
+          - generic [ref=e71]: const
+          - generic [ref=e72]: "{ data"
+          - generic [ref=e73]: ":"
+          - generic [ref=e74]: session
+          - generic [ref=e75]: ","
+          - generic [ref=e76]: "status }"
+          - generic [ref=e77]: =
+          - generic [ref=e78]: sessionResult
+          - generic [ref=e79]: "||"
+          - generic [ref=e80]: "{ data"
+          - generic [ref=e81]: ":"
+          - generic [ref=e83]: "null"
+          - generic [ref=e84]: ","
+          - generic [ref=e85]: status
+          - generic [ref=e86]: ":"
+          - generic [ref=e88]: "'loading'"
+          - generic [ref=e89]: "}"
+          - generic [ref=e91]: 14 |
+          - generic [ref=e93]: const
+          - generic [ref=e94]: "[title"
+          - generic [ref=e95]: ","
+          - generic [ref=e96]: setTitle]
+          - generic [ref=e97]: =
+          - generic [ref=e98]: useState(
+          - generic [ref=e99]: "''"
+          - generic [ref=e100]: )
+          - generic [ref=e102]: 15 |
+          - generic [ref=e104]: const
+          - generic [ref=e105]: "[content"
+          - generic [ref=e106]: ","
+          - generic [ref=e107]: setContent]
+          - generic [ref=e108]: =
+          - generic [ref=e109]: useState(
+          - generic [ref=e110]: "''"
+          - generic [ref=e111]: )
+      - heading "Call Stack" [level=2] [ref=e112]
+      - button "Show collapsed frames" [ref=e113] [cursor=pointer]
+```

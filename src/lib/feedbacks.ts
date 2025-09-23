@@ -130,45 +130,29 @@ export async function getFeedbacksByUserId(userId: string): Promise<FeedbackWith
 }
 
 // 피드백 수정
-export async function updateFeedback(id: string, updates: Partial<Feedback>, userId: string): Promise<{ success: boolean; error?: string }> {
+export async function updateFeedback(id: string, updates: Partial<Feedback>): Promise<Feedback | null> {
   if (!supabase) {
     console.error('Supabase client가 초기화되지 않았습니다.')
-    return { success: false, error: '데이터베이스 연결 오류' }
+    return null
   }
 
   try {
-    const { data: feedback, error: fetchError } = await supabase
+    const { data, error } = await supabase
       .from('feedbacks')
-      .select('user_id')
+      .update(updates)
       .eq('id', id)
+      .select()
       .single()
 
-    if (fetchError) {
-      console.error('답변 조회 오류:', fetchError)
-      return { success: false, error: '답변을 찾을 수 없습니다.' }
-    }
-
-    if (feedback.user_id !== userId) {
-      return { success: false, error: '본인이 작성한 답변만 수정할 수 있습니다.' }
-    }
-
-    const { error } = await supabase
-      .from('feedbacks')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .eq('user_id', userId)
-
     if (error) {
-      console.error('답변 수정 오류:', error)
-      return { success: false, error: '답변 수정에 실패했습니다.' }
+      console.error('피드백 수정 오류:', error)
+      return null
     }
-    return { success: true }
+
+    return data
   } catch (err) {
-    console.error('답변 수정 중 예외:', err)
-    return { success: false, error: '답변 수정 중 오류가 발생했습니다.' }
+    console.error('피드백 수정 중 예외:', err)
+    return null
   }
 }
 

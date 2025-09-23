@@ -4,17 +4,18 @@ import MobileBottomNav from '@/components/MobileBottomNav'
 import { FeedbackWithAuthor, getFeedbacksByQuestionId } from '@/lib/feedbacks'
 import { Question, getQuestionById, incrementQuestionViews } from '@/lib/questions'
 import { formatTimeAgo, getDisplayName } from '@/lib/utils'
-import { ArrowLeft, Bookmark, Clock, Eye, MessageCircle, Send, Share2, Tag, ThumbsUp, Edit3, Trash2 } from 'lucide-react'
-import { useSupabaseAuth } from '@/components/SupabaseAuthProvider'
+import { ArrowLeft, Bookmark, Clock, Edit3, Eye, MessageCircle, Send, Share2, Tag, ThumbsUp, Trash2 } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 
 export default function QuestionDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { user, loading: authLoading } = useSupabaseAuth()
+  const { data: session, status } = useSession()
+  const user = session?.user
+  const [actualUserId, setActualUserId] = useState<string | null>(null)
   const [question, setQuestion] = useState<Question | null>(null)
   const [feedbacks, setFeedbacks] = useState<FeedbackWithAuthor[]>([])
   const [loading, setLoading] = useState(true)
@@ -151,7 +152,35 @@ export default function QuestionDetailPage() {
     </div>
   )
 
-  // Supabase Auth에서는 user.id가 바로 Supabase 사용자 ID
+  // 실제 사용자 ID 조회
+  const loadActualUserId = useCallback(async () => {
+    if (!user?.email) return
+    
+    try {
+      const response = await fetch('/api/user/get', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: user.email }),
+      })
+      
+      const result = await response.json()
+      
+      if (response.ok && result.user) {
+        console.log('🔍 [USER ID] 실제 사용자 ID 조회 성공:', {
+          nextAuthId: user.id,
+          actualId: result.user.id,
+          email: user.email
+        })
+        setActualUserId(result.user.id)
+      } else {
+        console.warn('⚠️ [USER ID] 실제 사용자 ID 조회 실패:', result)
+      }
+    } catch (err) {
+      console.error('❌ [USER ID] 실제 사용자 ID 조회 오류:', err)
+    }
+  }, [user?.email])
 
   const loadQuestion = useCallback(async () => {
     try {
@@ -461,7 +490,7 @@ export default function QuestionDetailPage() {
   }
 
   const handleSubmitAnswer = async () => {
-    if (!answerContent.trim() || !user) {
+    if (!answerContent.trim() || !session?.user) {
       return
     }
 
@@ -471,14 +500,14 @@ export default function QuestionDetailPage() {
       const feedbackData = {
         question_id: questionId,
         content: answerContent.trim(),
-        user_id: user.id
+        user_id: (session.user as any).id
       }
 
       const userInfo = {
-        id: user.id,
-        email: user.email!,
-        name: user.user_metadata?.full_name || user.user_metadata?.name || 'Unknown User',
-        isLinkedIn: true // Supabase Auth에서는 LinkedIn으로 로그인
+        id: (session.user as any).id,
+        email: session.user.email!,
+        name: session.user.name!,
+        isLinkedIn: (session.user as any)?.provider === 'linkedin'
       }
 
       const response = await fetch('/api/feedbacks/create', {
@@ -518,16 +547,22 @@ export default function QuestionDetailPage() {
     }
   }, [questionId, loadQuestion, loadFeedbacks])
 
-  // Supabase Auth에서는 별도의 ID 로드가 필요 없음
-
-  // 세션이 로드된 후 좋아요 데이터 로드
+  // 실제 사용자 ID 로드 (한 번만 실행)
   useEffect(() => {
-    if (questionId && !authLoading) {
+    if (status === 'authenticated' && user?.email && !actualUserId) {
+      loadActualUserId()
+    }
+  }, [status, user?.email, actualUserId])
+
+  // 세션이 로드된 후 좋아요 데이터 로드 (중복 제거)
+  useEffect(() => {
+    if (questionId && status !== 'loading') {
       // 로그인하지 않은 사용자도 좋아요 수는 볼 수 있어야 함
-      console.log('좋아요 데이터 로딩 조건 확인:', { questionId, authLoading, userId: user?.id })
+      // 하지만 세션이 완전히 로드된 후에만 실행
+      console.log('좋아요 데이터 로딩 조건 확인:', { questionId, status, userId: user?.id })
       loadLikeData()
     }
-  }, [questionId, authLoading, loadLikeData, user?.id])
+  }, [questionId, status, loadLikeData])
 
   const getUserDisplayName = (question: Question) => {
     if (question.is_anonymous) {
@@ -682,16 +717,13 @@ export default function QuestionDetailPage() {
                   <>
                     <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden relative">
                       {profileInfo.avatarUrl && (
-                        <Image 
+                        <img 
                           src={profileInfo.avatarUrl} 
                           alt={profileInfo.displayName}
-                          width={40}
-                          height={40}
                           className="w-full h-full object-cover absolute inset-0 z-10"
                           onError={(e) => {
                             console.error('❌ [Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
                             e.currentTarget.style.display = 'none'
-                            e.stopPropagation()
                           }}
                           onLoad={() => {
                             console.log('✅ [Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)
@@ -720,14 +752,17 @@ export default function QuestionDetailPage() {
               </div>
               {/* 수정/삭제 버튼 (본인 작성 질문인 경우에만 표시) */}
               {(() => {
-                const canEdit = user && question.user_id === user.id
+                const canEdit = status === 'authenticated' && actualUserId && question.user_id === actualUserId
                 console.log('🔍 [EDIT BUTTON] 디버깅 정보:', {
-                  userId: user?.id,
+                  status,
+                  nextAuthUserId: user?.id,
+                  actualUserId: actualUserId,
                   questionUserId: question.user_id,
                   canEdit,
                   userType: typeof user?.id,
+                  actualUserType: typeof actualUserId,
                   questionUserType: typeof question.user_id,
-                  strictEqual: user?.id === question.user_id
+                  strictEqual: actualUserId === question.user_id
                 })
                 
                 // 본인이 작성한 질문인 경우에만 버튼 표시
@@ -917,7 +952,7 @@ export default function QuestionDetailPage() {
               <div className="flex items-center mb-4">
                 {(() => {
                   // 현재 로그인한 사용자의 프로필 정보 생성
-                  const userImage = user?.user_metadata?.avatar_url
+                  const userImage = (session?.user as any)?.image || session?.user?.image
                   let avatarUrl = userImage
                   
                   // LinkedIn 이미지인 경우 proxy 사용
@@ -925,23 +960,20 @@ export default function QuestionDetailPage() {
                     avatarUrl = `/api/image-proxy?url=${encodeURIComponent(avatarUrl)}`
                   }
                   
-                  const userName = user?.user_metadata?.full_name || user?.user_metadata?.name || '사용자'
+                  const userName = session?.user?.name || '사용자'
                   const displayName = getDisplayName(userName)
                   
                   return (
                     <>
                       <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3 overflow-hidden relative">
                         {avatarUrl && (
-                          <Image 
+                          <img 
                             src={avatarUrl} 
                             alt={displayName}
-                            width={32}
-                            height={32}
                             className="w-full h-full object-cover absolute inset-0 z-10"
                             onError={(e) => {
                               console.error('❌ [Answer Form Profile] 이미지 로드 실패:', avatarUrl)
                               e.currentTarget.style.display = 'none'
-                              e.stopPropagation()
                             }}
                             onLoad={() => {
                               console.log('✅ [Answer Form Profile] 이미지 로드 성공:', avatarUrl)
@@ -1038,12 +1070,13 @@ export default function QuestionDetailPage() {
                     </span>
                     {/* 본인이 작성한 답변인 경우 수정/삭제 버튼 표시 */}
                     {(() => {
-                      const canEditAnswer = user && feedback.user_id === user.id
+                      const canEditAnswer = status === 'authenticated' && actualUserId && feedback.user_id === actualUserId
                       console.log('🔍 [ANSWER EDIT BUTTON] 디버깅 정보:', {
-                        userId: user?.id,
+                        status,
+                        actualUserId: actualUserId,
                         feedbackUserId: feedback.user_id,
                         canEditAnswer,
-                        strictEqual: user?.id === feedback.user_id
+                        strictEqual: actualUserId === feedback.user_id
                       })
                       
                       // 본인이 작성한 답변인 경우에만 버튼 표시
@@ -1079,16 +1112,13 @@ export default function QuestionDetailPage() {
                         <>
                           <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center overflow-hidden relative">
                             {profileInfo.avatarUrl && (
-                              <Image 
+                              <img 
                                 src={profileInfo.avatarUrl} 
                                 alt={profileInfo.displayName}
-                                width={40}
-                                height={40}
                                 className="w-full h-full object-cover absolute inset-0 z-10"
                                 onError={(e) => {
                                   console.error('❌ [Feedback Profile Image] 이미지 로드 실패:', profileInfo.avatarUrl)
                                   e.currentTarget.style.display = 'none'
-                                  e.stopPropagation()
                                 }}
                                 onLoad={() => {
                                   console.log('✅ [Feedback Profile Image] 이미지 로드 성공:', profileInfo.avatarUrl)
