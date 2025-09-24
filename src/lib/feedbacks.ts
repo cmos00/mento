@@ -139,15 +139,6 @@ export async function updateFeedback(id: string, updates: Partial<Feedback>, use
   }
 
   try {
-    // 내용 길이 검증
-    if (updates.content && updates.content.trim().length < 10) {
-      console.error('❌ [updateFeedback] 내용이 너무 짧습니다:', { 
-        contentLength: updates.content.trim().length,
-        minLength: 10 
-      })
-      return null
-    }
-
     // 먼저 답변이 존재하고 사용자가 작성자인지 확인
     console.log('🔍 [updateFeedback] 답변 조회 시작:', { id })
     const { data: feedback, error: fetchError } = await supabase
@@ -178,6 +169,14 @@ export async function updateFeedback(id: string, updates: Partial<Feedback>, use
     }
 
     console.log('🔍 [updateFeedback] 권한 확인 완료, 업데이트 시작:', { id, updates })
+    
+    // 업데이트 데이터 로깅
+    console.log('🔍 [updateFeedback] 업데이트할 데이터:', {
+      content: updates.content,
+      contentLength: updates.content?.length,
+      userId: userId
+    })
+    
     const { data, error } = await supabase
       .from('feedbacks')
       .update(updates)
@@ -188,6 +187,12 @@ export async function updateFeedback(id: string, updates: Partial<Feedback>, use
 
     if (error) {
       console.error('❌ [updateFeedback] 피드백 수정 오류:', error)
+      console.error('❌ [updateFeedback] 오류 상세:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint
+      })
       return null
     }
 

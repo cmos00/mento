@@ -491,12 +491,6 @@ export default function QuestionDetailPage() {
   const handleEditFeedback = async () => {
     if (!editingFeedbackId || !editFeedbackContent.trim()) return
 
-    // 최소 길이 검증
-    if (editFeedbackContent.trim().length < 10) {
-      alert('답변은 최소 10자 이상 입력해주세요.')
-      return
-    }
-
     try {
       console.log('🔍 [Feedback Edit] 답변 수정 시작:', {
         editingFeedbackId,
@@ -1355,11 +1349,6 @@ export default function QuestionDetailPage() {
                         />
                             <div className="text-right text-sm text-gray-500 mt-2">
                               {editFeedbackContent.length}/2000
-                              {editFeedbackContent.trim().length < 10 && (
-                                <span className="text-red-500 ml-2">
-                                  (최소 10자 이상 입력해주세요)
-                                </span>
-                              )}
                             </div>
                         
                         <div className="flex items-center justify-between mt-4">
@@ -1371,7 +1360,7 @@ export default function QuestionDetailPage() {
                           </button>
                           <button
                             onClick={handleEditFeedback}
-                            disabled={!editFeedbackContent.trim() || editFeedbackContent.trim().length < 10}
+                            disabled={!editFeedbackContent.trim()}
                             className="px-6 py-2 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
                           >
                             <Send className="w-4 h-4 mr-2" />
