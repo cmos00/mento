@@ -6,8 +6,18 @@ import { authOptions } from '@/lib/auth'
 export async function POST(request: NextRequest) {
   try {
     // 세션 확인
+    console.log('🔍 [User Get API] 세션 조회 시작')
     const session = await getServerSession(authOptions)
+    console.log('🔍 [User Get API] 세션 조회 결과:', {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email,
+      userName: session?.user?.name
+    })
+    
     if (!session || !session.user) {
+      console.log('❌ [User Get API] 세션이 없거나 사용자 정보가 없음')
       return NextResponse.json(
         { error: '인증이 필요합니다.' },
         { status: 401 }
