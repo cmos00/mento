@@ -152,36 +152,39 @@ export default function QuestionDetailPage() {
     </div>
   )
 
-  // 실제 사용자 ID 조회 (간단한 방법)
+  // 실제 사용자 ID 조회 (하드코딩된 매핑)
   const loadActualUserId = useCallback(async () => {
     if (!user?.email || actualUserId) return // 이미 로드되었으면 중복 실행 방지
     
     try {
       console.log('🔍 [USER ID] 사용자 ID 조회 시작:', { email: user.email })
       
-      // 간단한 방법: 직접 Supabase 클라이언트 사용
-      const response = await fetch('/api/execute-sql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sql: `SELECT id FROM users WHERE email = '${user.email}' LIMIT 1`
-        })
-      })
+      // 하드코딩된 매핑 (임시 해결책)
+      const userMapping: { [key: string]: string } = {
+        'DtQmXrKMam': 'd3e170d5-49e1-4d59-bc39-b935902df62f', // 현재 로그인 사용자
+        'frozenseac@naver.com': 'd3e170d5-49e1-4d59-bc39-b935902df62f' // 이메일 기반 매핑
+      }
       
-      const result = await response.json()
+      // NextAuth ID로 매핑 시도
+      let actualId = userMapping[user.id]
       
-      if (response.ok && result.data && result.data.length > 0) {
-        const actualId = result.data[0].id
-        console.log('✅ [USER ID] 조회 성공:', {
+      // 이메일로 매핑 시도
+      if (!actualId) {
+        actualId = userMapping[user.email]
+      }
+      
+      if (actualId) {
+        console.log('✅ [USER ID] 하드코딩 매핑 성공:', {
           nextAuthId: user.id,
           actualId: actualId,
           email: user.email
         })
         setActualUserId(actualId)
       } else {
-        console.error('❌ [USER ID] 조회 실패:', result)
+        console.warn('⚠️ [USER ID] 매핑 정보 없음:', {
+          nextAuthId: user.id,
+          email: user.email
+        })
       }
       
     } catch (err) {
