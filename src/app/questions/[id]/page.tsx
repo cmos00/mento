@@ -32,6 +32,8 @@ export default function QuestionDetailPage() {
   const [editCategory, setEditCategory] = useState('')
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [editingFeedbackId, setEditingFeedbackId] = useState<string | null>(null)
+  const [editFeedbackContent, setEditFeedbackContent] = useState('')
 
   const questionId = params.id as string
 
@@ -287,7 +289,7 @@ export default function QuestionDetailPage() {
 
   // 질문 수정 함수
   const handleEditQuestion = async () => {
-    if (!user?.id || !question) return
+    if (!actualUserId || !question) return
 
     setIsEditing(true)
     try {
@@ -299,7 +301,8 @@ export default function QuestionDetailPage() {
         body: JSON.stringify({
           title: editTitle,
           content: editContent,
-          category: editCategory
+          category: editCategory,
+          actualUserId: actualUserId // Supabase ID 전달
         }),
       })
 
@@ -362,21 +365,35 @@ export default function QuestionDetailPage() {
     }
   }
 
-  // 답변 수정 함수
-  const handleEditFeedback = async (feedbackId: string) => {
+  // 답변 수정 시작
+  const startEditFeedback = (feedbackId: string) => {
     const feedback = feedbacks.find(f => f.id === feedbackId)
     if (!feedback) return
+    
+    setEditingFeedbackId(feedbackId)
+    setEditFeedbackContent(feedback.content)
+  }
 
-    const newContent = prompt('답변 내용을 수정하세요:', feedback.content)
-    if (!newContent || newContent.trim() === feedback.content.trim()) return
+  // 답변 수정 취소
+  const cancelEditFeedback = () => {
+    setEditingFeedbackId(null)
+    setEditFeedbackContent('')
+  }
+
+  // 답변 수정 완료
+  const handleEditFeedback = async () => {
+    if (!editingFeedbackId || !editFeedbackContent.trim()) return
 
     try {
-      const response = await fetch(`/api/feedbacks/${feedbackId}`, {
+      const response = await fetch(`/api/feedbacks/${editingFeedbackId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content: newContent }),
+        body: JSON.stringify({ 
+          content: editFeedbackContent.trim(),
+          actualUserId: actualUserId // Supabase ID 전달
+        }),
       })
 
       const result = await response.json()
@@ -387,6 +404,8 @@ export default function QuestionDetailPage() {
 
       // 성공 시 답변 목록 다시 로드
       await loadFeedbacks()
+      setEditingFeedbackId(null)
+      setEditFeedbackContent('')
       alert('답변이 수정되었습니다.')
     } catch (err) {
       console.error('답변 수정 오류:', err)
@@ -1081,7 +1100,7 @@ export default function QuestionDetailPage() {
                         return (
                           <div className="flex items-center space-x-1">
                             <button
-                              onClick={() => handleEditFeedback(feedback.id)}
+                              onClick={() => startEditFeedback(feedback.id)}
                               className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
                               title="수정"
                             >
@@ -1143,11 +1162,68 @@ export default function QuestionDetailPage() {
                     })()}
                   </div>
 
-                  {/* 답변 내용 */}
+                  {/* 답변 내용 또는 수정 폼 */}
                   <div className="ml-13 prose max-w-none">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {feedback.content}
-                    </p>
+                    {editingFeedbackId === feedback.id ? (
+                      /* 답변 수정 폼 */
+                      <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                        <div className="flex items-center mb-4">
+                          {(() => {
+                            const profileInfo = getFeedbackUserProfileInfo(feedback)
+                            return (
+                              <>
+                                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3 overflow-hidden relative">
+                                  {profileInfo.avatarUrl && (
+                                    <img 
+                                      src={profileInfo.avatarUrl} 
+                                      alt={profileInfo.displayName}
+                                      className="w-full h-full object-cover absolute inset-0 z-10"
+                                    />
+                                  )}
+                                  <div className="fallback-text w-full h-full bg-purple-400 text-white text-sm font-bold flex items-center justify-center absolute inset-0">
+                                    {profileInfo.displayName.charAt(0)}
+                                  </div>
+                                </div>
+                                <span className="font-medium text-gray-900">{profileInfo.displayName}</span>
+                              </>
+                            )
+                          })()}
+                        </div>
+                        
+                        <textarea
+                          value={editFeedbackContent}
+                          onChange={(e) => setEditFeedbackContent(e.target.value)}
+                          placeholder="도움이 되는 답변을 작성해주세요..."
+                          className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                          maxLength={2000}
+                        />
+                        <div className="text-right text-sm text-gray-500 mt-2">
+                          {editFeedbackContent.length}/2000
+                        </div>
+                        
+                        <div className="flex items-center justify-between mt-4">
+                          <button
+                            onClick={cancelEditFeedback}
+                            className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                          >
+                            취소
+                          </button>
+                          <button
+                            onClick={handleEditFeedback}
+                            disabled={!editFeedbackContent.trim()}
+                            className="px-6 py-2 bg-purple-500 text-white rounded-lg font-medium hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                          >
+                            <Send className="w-4 h-4 mr-2" />
+                            답변 수정
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      /* 답변 내용 */
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {feedback.content}
+                      </p>
+                    )}
                   </div>
 
                   {/* 추가 정보 (예시, 조언, 자료 등) */}

@@ -18,7 +18,7 @@ export async function PUT(
     }
 
     const feedbackId = params.id
-    const { content } = await request.json()
+    const { content, actualUserId } = await request.json()
 
     if (!content) {
       return NextResponse.json(
@@ -27,7 +27,10 @@ export async function PUT(
       )
     }
 
-    const result = await updateFeedback(feedbackId, { content })
+    // actualUserId가 제공되면 사용, 아니면 session.user.id 사용
+    const userId = actualUserId || session.user.id
+
+    const result = await updateFeedback(feedbackId, { content }, userId)
 
     if (!result) {
       return NextResponse.json(

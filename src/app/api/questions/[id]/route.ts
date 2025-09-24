@@ -18,7 +18,7 @@ export async function PUT(
     }
 
     const questionId = params.id
-    const { title, content, category } = await request.json()
+    const { title, content, category, actualUserId } = await request.json()
 
     if (!title || !content) {
       return NextResponse.json(
@@ -27,10 +27,13 @@ export async function PUT(
       )
     }
 
+    // actualUserId가 제공되면 사용, 아니면 session.user.id 사용
+    const userId = actualUserId || session.user.id
+
     const result = await updateQuestion(
       questionId,
       { title, content, category },
-      session.user.id
+      userId
     )
 
     if (!result.success) {

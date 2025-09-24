@@ -130,17 +130,35 @@ export async function getFeedbacksByUserId(userId: string): Promise<FeedbackWith
 }
 
 // 피드백 수정
-export async function updateFeedback(id: string, updates: Partial<Feedback>): Promise<Feedback | null> {
+export async function updateFeedback(id: string, updates: Partial<Feedback>, userId: string): Promise<Feedback | null> {
   if (!supabase) {
     console.error('Supabase client가 초기화되지 않았습니다.')
     return null
   }
 
   try {
+    // 먼저 답변이 존재하고 사용자가 작성자인지 확인
+    const { data: feedback, error: fetchError } = await supabase
+      .from('feedbacks')
+      .select('user_id')
+      .eq('id', id)
+      .single()
+
+    if (fetchError) {
+      console.error('답변 조회 오류:', fetchError)
+      return null
+    }
+
+    if (feedback.user_id !== userId) {
+      console.error('권한 없음: 본인이 작성한 답변만 수정할 수 있습니다.')
+      return null
+    }
+
     const { data, error } = await supabase
       .from('feedbacks')
       .update(updates)
       .eq('id', id)
+      .eq('user_id', userId) // 추가 보안: 사용자 ID도 확인
       .select()
       .single()
 
