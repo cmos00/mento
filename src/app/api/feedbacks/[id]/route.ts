@@ -8,9 +8,18 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    console.log('🔍 [Feedback PUT API] 요청 시작:', { feedbackId: params.id })
+    
     const session = await getServerSession(authOptions)
+    console.log('🔍 [Feedback PUT API] 세션 조회 결과:', {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email
+    })
     
     if (!session?.user?.id) {
+      console.log('❌ [Feedback PUT API] 세션이 없거나 사용자 정보가 없음')
       return NextResponse.json(
         { error: '로그인이 필요합니다.' },
         { status: 401 }
@@ -19,6 +28,13 @@ export async function PUT(
 
     const feedbackId = params.id
     const { content, actualUserId } = await request.json()
+    
+    console.log('🔍 [Feedback PUT API] 요청 데이터:', {
+      feedbackId,
+      content: content ? `${content.substring(0, 50)}...` : 'empty',
+      actualUserId,
+      sessionUserId: session.user.id
+    })
 
     if (!content) {
       return NextResponse.json(
@@ -29,8 +45,12 @@ export async function PUT(
 
     // actualUserId가 제공되면 사용, 아니면 session.user.id 사용
     const userId = actualUserId || session.user.id
+    
+    console.log('🔍 [Feedback PUT API] 사용할 userId:', { userId, source: actualUserId ? 'actualUserId' : 'session.user.id' })
 
     const result = await updateFeedback(feedbackId, { content }, userId)
+    
+    console.log('🔍 [Feedback PUT API] updateFeedback 결과:', { success: !!result, error: !result })
 
     if (!result) {
       return NextResponse.json(

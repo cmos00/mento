@@ -385,6 +385,12 @@ export default function QuestionDetailPage() {
     if (!editingFeedbackId || !editFeedbackContent.trim()) return
 
     try {
+      console.log('🔍 [Feedback Edit] 답변 수정 시작:', {
+        editingFeedbackId,
+        actualUserId,
+        contentLength: editFeedbackContent.length
+      })
+
       const response = await fetch(`/api/feedbacks/${editingFeedbackId}`, {
         method: 'PUT',
         headers: {
@@ -394,6 +400,11 @@ export default function QuestionDetailPage() {
           content: editFeedbackContent.trim(),
           actualUserId: actualUserId // Supabase ID 전달
         }),
+      })
+
+      console.log('🔍 [Feedback Edit] API 응답:', {
+        status: response.status,
+        ok: response.ok
       })
 
       const result = await response.json()
