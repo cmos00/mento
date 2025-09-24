@@ -413,6 +413,29 @@ export default function QuestionDetailPage() {
     }
   }
 
+  // 답변 디버깅 함수
+  const debugFeedback = async () => {
+    try {
+      console.log('🔍 [Debug Feedback] 답변 디버깅 시작')
+      
+      const response = await fetch('/api/debug-feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          feedbackId: 'e8794ea7-e79f-4fb2-92d6-74fd2e7d7255',
+          userId: actualUserId
+        }),
+      })
+      const result = await response.json()
+      console.log('🔍 [Debug Feedback] 응답:', result)
+      
+    } catch (err) {
+      console.error('Debug Feedback 오류:', err)
+    }
+  }
+
   // 테스트 API 호출 함수
   const testFeedbackAPI = async () => {
     try {
@@ -1031,6 +1054,12 @@ export default function QuestionDetailPage() {
             </button>
             
             {/* 테스트 버튼들 (임시) */}
+            <button
+              onClick={debugFeedback}
+              className="px-3 py-2 bg-orange-500 text-white rounded-lg text-sm hover:bg-orange-600 transition-colors mr-2"
+            >
+              답변 디버깅
+            </button>
             <button
               onClick={checkEnvironment}
               className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-colors mr-2"
