@@ -139,6 +139,15 @@ export async function updateFeedback(id: string, updates: Partial<Feedback>, use
   }
 
   try {
+    // 내용 길이 검증
+    if (updates.content && updates.content.trim().length < 10) {
+      console.error('❌ [updateFeedback] 내용이 너무 짧습니다:', { 
+        contentLength: updates.content.trim().length,
+        minLength: 10 
+      })
+      return null
+    }
+
     // 먼저 답변이 존재하고 사용자가 작성자인지 확인
     console.log('🔍 [updateFeedback] 답변 조회 시작:', { id })
     const { data: feedback, error: fetchError } = await supabase
