@@ -1,4 +1,3 @@
-# NextAuth 환경 변수 체크 API
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
