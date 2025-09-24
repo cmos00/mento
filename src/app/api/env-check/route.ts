@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
     const envVars = {
       NEXTAUTH_SECRET: !!process.env.NEXTAUTH_SECRET,
       NEXTAUTH_URL: !!process.env.NEXTAUTH_URL,
+      NEXTAUTH_URL_VALUE: process.env.NEXTAUTH_URL,
       LINKEDIN_CLIENT_ID: !!process.env.LINKEDIN_CLIENT_ID,
       LINKEDIN_CLIENT_SECRET: !!process.env.LINKEDIN_CLIENT_SECRET,
       NODE_ENV: process.env.NODE_ENV,
