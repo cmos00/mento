@@ -365,34 +365,19 @@ export default function QuestionDetailPage() {
     }
   }
 
-  // 테스트 API 호출 함수
-  const testFeedbackAPI = async () => {
+  // 간단한 세션 테스트 함수
+  const testSimpleSession = async () => {
     try {
-      console.log('🔍 [Test API] 테스트 시작')
+      console.log('🔍 [Simple Session Test] 테스트 시작')
       
-      // GET 요청으로 세션 상태 확인
-      const getResponse = await fetch('/api/test-feedback', {
+      const response = await fetch('/api/simple-session-test', {
         method: 'GET',
       })
-      const getResult = await getResponse.json()
-      console.log('🔍 [Test API] GET 응답:', getResult)
-      
-      // POST 요청으로 실제 데이터 전송 테스트
-      const postResponse = await fetch('/api/test-feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: '테스트 내용',
-          actualUserId: actualUserId
-        }),
-      })
-      const postResult = await postResponse.json()
-      console.log('🔍 [Test API] POST 응답:', postResult)
+      const result = await response.json()
+      console.log('🔍 [Simple Session Test] 응답:', result)
       
     } catch (err) {
-      console.error('Test API 오류:', err)
+      console.error('Simple Session Test 오류:', err)
     }
   }
 
@@ -982,7 +967,13 @@ export default function QuestionDetailPage() {
               {likeData ? `${likeData.count}개 좋아요` : '로딩 중...'}
             </button>
             
-            {/* 테스트 버튼 (임시) */}
+            {/* 테스트 버튼들 (임시) */}
+            <button
+              onClick={testSimpleSession}
+              className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition-colors mr-2"
+            >
+              세션 테스트
+            </button>
             <button
               onClick={testFeedbackAPI}
               className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors"
