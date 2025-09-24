@@ -157,28 +157,57 @@ export default function QuestionDetailPage() {
     if (!user?.email) return
     
     try {
+      console.log('🔍 [USER ID] 사용자 ID 조회 시작:', { email: user.email })
+      
+      // 방법 1: 기존 API 호출
       const response = await fetch('/api/user/get', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        // body에 email을 보내지 않음 - API에서 세션에서 직접 가져옴
       })
       
       const result = await response.json()
       
       if (response.ok && result.user) {
-        console.log('🔍 [USER ID] 실제 사용자 ID 조회 성공:', {
+        console.log('✅ [USER ID] API 조회 성공:', {
           nextAuthId: user.id,
           actualId: result.user.id,
           email: user.email
         })
         setActualUserId(result.user.id)
-      } else {
-        console.warn('⚠️ [USER ID] 실제 사용자 ID 조회 실패:', result)
+        return
       }
+      
+      console.warn('⚠️ [USER ID] API 조회 실패, 직접 Supabase 조회 시도:', result)
+      
+      // 방법 2: 직접 Supabase 조회 (임시 해결책)
+      const directResponse = await fetch('/api/execute-sql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: `SELECT id FROM users WHERE email = '${user.email}' LIMIT 1`
+        })
+      })
+      
+      const directResult = await directResponse.json()
+      
+      if (directResponse.ok && directResult.data && directResult.data.length > 0) {
+        const actualId = directResult.data[0].id
+        console.log('✅ [USER ID] 직접 조회 성공:', {
+          nextAuthId: user.id,
+          actualId: actualId,
+          email: user.email
+        })
+        setActualUserId(actualId)
+      } else {
+        console.error('❌ [USER ID] 모든 방법 실패:', directResult)
+      }
+      
     } catch (err) {
-      console.error('❌ [USER ID] 실제 사용자 ID 조회 오류:', err)
+      console.error('❌ [USER ID] 사용자 ID 조회 오류:', err)
     }
   }, [user?.email])
 
