@@ -381,6 +381,22 @@ export default function QuestionDetailPage() {
     }
   }
 
+  // 환경 변수 체크 함수
+  const checkEnvironment = async () => {
+    try {
+      console.log('🔍 [Env Check] 환경 변수 체크 시작')
+      
+      const response = await fetch('/api/env-check', {
+        method: 'GET',
+      })
+      const result = await response.json()
+      console.log('🔍 [Env Check] 응답:', result)
+      
+    } catch (err) {
+      console.error('Env Check 오류:', err)
+    }
+  }
+
   // 답변 수정 시작
   const startEditFeedback = (feedbackId: string) => {
     const feedback = feedbacks.find(f => f.id === feedbackId)
@@ -968,6 +984,12 @@ export default function QuestionDetailPage() {
             </button>
             
             {/* 테스트 버튼들 (임시) */}
+            <button
+              onClick={checkEnvironment}
+              className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-colors mr-2"
+            >
+              환경변수 체크
+            </button>
             <button
               onClick={testSimpleSession}
               className="px-3 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition-colors mr-2"
