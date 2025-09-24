@@ -397,6 +397,22 @@ export default function QuestionDetailPage() {
     }
   }
 
+  // 세션 디버깅 함수
+  const debugSession = async () => {
+    try {
+      console.log('🔍 [Session Debug] 세션 디버깅 시작')
+      
+      const response = await fetch('/api/session-debug', {
+        method: 'GET',
+      })
+      const result = await response.json()
+      console.log('🔍 [Session Debug] 응답:', result)
+      
+    } catch (err) {
+      console.error('Session Debug 오류:', err)
+    }
+  }
+
   // 테스트 API 호출 함수
   const testFeedbackAPI = async () => {
     try {
@@ -1020,6 +1036,12 @@ export default function QuestionDetailPage() {
               className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-colors mr-2"
             >
               환경변수 체크
+            </button>
+            <button
+              onClick={debugSession}
+              className="px-3 py-2 bg-purple-500 text-white rounded-lg text-sm hover:bg-purple-600 transition-colors mr-2"
+            >
+              세션 디버깅
             </button>
             <button
               onClick={testSimpleSession}
