@@ -318,9 +318,31 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   
+  // NextAuth URL 설정 강제
+  secret: process.env.NEXTAUTH_SECRET,
+  
   cookies: {
     sessionToken: {
       name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        domain: undefined // 명시적으로 도메인 제한 없음
+      }
+    },
+    callbackUrl: {
+      name: `next-auth.callback-url`,
+      options: {
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    },
+    csrfToken: {
+      name: `next-auth.csrf-token`,
       options: {
         httpOnly: true,
         sameSite: 'lax',
