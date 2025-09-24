@@ -365,13 +365,35 @@ export default function QuestionDetailPage() {
     }
   }
 
-  // 답변 수정 시작
-  const startEditFeedback = (feedbackId: string) => {
-    const feedback = feedbacks.find(f => f.id === feedbackId)
-    if (!feedback) return
-    
-    setEditingFeedbackId(feedbackId)
-    setEditFeedbackContent(feedback.content)
+  // 테스트 API 호출 함수
+  const testFeedbackAPI = async () => {
+    try {
+      console.log('🔍 [Test API] 테스트 시작')
+      
+      // GET 요청으로 세션 상태 확인
+      const getResponse = await fetch('/api/test-feedback', {
+        method: 'GET',
+      })
+      const getResult = await getResponse.json()
+      console.log('🔍 [Test API] GET 응답:', getResult)
+      
+      // POST 요청으로 실제 데이터 전송 테스트
+      const postResponse = await fetch('/api/test-feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: '테스트 내용',
+          actualUserId: actualUserId
+        }),
+      })
+      const postResult = await postResponse.json()
+      console.log('🔍 [Test API] POST 응답:', postResult)
+      
+    } catch (err) {
+      console.error('Test API 오류:', err)
+    }
   }
 
   // 답변 수정 취소
@@ -949,6 +971,14 @@ export default function QuestionDetailPage() {
                 }`} 
               />
               {likeData ? `${likeData.count}개 좋아요` : '로딩 중...'}
+            </button>
+            
+            {/* 테스트 버튼 (임시) */}
+            <button
+              onClick={testFeedbackAPI}
+              className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors"
+            >
+              API 테스트
             </button>
           </div>
         </div>
