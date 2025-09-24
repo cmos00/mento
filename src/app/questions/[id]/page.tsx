@@ -166,7 +166,7 @@ export default function QuestionDetailPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: `SELECT id FROM users WHERE email = '${user.email}' LIMIT 1`
+          sql: `SELECT id FROM users WHERE email = '${user.email}' LIMIT 1`
         })
       })
       
