@@ -131,29 +131,44 @@ export async function getFeedbacksByUserId(userId: string): Promise<FeedbackWith
 
 // 피드백 수정
 export async function updateFeedback(id: string, updates: Partial<Feedback>, userId: string): Promise<Feedback | null> {
+  console.log('🔍 [updateFeedback] 함수 시작:', { id, updates, userId })
+  
   if (!supabase) {
-    console.error('Supabase client가 초기화되지 않았습니다.')
+    console.error('❌ [updateFeedback] Supabase client가 초기화되지 않았습니다.')
     return null
   }
 
   try {
     // 먼저 답변이 존재하고 사용자가 작성자인지 확인
+    console.log('🔍 [updateFeedback] 답변 조회 시작:', { id })
     const { data: feedback, error: fetchError } = await supabase
       .from('feedbacks')
-      .select('user_id')
+      .select('user_id, content')
       .eq('id', id)
       .single()
 
     if (fetchError) {
-      console.error('답변 조회 오류:', fetchError)
+      console.error('❌ [updateFeedback] 답변 조회 오류:', fetchError)
       return null
     }
+
+    console.log('🔍 [updateFeedback] 답변 조회 성공:', { 
+      feedbackUserId: feedback.user_id, 
+      requestUserId: userId,
+      isOwner: feedback.user_id === userId
+    })
 
     if (feedback.user_id !== userId) {
-      console.error('권한 없음: 본인이 작성한 답변만 수정할 수 있습니다.')
+      console.error('❌ [updateFeedback] 권한 없음: 본인이 작성한 답변만 수정할 수 있습니다.')
+      console.error('❌ [updateFeedback] 권한 비교:', {
+        feedbackUserId: feedback.user_id,
+        requestUserId: userId,
+        match: feedback.user_id === userId
+      })
       return null
     }
 
+    console.log('🔍 [updateFeedback] 권한 확인 완료, 업데이트 시작:', { id, updates })
     const { data, error } = await supabase
       .from('feedbacks')
       .update(updates)
@@ -163,13 +178,14 @@ export async function updateFeedback(id: string, updates: Partial<Feedback>, use
       .single()
 
     if (error) {
-      console.error('피드백 수정 오류:', error)
+      console.error('❌ [updateFeedback] 피드백 수정 오류:', error)
       return null
     }
 
+    console.log('✅ [updateFeedback] 피드백 수정 성공:', data)
     return data
   } catch (err) {
-    console.error('피드백 수정 중 예외:', err)
+    console.error('❌ [updateFeedback] 피드백 수정 중 예외:', err)
     return null
   }
 }
