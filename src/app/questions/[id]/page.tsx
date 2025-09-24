@@ -178,7 +178,7 @@ export default function QuestionDetailPage() {
     } catch (err) {
       console.error('❌ [USER ID] 사용자 ID 설정 오류:', err)
     }
-  }, [actualUserId]) // actualUserId만 의존성에 추가
+  }, [user?.email, user?.id, actualUserId]) // 의존성 추가
 
   const loadQuestion = useCallback(async () => {
     try {
@@ -285,7 +285,7 @@ export default function QuestionDetailPage() {
         isLiked: false
       })
     }
-  }, [questionId, user?.id])
+  }, [questionId, user?.id, user?.email])
 
   // 질문 수정 함수
   const handleEditQuestion = async () => {
@@ -394,6 +394,15 @@ export default function QuestionDetailPage() {
     } catch (err) {
       console.error('Test API 오류:', err)
     }
+  }
+
+  // 답변 수정 시작
+  const startEditFeedback = (feedbackId: string) => {
+    const feedback = feedbacks.find(f => f.id === feedbackId)
+    if (!feedback) return
+    
+    setEditingFeedbackId(feedbackId)
+    setEditFeedbackContent(feedback.content)
   }
 
   // 답변 수정 취소
