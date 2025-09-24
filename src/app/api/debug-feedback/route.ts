@@ -8,15 +8,14 @@ export async function POST(request: NextRequest) {
     
     console.log('🔍 [Debug Feedback] 요청 데이터:', { feedbackId, userId })
     
-    // 직접 SQL 쿼리로 답변 조회
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/feedbacks`, {
+    // 직접 SQL 쿼리로 특정 답변 조회
+    const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/feedbacks?id=eq.${feedbackId}`, {
       method: 'GET',
       headers: {
         'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
         'Content-Type': 'application/json'
-      },
-      // URL에 쿼리 파라미터 추가
+      }
     })
     
     const data = await response.text()

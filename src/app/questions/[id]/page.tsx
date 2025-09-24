@@ -418,13 +418,18 @@ export default function QuestionDetailPage() {
     try {
       console.log('🔍 [Debug Feedback] 답변 디버깅 시작')
       
+      // 실제 답변 ID 사용 (첫 번째 답변)
+      const feedbackId = feedbacks.length > 0 ? feedbacks[0].id : 'e8794ea7-e79f-4fb2-92d6-74fd2e7d7255'
+      
+      console.log('🔍 [Debug Feedback] 사용할 답변 ID:', feedbackId)
+      
       const response = await fetch('/api/debug-feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          feedbackId: 'e8794ea7-e79f-4fb2-92d6-74fd2e7d7255',
+          feedbackId: feedbackId,
           userId: actualUserId
         }),
       })
