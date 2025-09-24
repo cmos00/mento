@@ -152,37 +152,15 @@ export default function QuestionDetailPage() {
     </div>
   )
 
-  // 실제 사용자 ID 조회
+  // 실제 사용자 ID 조회 (간단한 방법)
   const loadActualUserId = useCallback(async () => {
-    if (!user?.email) return
+    if (!user?.email || actualUserId) return // 이미 로드되었으면 중복 실행 방지
     
     try {
       console.log('🔍 [USER ID] 사용자 ID 조회 시작:', { email: user.email })
       
-      // 방법 1: 기존 API 호출
-      const response = await fetch('/api/user/get', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      
-      const result = await response.json()
-      
-      if (response.ok && result.user) {
-        console.log('✅ [USER ID] API 조회 성공:', {
-          nextAuthId: user.id,
-          actualId: result.user.id,
-          email: user.email
-        })
-        setActualUserId(result.user.id)
-        return
-      }
-      
-      console.warn('⚠️ [USER ID] API 조회 실패, 직접 Supabase 조회 시도:', result)
-      
-      // 방법 2: 직접 Supabase 조회 (임시 해결책)
-      const directResponse = await fetch('/api/execute-sql', {
+      // 간단한 방법: 직접 Supabase 클라이언트 사용
+      const response = await fetch('/api/execute-sql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -192,24 +170,24 @@ export default function QuestionDetailPage() {
         })
       })
       
-      const directResult = await directResponse.json()
+      const result = await response.json()
       
-      if (directResponse.ok && directResult.data && directResult.data.length > 0) {
-        const actualId = directResult.data[0].id
-        console.log('✅ [USER ID] 직접 조회 성공:', {
+      if (response.ok && result.data && result.data.length > 0) {
+        const actualId = result.data[0].id
+        console.log('✅ [USER ID] 조회 성공:', {
           nextAuthId: user.id,
           actualId: actualId,
           email: user.email
         })
         setActualUserId(actualId)
       } else {
-        console.error('❌ [USER ID] 모든 방법 실패:', directResult)
+        console.error('❌ [USER ID] 조회 실패:', result)
       }
       
     } catch (err) {
       console.error('❌ [USER ID] 사용자 ID 조회 오류:', err)
     }
-  }, [user?.email])
+  }, [user?.email, actualUserId]) // actualUserId를 의존성에 추가하여 중복 실행 방지
 
   const loadQuestion = useCallback(async () => {
     try {
@@ -579,9 +557,10 @@ export default function QuestionDetailPage() {
   // 실제 사용자 ID 로드 (한 번만 실행)
   useEffect(() => {
     if (status === 'authenticated' && user?.email && !actualUserId) {
+      console.log('🔍 [USE EFFECT] actualUserId 로드 시작')
       loadActualUserId()
     }
-  }, [status, user?.email, actualUserId])
+  }, [status, user?.email, actualUserId, loadActualUserId])
 
   // 세션이 로드된 후 좋아요 데이터 로드 (중복 제거)
   useEffect(() => {
