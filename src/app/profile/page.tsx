@@ -379,7 +379,6 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Tabs */}
