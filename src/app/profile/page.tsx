@@ -307,35 +307,73 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Quick Actions */}
+            {/* 컨텐츠 영역 */}
             <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">빠른 액션</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">내 계정 관리</h3>
               <div className="space-y-3">
-                <Link href="/questions/new">
-                  <button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center justify-center">
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    새 질문 작성
-                  </button>
-                </Link>
+                <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-between">
+                  <div className="flex items-center">
+                    <MessageSquare className="w-5 h-5 mr-3" />
+                    내 질문/답변 관리
+                  </div>
+                  <span className="text-gray-400">→</span>
+                </button>
                 
-                <Link href="/coffee">
-                  <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
-                    <Coffee className="w-5 h-5 mr-2" />
-                    커피쿠폰 관리
-                  </button>
-                </Link>
+                <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Users className="w-5 h-5 mr-3" />
+                    멘토링 내역 관리
+                  </div>
+                  <span className="text-gray-400">→</span>
+                </button>
                 
-                <Link href="/journal/new">
-                  <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
-                    <BookOpen className="w-5 h-5 mr-2" />
-                    저널 작성
+                <Link href="/journal">
+                  <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-between">
+                    <div className="flex items-center">
+                      <BookOpen className="w-5 h-5 mr-3" />
+                      내 저널 관리
+                    </div>
+                    <span className="text-gray-400">→</span>
                   </button>
                 </Link>
                 
                 <Link href="/profile/edit">
-                  <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
-                    <Settings className="w-5 h-5 mr-2" />
-                    프로필 편집
+                  <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Settings className="w-5 h-5 mr-3" />
+                      프로필 편집
+                    </div>
+                    <span className="text-gray-400">→</span>
+                  </button>
+                </Link>
+
+            {/* 커피 쿠폰 영역 */}
+            <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">커피 쿠폰 관리</h3>
+              <div className="space-y-3">
+                <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Coffee className="w-5 h-5 mr-3" />
+                    받은 쿠폰 내역
+                  </div>
+                  <span className="text-gray-400">→</span>
+                </button>
+                
+                <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Coffee className="w-5 h-5 mr-3" />
+                    보낸 쿠폰 내역
+                  </div>
+                  <span className="text-gray-400">→</span>
+                </button>
+                
+                <Link href="/coffee/charge">
+                  <button className="w-full border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Coffee className="w-5 h-5 mr-3" />
+                      충전 내역
+                    </div>
+                    <span className="text-gray-400">→</span>
                   </button>
                 </Link>
               </div>
