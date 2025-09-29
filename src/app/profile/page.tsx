@@ -475,7 +475,7 @@ export default function ProfilePage() {
                   <div className="relative inline-block">
                   {user?.image && !imageError ? (
                     <img
-                      src={getImageUrl(user.image)}
+                      src={getImageUrl(user.image) || ''}
                       alt={getDisplayName(user.name || '사용자')}  
                       className="w-24 h-24 rounded-full object-cover border-4 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
                       onError={() => {
@@ -505,7 +505,10 @@ export default function ProfilePage() {
                         원본: {user.image.length > 30 ? user.image.substring(0, 30) + '...' : user.image}
                       </div>
                       <div className="truncate">
-                        처리: {getImageUrl(user.image)?.length > 30 ? getImageUrl(user.image)!.substring(0, 30) + '...' : getImageUrl(user.image)}
+                        처리: {(() => {
+                          const processedUrl = getImageUrl(user.image);
+                          return processedUrl && processedUrl.length > 30 ? processedUrl.substring(0, 30) + '...' : processedUrl;
+                        })()}
                       </div>
                     </div>
                   )}
