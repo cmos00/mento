@@ -467,7 +467,24 @@ export default function QuestionDetailPage() {
         }),
       })
       const result = await response.json()
-      console.log('🔍 [Debug Feedback Update] 응답:', result)
+      
+      console.log('🔍 [Debug Feedback Update] 응답 전체:', result)
+      
+      if (result.error) {
+        console.log('❌ [Debug Feedback Update] 오류 상세:', {
+          error: result.error,
+          code: result.details?.code,
+          message: result.details?.message,
+          details: result.details?.details,
+          hint: result.details?.hint
+        })
+        
+        // 각 속성을 개별적으로 출력
+        console.log('❌ 오류 코드:', result.details?.code)
+        console.log('❌ 오류 메시지:', result.details?.message)
+        console.log('❌ 오류 세부사항:', result.details?.details)
+        console.log('❌ 힌트:', result.details?.hint)
+      }
       
     } catch (err) {
       console.error('Debug Feedback Update 오류:', err)
