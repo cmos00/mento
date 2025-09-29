@@ -24,7 +24,29 @@ export default function ProfilePage() {
   const { data: session, status } = useSession()
   const [dbUser, setDbUser] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('overview')
+  const [imageError, setImageError] = useState(false)
   const user = dbUser || session?.user
+
+  // 이미지 URL 처리 함수
+  const getImageUrl = (imageUrl: string) => {
+    if (!imageUrl) return null
+    
+    // LinkedIn 이미지인 경우 프록시 사용
+    if (imageUrl.includes('media.licdn.com')) {
+      return `/api/image-proxy?url=${encodeURIComponent(imageUrl)}`
+    }
+    
+    return imageUrl
+  }
+
+  console.log('🔍 [Profile Page] 사용자 정보:', {
+    session,
+    dbUser,
+    finalUser: user,
+    userImage: user?.image,
+    userEmail: user?.email,
+    provider: (user as any)?.provider
+  })
 
   // 탭 목록
   const tabs = [
@@ -447,20 +469,47 @@ export default function ProfilePage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky space-y-6">
               {/* 프로필 헤더 */}
               <div className="text-center">
-                <div className="relative inline-block mb-4">
-                  {user?.image ? (
+                {/* 백그라운드 원형 장식 */}
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-20 scale-110"></div>
+                  <div className="relative inline-block">
+                  {user?.image && !imageError ? (
                     <img
-                      src={user.image}
+                      src={getImageUrl(user.image)}
                       alt={getDisplayName(user.name || '사용자')}  
-                      className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+                      onError={() => {
+                        console.log('❌ [Profile Page] 이미지 로드 실패:', user.image)
+                        setImageError(true)
+                      }}
+                      onLoad={() => {
+                        console.log('✅ [Profile Page] 이미지 로드 성공:', user.image)
+                        setImageError(false)
+                      }}
                     />
                   ) : (
-                    <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
+                    <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-4 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
                       <span className="text-2xl font-bold text-white">
                         {getDisplayName(user?.name || '사용자').charAt(0)}
                       </span>
                     </div>
                   )}
+                  
+                  {/* 이미지 디버깅 정보 */}
+                  {user?.image && (
+                    <div className="mt-2 text-xs text-gray-500 max-w-48">
+                      <div className="mb-1">
+                        상태: {imageError ? '❌ 로드 실패' : '✅ 로드됨'}
+                      </div>
+                      <div className="truncate">
+                        원본: {user.image.length > 30 ? user.image.substring(0, 30) + '...' : user.image}
+                      </div>
+                      <div className="truncate">
+                        처리: {getImageUrl(user.image)?.length > 30 ? getImageUrl(user.image)!.substring(0, 30) + '...' : getImageUrl(user.image)}
+                      </div>
+                    </div>
+                  )}
+                  </div>
                 </div>
                 
                 <h1 className="text-xl font-bold text-gray-900 mb-1">
