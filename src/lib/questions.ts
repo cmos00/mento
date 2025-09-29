@@ -380,12 +380,10 @@ export async function getAllQuestionsWithStats() {
   }
 }
 
-// 인기 질문 조회 (120시간 기준 트렌딩 스코어로 정렬)
+// 인기 질문 조회 (트렌딩 스코어로 정렬)
 export async function getTrendingQuestions(limit: number = 3) {
   try {
-    // 최근 120시간 동안의 통계를 계산
-    const fiveDaysAgo = new Date()
-    fiveDaysAgo.setTime(fiveDaysAgo.getTime() - (120 * 60 * 60 * 1000))
+    console.log('🔍 [Trending Questions] 트렌딩 질문 조회 시작:', { limit })
     
     const { data: questions, error } = await supabase
       .from('questions')
@@ -402,38 +400,62 @@ export async function getTrendingQuestions(limit: number = 3) {
         )
       `)
       .eq('status', 'active')
-      .gte('created_at', fiveDaysAgo.toISOString())
       .order('created_at', { ascending: false })
+      .limit(50) // 최근 50개 질문중에서 트렌딩 스코어 계산
 
     if (error) {
       console.error('인기 질문 조회 오류:', error)
       throw new Error(error.message)
     }
 
+    console.log('🔍 [Trending Questions] 질문 조회 성공:', { count: questions?.length })
+    
     // 각 질문별로 트렌딩 스코어 계산
     const questionsWithTrendingScore = await Promise.all(
       (questions || []).map(async (question) => {
-        const { data: answerCount } = await getAnswerCountByQuestionId(question.id)
-        const { data: recentAnswerCount } = await getRecentAnswerCount(question.id, 120) // 120시간 이내 답변 수
-        
-        // 트렌딩 스코어 계산 (댓글 > 좋아요 > 조회수 순)
-        const viewsWeight = 1        // 조회수: 1배 가중치
-        const likesWeight = 3        // 좋아요: 3배 가중치  
-        const answersWeight = 5      // 댓글(답변): 5배 가중치
-        
-        const views = question.views || 0
-        const totalAnswers = answerCount || 0
-        const likes = 0 // TODO: 좋아요 수 구현 후 실제 값으로 변경
-        
-        const trendingScore = (views * viewsWeight) + 
-                            (likes * likesWeight) + 
-                            (totalAnswers * answersWeight)
+        try {
+          console.log('🔍 [Trending Questions] 질문 스코어 계산:', { questionId: question.id })
+          
+          // 답변 수 조회 (fallback 포함)
+          let answerCount = 0
+          try {
+            const answerResult = await getAnswerCountByQuestionId(question.id)
+            answerCount = answerResult.data || 0
+            console.log('🔍 [Trending Questions] 답변 수:', { questionId: question.id, answerCount })
+          } catch (err) {
+            console.warn('⚠️ [Trending Questions] 답변 수 조회 실패, 기본값 사용:', question.id)
+            answerCount = 0
+          }
+          
+          // 트렌딩 스코어 계산 (조회수와 답변 수 기반)
+          const views = question.views || 0
+          const viewsWeight = 1        // 조회수: 1배 가중치
+          const answersWeight = 5     // 답변: 5배 가중치
+          
+          const trendingScore = (views * viewsWeight) + (answerCount * answersWeight)
+          
+          console.log('🔍 [Trending Questions] 스코어 계산:', { 
+            questionId: question.id, 
+            views, 
+            answerCount, 
+            trendingScore 
+          })
 
-        return {
-          ...question,
-          answerCount: totalAnswers,
-          recentAnswerCount: recentAnswerCount || 0,
-          trendingScore
+          return {
+            ...question,
+            answerCount,
+            recentAnswerCount: 0, // 일단 0으로 설정
+            trendingScore
+          }
+        } catch (err) {
+          console.error('❌ [Trending Questions] 질문 스코어 계산 실패:', question.id, err)
+          // 오류가 발생한 경우 기본 값으로 반환
+          return {
+            ...question,
+            answerCount: 0,
+            recentAnswerCount: 0,
+            trendingScore: question.views || 0
+          }
         }
       })
     )
@@ -442,6 +464,11 @@ export async function getTrendingQuestions(limit: number = 3) {
     const trendingQuestions = questionsWithTrendingScore
       .sort((a, b) => b.trendingScore - a.trendingScore)
       .slice(0, limit)
+
+    console.log('✅ [Trending Questions] 트렌딩 질문 완료:', { 
+      totalCount: questionsWithTrendingScore.length,
+      trendingCount: trendingQuestions.length 
+    })
 
     return { data: trendingQuestions, error: null }
   } catch (error) {

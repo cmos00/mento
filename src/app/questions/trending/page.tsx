@@ -103,7 +103,7 @@ export default function TrendingQuestionsPage() {
                   인기 질문 모아보기
                 </h1>
                 <p className="text-lg text-gray-600">
-                  최근 24시간 동안 가장 활발하게 논의되고 있는 질문들입니다
+                  가장 활발하게 논의되고 있는 질문들입니다
                 </p>
               </div>
             </div>
