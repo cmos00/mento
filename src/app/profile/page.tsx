@@ -209,7 +209,7 @@ export default function ProfilePage() {
                 <div className="border-l-4 border-blue-500 pl-4 py-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium text-gray-900">질문 작성: "업무와 개인 생활의 균형점은?"</p>
+                      <p className="font-medium text-gray-900">질문 작성: &ldquo;업무와 개인 생활의 균형점은?&rdquo;</p>
                       <p className="text-sm text-gray-600 mt-1">팀 빌딩 관련 질문</p>
                     </div>
                     <span className="text-xs text-gray-500">2일 전</span>
@@ -219,7 +219,7 @@ export default function ProfilePage() {
                 <div className="border-l-4 border-green-500 pl-4 py-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium text-gray-900">답변 작성: "프로젝트 관리 방법 질문에 답변"</p>
+                      <p className="font-medium text-gray-900">답변 작성: &ldquo;프로젝트 관리 방법 질문에 답변&rdquo;</p>
                       <p className="text-sm text-gray-600 mt-1">3개 좋아요 받음</p>
                     </div>
                     <span className="text-xs text-gray-500">3일 전</span>
@@ -229,7 +229,7 @@ export default function ProfilePage() {
                 <div className="border-l-4 border-purple-500 pl-4 py-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium text-gray-900">저널 작성: "현재 업무에 대한 생각"</p>
+                      <p className="font-medium text-gray-900">저널 작성: &ldquo;현재 업무에 대한 생각&rdquo;</p>
                       <p className="text-sm text-gray-600 mt-1">개인 성찰</p>
                     </div>
                     <span className="text-xs text-gray-500">1주 전</span>
@@ -250,7 +250,7 @@ export default function ProfilePage() {
                 <div className="space-y-3">
                   <div className="border border-gray-200 rounded-lg p-3">
                     <h4 className="font-medium text-gray-900 mb-1">업무와 개인 생활의 균형점은?</h4>
-                    <p className="text-sm text-gray-600 mb-2">팀 빌ding 관련 질문</p>
+                    <p className="text-sm text-gray-600 mb-2">팀 빌딩 관련 질문</p>
                     <div className="flex justify-between text-xs text-gray-500">
                       <span>2일 전</span>
                       <span>5 답변</span>
