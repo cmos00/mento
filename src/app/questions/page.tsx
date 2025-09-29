@@ -650,14 +650,11 @@ export default function QuestionsPage() {
 
         {/* Trending Questions Section */}
         <div id="trending-questions-section" className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4">
             <h2 className="text-xl font-bold text-gray-900 flex items-center">
               <TrendingUp className="w-5 h-5 text-purple-500 mr-2" />
               인기 질문
             </h2>
-            <Link href="/questions/trending" className="text-purple-600 hover:text-purple-700 font-medium">
-              더보기 →
-            </Link>
           </div>
           <div id="trending-questions-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
             {trendingQuestions.length > 0 ? trendingQuestions.map((question, index) => (
