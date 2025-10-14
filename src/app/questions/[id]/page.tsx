@@ -541,10 +541,23 @@ export default function QuestionDetailPage() {
   const handleEditFeedback = async () => {
     if (!editingFeedbackId || !editFeedbackContent.trim()) return
 
+    // actualUserId가 없으면 다시 로드 시도
+    if (!actualUserId && user?.email) {
+      console.log('⚠️ [Feedback Edit] actualUserId가 없음, 재로드 시도')
+      await loadActualUserId()
+      
+      // 재로드 후에도 없으면 중단
+      if (!actualUserId) {
+        alert('사용자 정보를 불러올 수 없습니다. 다시 로그인해주세요.')
+        return
+      }
+    }
+
     try {
       console.log('🔍 [Feedback Edit] 답변 수정 시작:', {
         editingFeedbackId,
         actualUserId,
+        hasActualUserId: !!actualUserId,
         contentLength: editFeedbackContent.length
       })
 
@@ -567,6 +580,7 @@ export default function QuestionDetailPage() {
       const result = await response.json()
 
       if (!response.ok) {
+        console.error('❌ [Feedback Edit] API 에러:', result)
         throw new Error(result.error || '답변 수정 중 오류가 발생했습니다.')
       }
 
@@ -576,7 +590,7 @@ export default function QuestionDetailPage() {
       setEditFeedbackContent('')
       alert('답변이 수정되었습니다.')
     } catch (err) {
-      console.error('답변 수정 오류:', err)
+      console.error('❌ [Feedback Edit] 답변 수정 오류:', err)
       alert(err instanceof Error ? err.message : '답변 수정 중 오류가 발생했습니다.')
     }
   }
