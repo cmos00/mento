@@ -154,16 +154,27 @@ export async function updateFeedback(id: string, updates: Partial<Feedback>, use
 
     console.log('🔍 [updateFeedback] 답변 조회 성공:', { 
       feedbackUserId: feedback.user_id, 
+      feedbackUserIdType: typeof feedback.user_id,
       requestUserId: userId,
-      isOwner: feedback.user_id === userId
+      requestUserIdType: typeof userId,
+      isOwner: feedback.user_id === userId,
+      strictEqual: feedback.user_id === userId,
+      looseEqual: feedback.user_id == userId,
+      stringCompare: String(feedback.user_id) === String(userId)
     })
 
-    if (feedback.user_id !== userId) {
+    // 문자열로 명시적 변환하여 비교
+    const feedbackUserIdStr = String(feedback.user_id)
+    const requestUserIdStr = String(userId)
+    
+    if (feedbackUserIdStr !== requestUserIdStr) {
       console.error('❌ [updateFeedback] 권한 없음: 본인이 작성한 답변만 수정할 수 있습니다.')
       console.error('❌ [updateFeedback] 권한 비교:', {
         feedbackUserId: feedback.user_id,
+        feedbackUserIdStr,
         requestUserId: userId,
-        match: feedback.user_id === userId
+        requestUserIdStr,
+        match: feedbackUserIdStr === requestUserIdStr
       })
       return null
     }
