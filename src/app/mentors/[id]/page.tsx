@@ -222,12 +222,12 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-gray-600">
-                      <Clock className="w-4 h-4 mr-2" />
-                      <span>시간당 {mentor.hourly_rate > 0 ? `${mentor.hourly_rate.toLocaleString()}원` : '문의'}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
                       <Calendar className="w-4 h-4 mr-2" />
                       <span>{mentor.is_available ? '상담 가능' : '상담 불가'}</span>
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <Coffee className="w-4 h-4 mr-2" />
+                      <span>커피 쿠폰으로 감사 표현</span>
                     </div>
                   </div>
                 </div>
