@@ -37,6 +37,17 @@
     position: relative;
   }
 
+  /* 데스크톱 모드 강제 스타일 */
+  body.desktop-mode {
+    min-width: 1280px !important;
+    overflow-x: auto !important;
+  }
+
+  html:has(body.desktop-mode) {
+    min-width: 1280px !important;
+    overflow-x: auto !important;
+  }
+
   /* 모든 컨테이너가 화면을 벗어나지 않도록 설정 */
   .container, .max-w-6xl, .max-w-4xl, .max-w-2xl {
     width: 100%;

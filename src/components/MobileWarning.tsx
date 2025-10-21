@@ -12,6 +12,15 @@ export default function MobileWarning() {
     const userPreference = localStorage.getItem('viewMode')
     if (userPreference === 'desktop') {
       setShowDesktop(true)
+      
+      // 뷰포트 설정 즉시 적용
+      const viewport = document.querySelector('meta[name=viewport]')
+      if (viewport) {
+        viewport.setAttribute('content', 'width=1280, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes')
+      }
+      document.body.classList.add('desktop-mode')
+      document.documentElement.style.minWidth = '1280px'
+      
       return
     }
 
@@ -36,13 +45,14 @@ export default function MobileWarning() {
     // 뷰포트 메타 태그를 데스크톱 모드로 변경
     const viewport = document.querySelector('meta[name=viewport]')
     if (viewport) {
-      viewport.setAttribute('content', 'width=1280, initial-scale=0.5, maximum-scale=1.0, user-scalable=yes')
+      viewport.setAttribute('content', 'width=1280, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes')
     }
     
-    setShowDesktop(true)
+    // body에 데스크톱 모드 클래스 추가
+    document.body.classList.add('desktop-mode')
+    document.documentElement.style.minWidth = '1280px'
     
-    // 페이지 새로고침하여 레이아웃 적용
-    window.location.reload()
+    setShowDesktop(true)
   }
 
   // PC 화면으로 보기를 선택했거나 데스크톱이면 표시하지 않음
