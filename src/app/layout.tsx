@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Providers from '@/components/Providers'
+import MobileWarning from '@/components/MobileWarning'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,6 +23,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={inter.className}>
         <Providers>
+          <MobileWarning />
           <div className="min-h-screen bg-gray-50 mobile-safe">
             {children}
           </div>
