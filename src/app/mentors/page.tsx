@@ -1,89 +1,71 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Star, MessageCircle, Award, Briefcase, Filter, Search, Users, TrendingUp, Clock } from 'lucide-react'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
-
-interface Mentor {
-  id: number
-  name: string
-  title: string
-  company: string
-  experience: string
-  rating: number
-  reviews: number
-  specialties: string[]
-  badges: string[]
-  responseRate: number
-  avgResponseTime: string
-  bio: string
-}
-
-const mockMentors: Mentor[] = [
-  {
-    id: 1,
-    name: "김시니어",
-    title: "시니어 백엔드 개발자",
-    company: "네이버",
-    experience: "8년차",
-    rating: 4.9,
-    reviews: 127,
-    specialties: ["백엔드", "시스템설계", "팀리딩"],
-    badges: ["인기 멘토", "답변왕"],
-    responseRate: 95,
-    avgResponseTime: "2시간",
-    bio: "대규모 서비스 개발 경험을 바탕으로 백엔드 개발과 시스템 설계에 대한 실무적인 조언을 드립니다.",
-  },
-  {
-    id: 2,
-    name: "박매니저",
-    title: "프로덕트 매니저",
-    company: "카카오",
-    experience: "6년차",
-    rating: 4.8,
-    reviews: 89,
-    specialties: ["프로덕트", "기획", "데이터분석"],
-    badges: ["신뢰 멘토"],
-    responseRate: 92,
-    avgResponseTime: "3시간",
-    bio: "B2C 프로덕트 기획부터 런칭까지의 전 과정을 경험했습니다. PM 커리어에 대한 고민을 함께 나눠요.",
-  },
-  {
-    id: 3,
-    name: "이디자이너",
-    title: "UX 디자이너",
-    company: "토스",
-    experience: "5년차",
-    rating: 4.7,
-    reviews: 64,
-    specialties: ["UX디자인", "사용자리서치", "디자인시스템"],
-    badges: ["전문가"],
-    responseRate: 88,
-    avgResponseTime: "4시간",
-    bio: "사용자 중심의 디자인과 디자이너의 커리어 성장에 대해 이야기해요.",
-  },
-]
+import { getAllMentors, Mentor } from '@/lib/mentors'
 
 const categories = [
-  { name: "전체", count: 156 },
-  { name: "개발", count: 42 },
-  { name: "기획", count: 38 },
-  { name: "디자인", count: 29 },
-  { name: "마케팅", count: 24 },
-  { name: "영업", count: 23 },
+  { name: "전체", count: 0 },
+  { name: "개발", count: 0 },
+  { name: "기획", count: 0 },
+  { name: "디자인", count: 0 },
+  { name: "마케팅", count: 0 },
+  { name: "영업", count: 0 },
 ]
 
 export default function MentorsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string>('전체')
+  const [mentors, setMentors] = useState<Mentor[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filteredMentors = mockMentors.filter(mentor => {
-    const matchesCategory = selectedCategory === '전체' || mentor.specialties.some(s => s.includes(selectedCategory))
-    const matchesSearch = mentor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         mentor.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         mentor.company.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    loadMentors()
+  }, [])
+
+  const loadMentors = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await getAllMentors()
+      
+      if (error) {
+        console.error('멘토 로딩 실패:', error)
+        return
+      }
+
+      if (data) {
+        setMentors(data)
+        // 카테고리별 카운트 업데이트
+        updateCategoryCounts(data)
+      }
+    } catch (err) {
+      console.error('멘토 로딩 중 오류:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateCategoryCounts = (mentorData: Mentor[]) => {
+    categories[0].count = mentorData.length
+    // 각 카테고리별로 카운트 (간단히 specialties에 포함된 것으로 카운트)
+    categories.forEach((cat, idx) => {
+      if (idx === 0) return // '전체'는 이미 설정됨
+      categories[idx].count = mentorData.filter(m => 
+        m.specialties.some(s => s.toLowerCase().includes(cat.name.toLowerCase()))
+      ).length
+    })
+  }
+
+  const filteredMentors = mentors.filter(mentor => {
+    const matchesCategory = selectedCategory === '전체' || 
+      mentor.specialties.some(s => s.toLowerCase().includes(selectedCategory.toLowerCase()))
+    const matchesSearch = 
+      mentor.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mentor.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      mentor.bio.toLowerCase().includes(searchTerm.toLowerCase())
     return matchesCategory && matchesSearch
   })
 
@@ -167,75 +149,83 @@ export default function MentorsPage() {
             </div>
 
             {/* Mentors Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {filteredMentors.map((mentor) => (
-                <Link key={mentor.id} href={`/mentors/${mentor.id}`} className="block group">
-                  <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform group-hover:-translate-y-1">
-                    {/* Mentor Header */}
-                    <div className="flex items-start space-x-4 mb-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xl font-bold ring-4 ring-purple-100">
-                        {mentor.name.charAt(0)}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <h3 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">{mentor.name}</h3>
-                          {mentor.badges.includes("인기 멘토") && (
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          )}
+            {loading ? (
+              <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+                <p className="mt-4 text-gray-600">멘토 목록을 불러오는 중...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {filteredMentors.map((mentor) => (
+                  <div key={mentor.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300">
+                    <Link href={`/mentors/${mentor.id}`} className="block group">
+                      {/* Mentor Header */}
+                      <div className="flex items-start space-x-4 mb-4">
+                        <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-xl font-bold ring-4 ring-purple-100">
+                          {mentor.title.charAt(0)}
                         </div>
-                        <p className="text-sm text-gray-600 font-medium">{mentor.title}</p>
-                        <p className="text-xs text-gray-500">{mentor.company} • {mentor.experience}</p>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                          <span className="text-sm font-semibold text-gray-900">{mentor.rating}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h3 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">{mentor.title}</h3>
+                            {mentor.badges.includes("인기 멘토") && (
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600 font-medium">{mentor.company}</p>
+                          <p className="text-xs text-gray-500">{mentor.experience}</p>
                         </div>
-                        <p className="text-xs text-gray-500">{mentor.reviews}개 리뷰</p>
+                        <div className="text-right">
+                          <div className="flex items-center space-x-1">
+                            <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                            <span className="text-sm font-semibold text-gray-900">{mentor.rating}</span>
+                          </div>
+                          <p className="text-xs text-gray-500">{mentor.reviews_count}개 리뷰</p>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Bio */}
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{mentor.bio}</p>
+                      {/* Bio */}
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">{mentor.bio}</p>
 
-                    {/* Specialties */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {mentor.specialties.slice(0, 3).map((specialty) => (
-                        <span
-                          key={specialty}
-                          className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium hover:bg-purple-200 transition-colors"
-                        >
-                          {specialty}
-                        </span>
-                      ))}
-                      {mentor.specialties.length > 3 && (
-                        <span className="px-3 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
-                          +{mentor.specialties.length - 3}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Stats */}
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <div className="flex items-center space-x-4">
-                        <span className="flex items-center">
-                          <MessageCircle className="w-4 h-4 mr-1 text-green-600" />
-                          <span className="font-medium">{mentor.responseRate}%</span>
-                        </span>
-                        <span className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1 text-blue-600" />
-                          <span className="font-medium">{mentor.avgResponseTime}</span>
-                        </span>
+                      {/* Specialties */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {mentor.specialties.slice(0, 3).map((specialty, idx) => (
+                          <span
+                            key={idx}
+                            className="px-3 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium hover:bg-purple-200 transition-colors"
+                          >
+                            {specialty}
+                          </span>
+                        ))}
+                        {mentor.specialties.length > 3 && (
+                          <span className="px-3 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
+                            +{mentor.specialties.length - 3}
+                          </span>
+                        )}
                       </div>
-                    </div>
+
+                      {/* Stats */}
+                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        <div className="flex items-center space-x-4">
+                          <span className="flex items-center">
+                            <MessageCircle className="w-4 h-4 mr-1 text-green-600" />
+                            <span className="font-medium">{mentor.response_rate}%</span>
+                          </span>
+                          <span className="flex items-center">
+                            <Clock className="w-4 h-4 mr-1 text-blue-600" />
+                            <span className="font-medium">{mentor.avg_response_time}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
 
                     {/* Action Button */}
                     <div className="pt-4 border-t border-gray-100">
                       <button 
-                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all transform hover:scale-105"
+                        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-4 rounded-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-colors"
                         onClick={(e) => {
                           e.preventDefault()
-                          // Handle 1:1 request
+                          // TODO: 채팅 기능 구현
+                          alert('채팅 기능은 곧 출시됩니다!')
                         }}
                       >
                         1:1 상담 요청
@@ -245,9 +235,9 @@ export default function MentorsPage() {
                     {/* Badges */}
                     {mentor.badges.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-1">
-                        {mentor.badges.map((badge) => (
+                        {mentor.badges.map((badge, idx) => (
                           <span
-                            key={badge}
+                            key={idx}
                             className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium"
                           >
                             {badge}
@@ -256,9 +246,9 @@ export default function MentorsPage() {
                       </div>
                     )}
                   </div>
-                </Link>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* No Mentors */}
             {filteredMentors.length === 0 && (
