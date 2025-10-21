@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { Star, MessageCircle, Award, Briefcase, Clock, MapPin, Calendar, ArrowLeft, Coffee, Send, X } from 'lucide-react'
 import MobileBottomNav from '@/components/MobileBottomNav'
-import { getMentorById, Mentor } from '@/lib/mentors'
+import { Mentor, getMentorById } from '@/lib/mentors'
+import { ArrowLeft, Award, Briefcase, Calendar, Clock, Coffee, MessageCircle, Send, Star, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 export default function MentorDetailPage({ params }: { params: { id: string } }) {
   const { data: session } = useSession()
@@ -245,7 +245,7 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
             <MessageCircle className="w-5 h-5 mr-2" />
             멘토링 신청
           </button>
-          <Link href={`/coffee/send?mentorId=${mentor.id}&mentorName=${mentor.name}`}>
+          <Link href={`/coffee/send?mentorId=${mentor.id}&mentorName=${encodeURIComponent(mentor.title)}`}>
             <button className="flex-1 border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
               <Coffee className="w-5 h-5 mr-2" />
               커피 쿠폰 보내기
