@@ -1,11 +1,11 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { Star, MessageCircle, Award, Briefcase, Filter, Search, Users, TrendingUp, Clock } from 'lucide-react'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
-import { getAllMentors, Mentor } from '@/lib/mentors'
+import { Mentor, getAllMentors } from '@/lib/mentors'
+import { Clock, MessageCircle, Search, Star, Users } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 const categories = [
   { name: "전체", count: 0 },

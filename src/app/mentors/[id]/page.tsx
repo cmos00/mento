@@ -1,13 +1,16 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Star, MessageCircle, Award, Briefcase, Clock, MapPin, Calendar, ArrowLeft, Coffee, Send, X } from 'lucide-react'
-import { mockAuth, MockUser } from '@/lib/mockAuth'
 import MobileBottomNav from '@/components/MobileBottomNav'
+import { getMentorById, Mentor } from '@/lib/mentors'
+import { useSession } from 'next-auth/react'
 
 export default function MentorDetailPage({ params }: { params: { id: string } }) {
-  const [mockUser] = useState<MockUser | null>(mockAuth.getUser())
+  const { data: session } = useSession()
+  const [mentor, setMentor] = useState<Mentor | null>(null)
+  const [loading, setLoading] = useState(true)
   const [newMessage, setNewMessage] = useState('')
   const [showMentoringModal, setShowMentoringModal] = useState(false)
   const [mentoringRequest, setMentoringRequest] = useState({
@@ -19,26 +22,28 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const mentor = {
-    id: parseInt(params.id),
-    name: "김시니어",
-    title: "시니어 백엔드 개발자",
-    company: "네이버",
-    experience: "8년차",
-    rating: 4.9,
-    reviews: 127,
-    specialties: ["백엔드", "시스템설계", "팀리딩"],
-    badges: ["인기 멘토", "답변왕", "검증된 멘토"],
-    responseRate: 95,
-    avgResponseTime: "2시간",
-    bio: "대규모 서비스 개발 경험을 바탕으로 백엔드 개발과 시스템 설계에 대한 실무적인 조언을 드립니다. 특히 마이크로서비스 아키텍처와 클라우드 인프라에 대한 깊은 이해를 바탕으로 실무에서 바로 적용할 수 있는 솔루션을 제시합니다.",
-    location: "서울 강남구",
-    education: "서울대학교 컴퓨터공학과",
-    languages: ["한국어", "영어"],
-    availability: "평일 저녁, 주말 오후",
-    hourlyRate: "15만원",
-    totalMentoring: 89,
-    successRate: 98,
+  useEffect(() => {
+    loadMentor()
+  }, [params.id])
+
+  const loadMentor = async () => {
+    try {
+      setLoading(true)
+      const { data, error } = await getMentorById(params.id)
+      
+      if (error) {
+        console.error('멘토 로딩 실패:', error)
+        return
+      }
+
+      if (data) {
+        setMentor(data)
+      }
+    } catch (err) {
+      console.error('멘토 로딩 중 오류:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const reviews = [
@@ -94,10 +99,13 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
     })
   }
 
-  if (!mockUser) {
+  if (loading || !mentor) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#6A5ACD] border-t-transparent rounded-full animate-spin"></div>
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">멘토 정보를 불러오는 중...</p>
+        </div>
       </div>
     )
   }
@@ -127,11 +135,11 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
             <div className="lg:w-1/3">
               <div className="text-center lg:text-left">
                 <div className="w-24 h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-3xl lg:text-4xl font-bold mx-auto lg:mx-0 mb-4">
-                  {mentor.name.charAt(0)}
+                  {mentor.title.charAt(0)}
                 </div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{mentor.name}</h1>
-                <p className="text-lg text-gray-600 mb-1">{mentor.title}</p>
-                <p className="text-gray-600 mb-3">{mentor.company}</p>
+                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{mentor.title}</h1>
+                <p className="text-lg text-gray-600 mb-1">{mentor.company}</p>
+                <p className="text-gray-600 mb-3">{mentor.experience}</p>
                 
                 {/* Rating */}
                 <div className="flex items-center justify-center lg:justify-start space-x-2 mb-4">
@@ -139,14 +147,14 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
                     <Star className="w-5 h-5 text-yellow-400 fill-current" />
                     <span className="text-lg font-semibold ml-1">{mentor.rating}</span>
                   </div>
-                  <span className="text-gray-500">({mentor.reviews}개 리뷰)</span>
+                  <span className="text-gray-500">({mentor.reviews_count}개 리뷰)</span>
                 </div>
 
                 {/* Badges */}
                 <div className="flex flex-wrap justify-center lg:justify-start gap-2 mb-4">
-                  {mentor.badges.map((badge) => (
+                  {mentor.badges.map((badge, idx) => (
                     <span
-                      key={badge}
+                      key={idx}
                       className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full font-medium"
                     >
                       {badge}
@@ -168,19 +176,19 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">{mentor.totalMentoring}</p>
+                    <p className="text-2xl font-bold text-purple-600">{mentor.total_sessions}</p>
                     <p className="text-sm text-gray-600">총 멘토링</p>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">{mentor.successRate}%</p>
+                    <p className="text-2xl font-bold text-purple-600">-</p>
                     <p className="text-sm text-gray-600">성공률</p>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">{mentor.responseRate}%</p>
+                    <p className="text-2xl font-bold text-purple-600">{mentor.response_rate}%</p>
                     <p className="text-sm text-gray-600">응답률</p>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">{mentor.avgResponseTime}</p>
+                    <p className="text-2xl font-bold text-purple-600">{mentor.avg_response_time}</p>
                     <p className="text-sm text-gray-600">평균 응답</p>
                   </div>
                 </div>
@@ -189,9 +197,9 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">전문 분야</h3>
                   <div className="flex flex-wrap gap-2">
-                    {mentor.specialties.map((specialty) => (
+                    {mentor.specialties.map((specialty, idx) => (
                       <span
-                        key={specialty}
+                        key={idx}
                         className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full"
                       >
                         {specialty}
@@ -204,26 +212,22 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-gray-600">
-                      <MapPin className="w-4 h-4 mr-2" />
-                      <span>{mentor.location}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
                       <Briefcase className="w-4 h-4 mr-2" />
                       <span>{mentor.experience}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      <span>{mentor.availability}</span>
+                      <Award className="w-4 h-4 mr-2" />
+                      <span>{mentor.is_verified ? '검증된 멘토' : '멘토'}</span>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-gray-600">
                       <Clock className="w-4 h-4 mr-2" />
-                      <span>시간당 {mentor.hourlyRate}</span>
+                      <span>시간당 {mentor.hourly_rate > 0 ? `${mentor.hourly_rate.toLocaleString()}원` : '문의'}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
-                      <Award className="w-4 h-4 mr-2" />
-                      <span>{mentor.education}</span>
+                      <Calendar className="w-4 h-4 mr-2" />
+                      <span>{mentor.is_available ? '상담 가능' : '상담 불가'}</span>
                     </div>
                   </div>
                 </div>
