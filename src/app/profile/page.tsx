@@ -159,24 +159,24 @@ export default function ProfilePage() {
             {/* 통계 박스 */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-100">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <MessageSquare className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <MessageSquare className="w-5 h-5 text-purple-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">12</h3>
                 <p className="text-sm text-gray-600">질문</p>
               </div>
               
               <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-100">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <BarChart3 className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <BarChart3 className="w-5 h-5 text-purple-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">8</h3>
                 <p className="text-sm text-gray-600">답변</p>
               </div>
               
               <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-100">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Heart className="w-5 h-5 text-red-600" />
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Heart className="w-5 h-5 text-purple-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">24</h3>
                 <p className="text-sm text-gray-600">좋아요</p>
@@ -196,7 +196,7 @@ export default function ProfilePage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-4">최근 활동</h3>
               <div className="space-y-4">
                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <MessageSquare className="w-5 h-5 text-blue-600 mr-3" />
+                  <MessageSquare className="w-5 h-5 text-purple-600 mr-3" />
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">새로운 질문을 작성했습니다</p>
                     <p className="text-sm text-gray-600">2시간 전</p>
@@ -204,7 +204,7 @@ export default function ProfilePage() {
                 </div>
                 
                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <BarChart3 className="w-5 h-5 text-green-600 mr-3" />
+                  <BarChart3 className="w-5 h-5 text-purple-600 mr-3" />
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">답변을 작성했습니다</p>
                     <p className="text-sm text-gray-600">5시간 전</p>
@@ -212,7 +212,7 @@ export default function ProfilePage() {
                 </div>
                 
                 <div className="flex items-center p-3 bg-gray-50 rounded-lg">
-                  <Heart className="w-5 h-5 text-red-600 mr-3" />
+                  <Heart className="w-5 h-5 text-purple-600 mr-3" />
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">답변이 좋아요를 받았습니다</p>
                     <p className="text-sm text-gray-600">1일 전</p>
@@ -229,17 +229,17 @@ export default function ProfilePage() {
             <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">활동 내역</h3>
               <div className="space-y-4">
-                <div className="border-l-4 border-blue-500 pl-4 py-2">
+                <div className="border-l-4 border-purple-500 pl-4 py-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium text-gray-900">질문 작성: &ldquo;업무와 개인 생활의 균형점은?&rdquo;</p>
+                      <p className="font-medium text-gray-900">질문 작성: &ldquo;업무와 개인 생활의 균형점은?&ldquo;</p>
                       <p className="text-sm text-gray-600 mt-1">팀 빌딩 관련 질문</p>
                     </div>
                     <span className="text-xs text-gray-500">2일 전</span>
                   </div>
                 </div>
                 
-                <div className="border-l-4 border-green-500 pl-4 py-2">
+                <div className="border-l-4 border-purple-500 pl-4 py-2">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium text-gray-900">답변 작성: &ldquo;프로젝트 관리 방법 질문에 답변&rdquo;</p>
@@ -399,9 +399,9 @@ export default function ProfilePage() {
             <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">최근 커피 트랜잭션</h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
                   <div className="flex items-center">
-                    <Coffee className="w-5 h-5 text-green-600 mr-3" />
+                    <Coffee className="w-5 h-5 text-purple-600 mr-3" />
                     <div>
                       <p className="font-medium text-gray-900">커피를 받았습니다</p>
                       <p className="text-sm text-gray-600">팀원으로부터 +5</p>
@@ -410,9 +410,9 @@ export default function ProfilePage() {
                   <span className="text-sm text-gray-500">2일 전</span>
                 </div>
                 
-                <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
                   <div className="flex items-center">
-                    <Coffee className="w-5 h-5 text-red-600 mr-3" />
+                    <Coffee className="w-5 h-5 text-purple-600 mr-3" />
                     <div>
                       <p className="font-medium text-gray-900">커피를 보냈습니다</p>
                       <p className="text-sm text-gray-600">멘토에게 -3</p>
