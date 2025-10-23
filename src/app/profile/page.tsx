@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('overview')
   const [imageError, setImageError] = useState(false)
   const [mentoringEnabled, setMentoringEnabled] = useState(false)
+  const [isSavingMentoring, setIsSavingMentoring] = useState(false)
   const user = dbUser || session?.user
 
   // 이미지 URL 처리 함수
@@ -96,6 +97,8 @@ export default function ProfilePage() {
             const userData = await fetchResponse.json()
             console.log('✅ [Profile Page] 사용자 정보 조회 성공:', userData)
             setDbUser(userData)
+            // 멘토링 상태 초기화
+            setMentoringEnabled(userData.mentoring_enabled || false)
           } else {
             const errorResult = await fetchResponse.json()
             console.log('⚠️ [Profile Page] 사용자 정보 조회 실패:', errorResult)
@@ -108,6 +111,38 @@ export default function ProfilePage() {
 
     updateAndFetchUserInfo()
   }, [session])
+
+  // 멘토링 상태 변경
+  const handleMentoringToggle = async () => {
+    const newValue = !mentoringEnabled
+    setIsSavingMentoring(true)
+    
+    try {
+      const response = await fetch('/api/user/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: user?.email,
+          mentoring_enabled: newValue
+        }),
+      })
+
+      if (response.ok) {
+        setMentoringEnabled(newValue)
+        console.log('✅ [Profile Page] 멘토링 상태 업데이트 성공:', newValue)
+      } else {
+        console.error('❌ [Profile Page] 멘토링 상태 업데이트 실패')
+        alert('멘토링 상태 변경에 실패했습니다.')
+      }
+    } catch (error) {
+      console.error('❌ [Profile Page] 멘토링 상태 업데이트 중 오류:', error)
+      alert('멘토링 상태 변경 중 오류가 발생했습니다.')
+    } finally {
+      setIsSavingMentoring(false)
+    }
+  }
 
   // 로딩 중
   if (status === 'loading') {
@@ -540,10 +575,11 @@ export default function ProfilePage() {
                       <span className="font-medium text-gray-900">멘토링 상태</span>
                     </div>
                     <button
-                      onClick={() => setMentoringEnabled(!mentoringEnabled)}
+                      onClick={handleMentoringToggle}
+                      disabled={isSavingMentoring}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         mentoringEnabled ? 'bg-purple-600' : 'bg-gray-300'
-                      }`}
+                      } ${isSavingMentoring ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${

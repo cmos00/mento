@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { ArrowLeft, Award, Briefcase, Calendar, Coffee, MessageCircle, Send, Star, X, Users } from 'lucide-react'
-import { useSession } from 'next-auth/react'
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 import { Mentor, getMentorById } from '@/lib/mentors'
+import { ArrowLeft, Award, Calendar, Coffee, MessageCircle, Send, Star, Users, X } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 export default function MentorDetailPage({ params }: { params: { id: string } }) {
   const { data: session } = useSession()

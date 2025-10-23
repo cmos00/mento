@@ -34,12 +34,16 @@ export async function POST(request: NextRequest) {
       }
     )
 
+    // 요청 본문 파싱
+    const body = await request.json()
+
     console.log('🔄 [User Update] 사용자 정보 업데이트 시작:', {
       userId: session.user.id,
       name: session.user.name,
       email: session.user.email,
       image: session.user.image,
-      provider: (session.user as any)?.provider
+      provider: (session.user as any)?.provider,
+      mentoringEnabled: body.mentoring_enabled
     })
 
     // 기존 사용자 찾기
@@ -56,15 +60,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // 업데이트할 데이터 구성
+    const updateData: any = {
+      name: session.user.name,
+      avatar_url: session.user.image || null,
+      image: session.user.image || null,
+      updated_at: new Date().toISOString()
+    }
+
+    // mentoring_enabled가 제공된 경우 추가
+    if (typeof body.mentoring_enabled === 'boolean') {
+      updateData.mentoring_enabled = body.mentoring_enabled
+    }
+
     // 사용자 정보 업데이트
     const { error: userError } = await supabaseAdmin
       .from('users')
-      .update({
-        name: session.user.name,
-        avatar_url: session.user.image || null,
-        image: session.user.image || null,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', existingUser.id)
 
     if (userError) {

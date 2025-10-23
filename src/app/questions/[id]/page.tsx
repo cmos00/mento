@@ -1439,10 +1439,35 @@ export default function QuestionDetailPage() {
                         </div>
                       </div>
                     ) : (
-                      /* 답변 내용 */
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {feedback.content}
-                      </p>
+                      <>
+                        {/* 답변 내용 */}
+                        <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                          {feedback.content}
+                        </p>
+                        
+                        {/* 1:1 상담 신청 버튼 */}
+                        {(() => {
+                          // 본인 답변이거나 멘토링을 받지 않는 사용자는 버튼 표시 안 함
+                          const isOwnFeedback = actualUserId && feedback.user_id === actualUserId
+                          const isMentoringEnabled = feedback.users?.mentoring_enabled === true
+                          const shouldShowButton = !isOwnFeedback && isMentoringEnabled
+                          
+                          if (shouldShowButton) {
+                            return (
+                              <div className="mt-4">
+                                <Link 
+                                  href={`/mentors/${feedback.user_id}`}
+                                  className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all"
+                                >
+                                  <MessageCircle className="w-4 h-4 mr-2" />
+                                  1:1 상담 신청
+                                </Link>
+                              </div>
+                            )
+                          }
+                          return null
+                        })()}
+                      </>
                     )}
                   </div>
 
