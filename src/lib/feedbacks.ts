@@ -21,6 +21,7 @@ export interface FeedbackWithAuthor extends Feedback {
     company?: string
     position?: string
     avatar_url?: string
+    mentoring_enabled?: boolean
   } | null
 }
 
@@ -75,7 +76,8 @@ export async function getFeedbacksByQuestionId(questionId: string): Promise<Feed
           email,
           company,
           position,
-          avatar_url
+          avatar_url,
+          mentoring_enabled
         )
       `)
       .eq('question_id', questionId)

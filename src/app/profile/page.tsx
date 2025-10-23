@@ -4,17 +4,14 @@ import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
 import { getDisplayName } from '@/lib/utils'
 import {
-  BookOpen,
-  Coffee,
-  MessageSquare,
-  Settings,
-  Users,
-  Award,
-  TrendingUp,
-  BarChart3,
-  Clock,
-  Star,
-  Heart
+    Award,
+    BarChart3,
+    Clock,
+    Coffee,
+    Heart,
+    MessageSquare,
+    Settings,
+    Users
 } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
