@@ -130,8 +130,9 @@ export default function ProfilePage() {
         setMentoringEnabled(newValue)
         console.log('✅ [Profile Page] 멘토링 상태 업데이트 성공:', newValue)
       } else {
-        console.error('❌ [Profile Page] 멘토링 상태 업데이트 실패')
-        alert('멘토링 상태 변경에 실패했습니다.')
+        const errorData = await response.json()
+        console.error('❌ [Profile Page] 멘토링 상태 업데이트 실패:', errorData)
+        alert(`멘토링 상태 변경에 실패했습니다.\n\n에러: ${errorData.error || '알 수 없는 오류'}\n\nSupabase에서 다음 SQL을 실행해주세요:\nALTER TABLE users ADD COLUMN IF NOT EXISTS mentoring_enabled BOOLEAN DEFAULT false;`)
       }
     } catch (error) {
       console.error('❌ [Profile Page] 멘토링 상태 업데이트 중 오류:', error)
