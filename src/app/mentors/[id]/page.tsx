@@ -1,11 +1,12 @@
 "use client"
 
-import MobileBottomNav from '@/components/MobileBottomNav'
-import { Mentor, getMentorById } from '@/lib/mentors'
-import { ArrowLeft, Award, Briefcase, Calendar, Coffee, MessageCircle, Send, Star, X } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { ArrowLeft, Award, Briefcase, Calendar, Coffee, MessageCircle, Send, Star, X, Users } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import MobileBottomNav from '@/components/MobileBottomNav'
+import PCNavigation from '@/components/PCNavigation'
+import { Mentor, getMentorById } from '@/lib/mentors'
 
 export default function MentorDetailPage({ params }: { params: { id: string } }) {
   const { data: session } = useSession()
@@ -46,6 +47,31 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
     }
   }
 
+  const handleMentoringRequest = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!mentoringRequest.topic.trim() || !mentoringRequest.description.trim()) {
+      alert('필수 항목을 모두 입력해주세요.')
+      return
+    }
+
+    setIsSubmitting(true)
+    
+    // TODO: 실제 API 호출 로직 구현
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    setIsSubmitting(false)
+    setShowMentoringModal(false)
+    alert('멘토링 신청이 완료되었습니다. 멘토의 응답을 기다려주세요.')
+    
+    setMentoringRequest({
+      topic: '',
+      description: '',
+      preferredDate: '',
+      preferredTime: '',
+      duration: '60'
+    })
+  }
+
   const reviews = [
     {
       id: 1,
@@ -73,76 +99,59 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
     }
   ]
 
-  const handleMentoringRequest = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!mentoringRequest.topic.trim() || !mentoringRequest.description.trim()) {
-      alert('필수 항목을 모두 입력해주세요.')
-      return
-    }
-
-    setIsSubmitting(true)
-    
-    // TODO: 실제 API 호출 로직 구현
-    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
-    
-    setIsSubmitting(false)
-    setShowMentoringModal(false)
-    alert('멘토링 신청이 완료되었습니다. 멘토의 응답을 기다려주세요.')
-    
-    // 폼 초기화
-    setMentoringRequest({
-      topic: '',
-      description: '',
-      preferredDate: '',
-      preferredTime: '',
-      duration: '60'
-    })
-  }
-
   if (loading || !mentor) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">멘토 정보를 불러오는 중...</p>
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <p className="text-xl text-gray-700 font-medium">멘토 정보를 불러오는 중...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-purple-100 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Link href="/mentors" className="p-2 text-gray-600 hover:text-purple-600 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-              <Briefcase className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xl font-bold text-gray-900">CareerTalk</span>
+    <div className="min-h-screen bg-gray-100">
+      {/* PC Navigation */}
+      <PCNavigation title="멘토 프로필" icon={Users} />
+      
+      {/* Mobile Header */}
+      <header className="md:hidden bg-white border-b border-gray-200 px-4 py-4">
+        <div className="flex items-center space-x-3">
+          <Link href="/mentors" className="p-2 text-gray-600 hover:text-purple-600 transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+            <Users className="w-5 h-5 text-white" />
           </div>
+          <span className="text-xl font-bold text-gray-900">멘토 프로필</span>
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-6 pb-24 md:pb-6">
-        {/* Mentor Profile Card */}
-        <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Avatar and Basic Info */}
-            <div className="lg:w-1/3">
-              <div className="text-center lg:text-left">
-                <div className="w-24 h-24 lg:w-32 lg:h-32 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center text-white text-3xl lg:text-4xl font-bold mx-auto lg:mx-0 mb-4">
-                  {mentor.title.charAt(0)}
+      <div className="max-w-7xl mx-auto px-4 py-8 pb-24 md:pb-8">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* 왼쪽 사이드바 - 멘토 정보 */}
+          <div className="lg:w-80 flex-shrink-0">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-24 space-y-6">
+              {/* 멘토 프로필 헤더 */}
+              <div className="text-center">
+                <div className="relative mb-6">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-20 scale-110"></div>
+                  <div className="relative inline-block">
+                    <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-4 border-purple-200 shadow-lg">
+                      <span className="text-2xl font-bold text-white">
+                        {mentor.title.charAt(0)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{mentor.title}</h1>
-                <p className="text-lg text-gray-600 mb-1">{mentor.company}</p>
-                <p className="text-gray-600 mb-3">{mentor.experience}</p>
+                
+                <h1 className="text-xl font-bold text-gray-900 mb-1">{mentor.title}</h1>
+                <p className="text-gray-600 mb-1">{mentor.company}</p>
+                <p className="text-sm text-gray-500 mb-4">{mentor.experience}</p>
                 
                 {/* Rating */}
-                <div className="flex items-center justify-center lg:justify-start space-x-2 mb-4">
+                <div className="flex items-center justify-center space-x-2 mb-4">
                   <div className="flex items-center">
                     <Star className="w-5 h-5 text-yellow-400 fill-current" />
                     <span className="text-lg font-semibold ml-1">{mentor.rating}</span>
@@ -151,155 +160,140 @@ export default function MentorDetailPage({ params }: { params: { id: string } })
                 </div>
 
                 {/* Badges */}
-                <div className="flex flex-wrap justify-center lg:justify-start gap-2 mb-4">
-                  {mentor.badges.map((badge, idx) => (
-                    <span
-                      key={idx}
-                      className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full font-medium"
-                    >
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Details */}
-            <div className="lg:w-2/3">
-              <div className="space-y-4">
-                {/* Bio */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">소개</h3>
-                  <p className="text-gray-700 leading-relaxed">{mentor.bio}</p>
-                </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">{mentor.total_sessions}</p>
-                    <p className="text-sm text-gray-600">총 멘토링</p>
-                  </div>
-                  <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">-</p>
-                    <p className="text-sm text-gray-600">성공률</p>
-                  </div>
-                  <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">{mentor.response_rate}%</p>
-                    <p className="text-sm text-gray-600">응답률</p>
-                  </div>
-                  <div className="text-center p-3 bg-gray-50 rounded-lg">
-                    <p className="text-2xl font-bold text-purple-600">{mentor.avg_response_time}</p>
-                    <p className="text-sm text-gray-600">평균 응답</p>
-                  </div>
-                </div>
-
-                {/* Specialties */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">전문 분야</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {mentor.specialties.map((specialty, idx) => (
+                {mentor.badges.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-2 mb-4">
+                    {mentor.badges.map((badge, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full"
+                        className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full font-medium"
                       >
-                        {specialty}
+                        {badge}
                       </span>
                     ))}
                   </div>
-                </div>
+                )}
+              </div>
 
-                {/* Additional Info */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Briefcase className="w-4 h-4 mr-2" />
-                      <span>{mentor.experience}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Award className="w-4 h-4 mr-2" />
-                      <span>{mentor.is_verified ? '검증된 멘토' : '멘토'}</span>
-                    </div>
+              {/* 통계 정보 */}
+              <div className="border-t border-gray-200 pt-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center p-3 bg-purple-50 rounded-lg">
+                    <p className="text-2xl font-bold text-purple-600">{mentor.total_sessions}</p>
+                    <p className="text-xs text-gray-600">총 멘토링</p>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      <span>{mentor.is_available ? '상담 가능' : '상담 불가'}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Coffee className="w-4 h-4 mr-2" />
-                      <span>커피 쿠폰으로 감사 표현</span>
-                    </div>
+                  <div className="text-center p-3 bg-purple-50 rounded-lg">
+                    <p className="text-2xl font-bold text-purple-600">{mentor.response_rate}%</p>
+                    <p className="text-xs text-gray-600">응답률</p>
                   </div>
                 </div>
+              </div>
+
+              {/* 상태 정보 */}
+              <div className="border-t border-gray-200 pt-6 space-y-2">
+                <div className="flex items-center text-sm text-gray-600">
+                  <Calendar className="w-4 h-4 mr-2 text-purple-600" />
+                  <span>{mentor.is_available ? '상담 가능' : '상담 불가'}</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Award className="w-4 h-4 mr-2 text-purple-600" />
+                  <span>{mentor.is_verified ? '검증된 멘토' : '멘토'}</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Coffee className="w-4 h-4 mr-2 text-purple-600" />
+                  <span>커피 쿠폰으로 감사 표현</span>
+                </div>
+              </div>
+
+              {/* 액션 버튼 */}
+              <div className="border-t border-gray-200 pt-6 space-y-3">
+                <button 
+                  onClick={() => setShowMentoringModal(true)}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
+                >
+                  <MessageCircle className="w-5 h-5 mr-2" />
+                  멘토링 신청
+                </button>
+                
+                <Link href={`/coffee/send?mentorId=${mentor.id}&mentorName=${encodeURIComponent(mentor.title)}`}>
+                  <button className="w-full border border-purple-300 text-purple-600 hover:bg-purple-50 font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center">
+                    <Coffee className="w-5 h-5 mr-2" />
+                    커피 쿠폰 보내기
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <button 
-            onClick={() => setShowMentoringModal(true)}
-            className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-6 rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center justify-center"
-          >
-            <MessageCircle className="w-5 h-5 mr-2" />
-            멘토링 신청
-          </button>
-          <Link href={`/coffee/send?mentorId=${mentor.id}&mentorName=${encodeURIComponent(mentor.title)}`}>
-            <button className="flex-1 border border-purple-300 text-purple-600 py-3 px-6 rounded-xl font-medium hover:bg-purple-50 transition-colors flex items-center justify-center">
-              <Coffee className="w-5 h-5 mr-2" />
-              커피 쿠폰 보내기
-            </button>
-          </Link>
-        </div>
+          {/* 오른쪽 메인 컨텐츠 */}
+          <div className="flex-1 space-y-6">
+            {/* 소개 */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">소개</h2>
+              <p className="text-gray-700 leading-relaxed">{mentor.bio}</p>
+            </div>
 
-        {/* Reviews */}
-        <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">리뷰 ({reviews.length})</h3>
-          <div className="space-y-4">
-            {reviews.map((review) => (
-              <div key={review.id} className="border-b border-gray-100 pb-4 last:border-b-0">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-medium text-gray-900">{review.author}</span>
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
+            {/* 전문 분야 */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">전문 분야</h2>
+              <div className="flex flex-wrap gap-2">
+                {mentor.specialties.map((specialty, idx) => (
+                  <span
+                    key={idx}
+                    className="px-4 py-2 bg-purple-100 text-purple-700 text-sm rounded-full font-medium"
+                  >
+                    {specialty}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* 리뷰 */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">리뷰 ({reviews.length})</h2>
+              <div className="space-y-6">
+                {reviews.map((review) => (
+                  <div key={review.id} className="border-b border-gray-100 pb-6 last:border-b-0 last:pb-0">
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="font-medium text-gray-900">{review.author}</span>
+                        <div className="flex items-center">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${
+                                i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-500">{review.date}</span>
                     </div>
+                    <p className="text-gray-700 mb-2">{review.content}</p>
+                    <span className="text-sm text-gray-500">도움이 됐어요 {review.helpful}</span>
                   </div>
-                  <span className="text-sm text-gray-500">{review.date}</span>
-                </div>
-                <p className="text-gray-700 mb-2">{review.content}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">도움이 됐어요 {review.helpful}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* 메시지 보내기 */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">메시지 보내기</h2>
+              <div className="space-y-4">
+                <textarea
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="멘토에게 궁금한 점이나 멘토링 요청사항을 작성해주세요..."
+                  rows={4}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                />
+                <div className="flex justify-end">
+                  <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center">
+                    <Send className="w-4 h-4 mr-2" />
+                    메시지 보내기
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Contact Form */}
-        <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">메시지 보내기</h3>
-          <div className="space-y-4">
-            <textarea
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="멘토에게 궁금한 점이나 멘토링 요청사항을 작성해주세요..."
-              rows={4}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-            />
-            <div className="flex justify-end">
-              <button className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 transition-all flex items-center">
-                <Send className="w-4 h-4 mr-2" />
-                메시지 보내기
-              </button>
             </div>
           </div>
         </div>
