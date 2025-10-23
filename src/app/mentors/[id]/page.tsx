@@ -2,7 +2,7 @@
 
 import MobileBottomNav from '@/components/MobileBottomNav'
 import { Mentor, getMentorById } from '@/lib/mentors'
-import { ArrowLeft, Award, Briefcase, Calendar, Clock, Coffee, MessageCircle, Send, Star, X } from 'lucide-react'
+import { ArrowLeft, Award, Briefcase, Calendar, Coffee, MessageCircle, Send, Star, X } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'

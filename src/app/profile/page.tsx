@@ -25,6 +25,7 @@ export default function ProfilePage() {
   const [dbUser, setDbUser] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('overview')
   const [imageError, setImageError] = useState(false)
+  const [mentoringEnabled, setMentoringEnabled] = useState(false)
   const user = dbUser || session?.user
 
   // 이미지 URL 처리 함수
@@ -528,6 +529,35 @@ export default function ProfilePage() {
                     )}
                   </div>
                 )}
+              </div>
+
+              {/* 멘토링 설정 (본인만 볼 수 있음) */}
+              <div className="border-t border-gray-200 pt-6">
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center">
+                      <Users className="w-5 h-5 text-purple-600 mr-2" />
+                      <span className="font-medium text-gray-900">멘토링 상태</span>
+                    </div>
+                    <button
+                      onClick={() => setMentoringEnabled(!mentoringEnabled)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        mentoringEnabled ? 'bg-purple-600' : 'bg-gray-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          mentoringEnabled ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    {mentoringEnabled
+                      ? '다른 사용자들이 1:1 상담을 요청할 수 있습니다'
+                      : '멘토링 요청을 받지 않습니다'}
+                  </p>
+                </div>
               </div>
 
               {/* 탭 네비게이션 */}
