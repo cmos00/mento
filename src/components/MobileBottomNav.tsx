@@ -12,8 +12,6 @@ export default function MobileBottomNav() {
 
   const navItems = [
     { href: '/questions', icon: Home, label: '홈', requireAuth: false },
-    { href: '/mentors', icon: Users, label: '멘토', requireAuth: false },
-    { href: '/journal', icon: BookOpen, label: '저널', requireAuth: false },
     { href: '/notifications', icon: Bell, label: '알림', requireAuth: true },
     { href: '/profile', icon: User, label: '프로필', requireAuth: true }
   ]

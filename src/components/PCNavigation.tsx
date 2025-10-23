@@ -14,8 +14,6 @@ export default function PCNavigation({ title, icon: Icon }: PCNavigationProps) {
 
   const navItems = [
     { href: '/questions', icon: MessageCircle, label: '홈' },
-    { href: '/mentors', icon: Users, label: '멘토' },
-    { href: '/journal', icon: BookOpen, label: '저널' },
     { href: '/notifications', icon: Bell, label: '알림' },
     { href: '/profile', icon: User, label: '프로필' }
   ]

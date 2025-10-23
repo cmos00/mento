@@ -8,7 +8,7 @@ import { useState } from 'react'
 
 interface Notification {
   id: number
-  type: 'question_answer' | 'journal_comment' | 'coffee_chat_request' | 'coffee_chat_accepted' | 'coffee_coupon' | 'system'
+  type: 'question_answer' | 'coffee_chat_request' | 'coffee_chat_accepted' | 'coffee_coupon' | 'system'
   title: string
   message: string
   timeAgo: string
@@ -22,7 +22,7 @@ interface Notification {
   }
   relatedContent?: {
     title: string
-    type: 'question' | 'journal' | 'coffee_chat'
+    type: 'question' | 'coffee_chat'
   }
 }
 
@@ -44,24 +44,6 @@ export default function NotificationsPage() {
       relatedContent: {
         title: '3년차 개발자, 이직 타이밍이 맞을까요?',
         type: 'question'
-      }
-    },
-    {
-      id: 2,
-      type: 'journal_comment',
-      title: '저널 글에 댓글이 달렸습니다',
-      message: '"팀 리드가 되기 전에 준비해야 할 것들" 글에 박매니저님이 댓글을 남겼습니다.',
-      timeAgo: '1시간 전',
-      isRead: false,
-      actionUrl: '/journal/2',
-      actionText: '댓글 보기',
-      sender: {
-        name: '박매니저',
-        company: '카카오'
-      },
-      relatedContent: {
-        title: '팀 리드가 되기 전에 준비해야 할 것들',
-        type: 'journal'
       }
     },
     {
@@ -164,8 +146,6 @@ export default function NotificationsPage() {
     switch (type) {
       case 'question_answer':
         return <MessageCircle className="w-5 h-5 text-blue-600" />
-      case 'journal_comment':
-        return <BookOpen className="w-5 h-5 text-green-600" />
       case 'coffee_chat_request':
         return <Calendar className="w-5 h-5 text-purple-600" />
       case 'coffee_chat_accepted':
@@ -183,8 +163,6 @@ export default function NotificationsPage() {
     switch (type) {
       case 'question_answer':
         return 'bg-blue-50 border-blue-200'
-      case 'journal_comment':
-        return 'bg-green-50 border-green-200'
       case 'coffee_chat_request':
         return 'bg-purple-50 border-purple-200'
       case 'coffee_chat_accepted':
@@ -202,8 +180,6 @@ export default function NotificationsPage() {
     switch (type) {
       case 'question_answer':
         return '질문 답변'
-      case 'journal_comment':
-        return '저널 댓글'
       case 'coffee_chat_request':
         return '커피챗 요청'
       case 'coffee_chat_accepted':
@@ -252,14 +228,10 @@ export default function NotificationsPage() {
       <div className="max-w-6xl mx-auto px-4 py-6 pb-24 md:pb-6">
         {/* Notification Stats */}
         <div className="bg-white/80 backdrop-blur-sm border-0 rounded-2xl shadow-lg p-6 mb-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">{notifications.filter(n => n.type === 'question_answer').length}</div>
               <div className="text-sm text-gray-600">질문 답변</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{notifications.filter(n => n.type === 'journal_comment').length}</div>
-              <div className="text-sm text-gray-600">저널 댓글</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">{notifications.filter(n => n.type.includes('coffee_chat')).length}</div>
@@ -389,17 +361,6 @@ export default function NotificationsPage() {
               <div>
                 <p className="font-medium text-gray-900">질문 답변 알림</p>
                 <p className="text-sm text-gray-600">질문에 새로운 답변이 달렸을 때</p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" defaultChecked className="sr-only peer" />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-              </label>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-gray-900">저널 댓글 알림</p>
-                <p className="text-sm text-gray-600">저널 글에 새로운 댓글이 달렸을 때</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" defaultChecked className="sr-only peer" />

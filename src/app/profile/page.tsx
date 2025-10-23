@@ -51,7 +51,6 @@ export default function ProfilePage() {
   const tabs = [
     { id: 'overview', name: '개요', icon: BarChart3 },
     { id: 'activity', name: '활동', icon: Clock },
-    { id: 'content', name: '콘텐츠', icon: MessageSquare },
     { id: 'coffee', name: '커피쿠폰', icon: Coffee }
   ]
 
@@ -279,16 +278,6 @@ export default function ProfilePage() {
                       <p className="text-sm text-gray-600 mt-1">3개 좋아요 받음</p>
                     </div>
                     <span className="text-xs text-gray-500">3일 전</span>
-                  </div>
-                </div>
-                
-                <div className="border-l-4 border-purple-500 pl-4 py-2">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-medium text-gray-900">저널 작성: &ldquo;현재 업무에 대한 생각&rdquo;</p>
-                      <p className="text-sm text-gray-600 mt-1">개인 성찰</p>
-                    </div>
-                    <span className="text-xs text-gray-500">1주 전</span>
                   </div>
                 </div>
               </div>
@@ -528,31 +517,29 @@ export default function ProfilePage() {
                       </span>
                     </div>
                   )}
-                  
-                  {/* 이미지 디버깅 정보 */}
-                  {user?.image && (
-                    <div className="mt-2 text-xs text-gray-500 max-w-48">
-                      <div className="mb-1">
-                        상태: {imageError ? '❌ 로드 실패' : '✅ 로드됨'}
-                      </div>
-                      <div className="truncate">
-                        원본: {user.image.length > 30 ? user.image.substring(0, 30) + '...' : user.image}
-                      </div>
-                      <div className="truncate">
-                        처리: {(() => {
-                          const processedUrl = getImageUrl(user.image);
-                          return processedUrl && processedUrl.length > 30 ? processedUrl.substring(0, 30) + '...' : processedUrl;
-                        })()}
-                      </div>
-                    </div>
-                  )}
                   </div>
                 </div>
                 
-                <h1 className="text-xl font-bold text-gray-900 mb-1">
-                  {getDisplayName(user?.name || '사용자')}
-                </h1>
-                <p className="text-gray-600 mb-4">{user?.email}</p>
+                {user?.linkedin_url ? (
+                  <a 
+                    href={user.linkedin_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block hover:opacity-80 transition-opacity"
+                  >
+                    <h1 className="text-xl font-bold text-gray-900 mb-1">
+                      {getDisplayName(user?.name || '사용자')}
+                    </h1>
+                    <p className="text-gray-600 mb-4">{user?.email}</p>
+                  </a>
+                ) : (
+                  <>
+                    <h1 className="text-xl font-bold text-gray-900 mb-1">
+                      {getDisplayName(user?.name || '사용자')}
+                    </h1>
+                    <p className="text-gray-600 mb-4">{user?.email}</p>
+                  </>
+                )}
                 
                 {user?.company && (
                   <div className="bg-purple-50 rounded-lg p-3 mb-4">
@@ -646,7 +633,6 @@ export default function ProfilePage() {
                 <p className="text-gray-600">
                   {activeTab === 'overview' && '프로필 개요 및 통계를 확인하세요'}
                   {activeTab === 'activity' && '최근 활동 내역을 확인하세요'}
-                  {activeTab === 'content' && '작성한 질문, 답변, 저널을 관리하세요'}
                   {activeTab === 'coffee' && '커피 쿠폰 잔액 및 내역을 확인하세요'}
                 </p>
               </div>
