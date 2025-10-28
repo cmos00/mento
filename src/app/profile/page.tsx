@@ -493,29 +493,34 @@ export default function ProfilePage() {
               {/* 프로필 헤더 */}
               <div className="text-center">
                 {/* 프로필 이미지 */}
-                <div className="relative mb-6">
-                  <div className="relative inline-block">
-                  {user?.image && !imageError ? (
-                    <img
-                      src={getImageUrl(user.image) || ''}
-                      alt={getDisplayName(user.name || '사용자')}  
-                      className="w-24 h-24 rounded-full object-cover border-4 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-                      onError={() => {
-                        console.log('❌ [Profile Page] 이미지 로드 실패:', user.image)
-                        setImageError(true)
-                      }}
-                      onLoad={() => {
-                        console.log('✅ [Profile Page] 이미지 로드 성공:', user.image)
-                        setImageError(false)
-                      }}
-                    />
-                  ) : (
-                    <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-4 border-purple-200 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
-                      <span className="text-2xl font-bold text-white">
-                        {getDisplayName(user?.name || '사용자').charAt(0)}
-                      </span>
+                <div className="relative mb-6 flex justify-center items-center">
+                  <div className="relative">
+                    {/* 그라데이션 배경 */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-200 via-purple-100 to-transparent rounded-full blur-2xl opacity-60 scale-150"></div>
+                    {/* 프로필 이미지 */}
+                    <div className="relative">
+                      {user?.image && !imageError ? (
+                        <img
+                          src={getImageUrl(user.image) || ''}
+                          alt={getDisplayName(user.name || '사용자')}  
+                          className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                          onError={() => {
+                            console.log('❌ [Profile Page] 이미지 로드 실패:', user.image)
+                            setImageError(true)
+                          }}
+                          onLoad={() => {
+                            console.log('✅ [Profile Page] 이미지 로드 성공:', user.image)
+                            setImageError(false)
+                          }}
+                        />
+                      ) : (
+                        <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-4 border-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                          <span className="text-3xl font-bold text-white">
+                            {getDisplayName(user?.name || '사용자').charAt(0)}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  )}
                   </div>
                 </div>
                 
