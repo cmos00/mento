@@ -492,9 +492,8 @@ export default function ProfilePage() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky space-y-6">
               {/* 프로필 헤더 */}
               <div className="text-center">
-                {/* 백그라운드 원형 장식 */}
+                {/* 프로필 이미지 */}
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-20 scale-110"></div>
                   <div className="relative inline-block">
                   {user?.image && !imageError ? (
                     <img
