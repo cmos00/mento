@@ -1,8 +1,8 @@
 "use client"
 
+import { Bell, MessageCircle, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MessageCircle, Users, BookOpen, Bell, User } from 'lucide-react'
 
 interface PCNavigationProps {
   title: string

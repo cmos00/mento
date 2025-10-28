@@ -2,7 +2,7 @@
 
 import MobileBottomNav from '@/components/MobileBottomNav'
 import PCNavigation from '@/components/PCNavigation'
-import { ArrowRight, Bell, BookOpen, Calendar, Check, Coffee, MessageCircle, X } from 'lucide-react'
+import { ArrowRight, Bell, Calendar, Check, Coffee, MessageCircle, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -292,7 +292,6 @@ export default function NotificationsPage() {
                           <div className="bg-gray-50 rounded-lg p-3 mb-3">
                             <div className="flex items-center space-x-2">
                               {notification.relatedContent.type === 'question' && <MessageCircle className="w-4 h-4 text-blue-600" />}
-                              {notification.relatedContent.type === 'journal' && <BookOpen className="w-4 h-4 text-green-600" />}
                               {notification.relatedContent.type === 'coffee_chat' && <Calendar className="w-4 h-4 text-purple-600" />}
                               <span className="text-sm text-gray-700 font-medium">{notification.relatedContent.title}</span>
                             </div>

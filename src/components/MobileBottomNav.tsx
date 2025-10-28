@@ -1,9 +1,9 @@
 "use client"
 
-import Link from 'next/link'
-import { Home, Users, BookOpen, User, Bell } from 'lucide-react'
-import { usePathname } from 'next/navigation'
+import { Bell, Home, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function MobileBottomNav() {
   const pathname = usePathname()
