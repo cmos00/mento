@@ -464,7 +464,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       {/* PC Navigation */}
       <PCNavigation title="프로필" icon={Users} />
       
