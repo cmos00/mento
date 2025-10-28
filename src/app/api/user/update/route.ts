@@ -71,24 +71,33 @@ export async function POST(request: NextRequest) {
     // mentoring_enabled가 제공된 경우 추가
     if (typeof body.mentoring_enabled === 'boolean') {
       updateData.mentoring_enabled = body.mentoring_enabled
+      console.log('🔄 [User Update] mentoring_enabled 업데이트:', body.mentoring_enabled)
     }
 
+    console.log('📝 [User Update] 업데이트 데이터:', updateData)
+
     // 사용자 정보 업데이트
-    const { error: userError } = await supabaseAdmin
+    const { data: updatedData, error: userError } = await supabaseAdmin
       .from('users')
       .update(updateData)
       .eq('id', existingUser.id)
+      .select()
 
     if (userError) {
-      console.error('❌ [User Update] 사용자 업데이트 오류:', userError)
+      console.error('❌ [User Update] 사용자 업데이트 오류:', {
+        message: userError.message,
+        details: userError.details,
+        hint: userError.hint,
+        code: userError.code
+      })
       return NextResponse.json(
-        { error: `사용자 업데이트 실패: ${userError.message}` },
+        { error: `사용자 업데이트 실패: ${userError.message}`, details: userError },
         { status: 500 }
       )
     }
 
-    console.log('✅ [User Update] 사용자 정보 업데이트 완료')
-    return NextResponse.json({ success: true })
+    console.log('✅ [User Update] 사용자 정보 업데이트 완료:', updatedData)
+    return NextResponse.json({ success: true, data: updatedData })
 
   } catch (error) {
     console.error('❌ [User Update] API 오류:', error)

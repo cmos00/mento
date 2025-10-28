@@ -113,6 +113,12 @@ export default function ProfilePage() {
     const newValue = !mentoringEnabled
     setIsSavingMentoring(true)
     
+    console.log('🔄 [Profile Page] 멘토링 토글 시작:', {
+      currentValue: mentoringEnabled,
+      newValue: newValue,
+      userEmail: user?.email
+    })
+    
     try {
       const response = await fetch('/api/user/update', {
         method: 'POST',
@@ -125,17 +131,29 @@ export default function ProfilePage() {
         }),
       })
 
+      console.log('📡 [Profile Page] API 응답 상태:', response.status)
+
       if (response.ok) {
+        const result = await response.json()
         setMentoringEnabled(newValue)
-        console.log('✅ [Profile Page] 멘토링 상태 업데이트 성공:', newValue)
+        console.log('✅ [Profile Page] 멘토링 상태 업데이트 성공:', newValue, result)
+        
+        // 성공 피드백
+        alert(`멘토링 상태가 ${newValue ? 'ON' : 'OFF'}으로 변경되었습니다.`)
       } else {
         const errorData = await response.json()
         console.error('❌ [Profile Page] 멘토링 상태 업데이트 실패:', errorData)
-        alert(`멘토링 상태 변경에 실패했습니다.\n\n에러: ${errorData.error || '알 수 없는 오류'}\n\nSupabase에서 다음 SQL을 실행해주세요:\nALTER TABLE users ADD COLUMN IF NOT EXISTS mentoring_enabled BOOLEAN DEFAULT false;`)
+        
+        // 상세 에러 정보 표시
+        if (errorData.error && errorData.error.includes('column')) {
+          alert(`데이터베이스 컬럼이 없습니다.\n\nSupabase SQL Editor에서 다음을 실행하세요:\n\nALTER TABLE users ADD COLUMN IF NOT EXISTS mentoring_enabled BOOLEAN DEFAULT false;\nCREATE INDEX IF NOT EXISTS idx_users_mentoring_enabled ON users(mentoring_enabled);`)
+        } else {
+          alert(`멘토링 상태 변경 실패\n\n에러: ${errorData.error || '알 수 없는 오류'}`)
+        }
       }
     } catch (error) {
       console.error('❌ [Profile Page] 멘토링 상태 업데이트 중 오류:', error)
-      alert('멘토링 상태 변경 중 오류가 발생했습니다.')
+      alert(`네트워크 오류가 발생했습니다.\n\n${error}`)
     } finally {
       setIsSavingMentoring(false)
     }
@@ -498,7 +516,7 @@ export default function ProfilePage() {
                     <img
                       src={getImageUrl(user.image) || ''}
                       alt={getDisplayName(user.name || '사용자')}  
-                      className="w-28 h-28 rounded-full object-cover border-4 border-purple-200 shadow-lg"
+                      className="w-28 h-28 rounded-full object-cover shadow-lg"
                       onError={() => {
                         console.log('❌ [Profile Page] 이미지 로드 실패:', user.image)
                         setImageError(true)
@@ -509,7 +527,7 @@ export default function ProfilePage() {
                       }}
                     />
                   ) : (
-                    <div className="w-28 h-28 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center border-4 border-purple-200 shadow-lg">
+                    <div className="w-28 h-28 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
                       <span className="text-3xl font-bold text-white">
                         {getDisplayName(user?.name || '사용자').charAt(0)}
                       </span>
