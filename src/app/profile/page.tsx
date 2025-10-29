@@ -595,21 +595,50 @@ export default function ProfilePage() {
                   </p>
                   
                   {/* 디버그 버튼 */}
-                  <button
-                    onClick={async () => {
-                      const response = await fetch('/api/debug/check-column')
-                      const data = await response.json()
-                      console.log('🔍 [Debug] 컬럼 체크 결과:', data)
-                      if (data.checks?.hasMentoringColumn) {
-                        alert('✅ mentoring_enabled 컬럼이 존재합니다!\n\n사용 가능한 컬럼:\n' + data.checks.availableColumns.join(', '))
-                      } else {
-                        alert('❌ mentoring_enabled 컬럼이 없습니다!\n\n' + data.recommendation)
-                      }
-                    }}
-                    className="mt-3 w-full text-xs text-purple-600 hover:text-purple-700 underline"
-                  >
-                    🔍 데이터베이스 컬럼 확인
-                  </button>
+                  <div className="mt-3 space-y-2">
+                    <button
+                      onClick={async () => {
+                        const response = await fetch('/api/debug/check-column')
+                        const data = await response.json()
+                        console.log('🔍 [Debug] 컬럼 체크 결과:', data)
+                        if (data.checks?.hasMentoringColumn) {
+                          alert('✅ mentoring_enabled 컬럼이 존재합니다!\n\n사용 가능한 컬럼:\n' + data.checks.availableColumns.join(', '))
+                        } else {
+                          alert('❌ mentoring_enabled 컬럼이 없습니다!\n\n' + data.recommendation)
+                        }
+                      }}
+                      className="w-full text-xs text-purple-600 hover:text-purple-700 underline"
+                    >
+                      🔍 데이터베이스 컬럼 확인
+                    </button>
+                    
+                    <button
+                      onClick={async () => {
+                        console.log('🧪 [Test] 업데이트 테스트 시작')
+                        const response = await fetch('/api/debug/test-update', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            currentValue: mentoringEnabled,
+                            mentoring_enabled: !mentoringEnabled
+                          })
+                        })
+                        const data = await response.json()
+                        console.log('🧪 [Test] 테스트 결과:', data)
+                        
+                        if (data.success) {
+                          alert(`✅ 업데이트 테스트 성공!\n\n변경 전: ${data.before.mentoring_enabled}\n변경 후: ${data.after.mentoring_enabled}`)
+                          // 성공했으면 실제 상태도 업데이트
+                          setMentoringEnabled(data.after.mentoring_enabled)
+                        } else {
+                          alert(`❌ 업데이트 테스트 실패\n\n에러: ${data.error}\n\n상세:\n${JSON.stringify(data.details || data, null, 2)}`)
+                        }
+                      }}
+                      className="w-full text-xs text-green-600 hover:text-green-700 underline"
+                    >
+                      🧪 업데이트 테스트 (디버그 모드)
+                    </button>
+                  </div>
                 </div>
               </div>
 

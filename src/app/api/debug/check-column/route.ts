@@ -23,12 +23,7 @@ export async function GET() {
       }
     )
 
-    // 1. users 테이블의 모든 컬럼 조회
-    const { data: columns, error: columnsError } = await supabaseAdmin
-      .rpc('get_table_columns', { table_name: 'users' })
-      .catch(() => ({ data: null, error: null }))
-
-    // RPC가 없는 경우 직접 쿼리
+    // 1. users 테이블에서 샘플 데이터 조회
     const { data: userData, error: userError } = await supabaseAdmin
       .from('users')
       .select('*')
