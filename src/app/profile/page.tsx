@@ -593,6 +593,23 @@ export default function ProfilePage() {
                       ? '다른 사용자들이 1:1 상담을 요청할 수 있습니다'
                       : '멘토링 요청을 받지 않습니다'}
                   </p>
+                  
+                  {/* 디버그 버튼 */}
+                  <button
+                    onClick={async () => {
+                      const response = await fetch('/api/debug/check-column')
+                      const data = await response.json()
+                      console.log('🔍 [Debug] 컬럼 체크 결과:', data)
+                      if (data.checks?.hasMentoringColumn) {
+                        alert('✅ mentoring_enabled 컬럼이 존재합니다!\n\n사용 가능한 컬럼:\n' + data.checks.availableColumns.join(', '))
+                      } else {
+                        alert('❌ mentoring_enabled 컬럼이 없습니다!\n\n' + data.recommendation)
+                      }
+                    }}
+                    className="mt-3 w-full text-xs text-purple-600 hover:text-purple-700 underline"
+                  >
+                    🔍 데이터베이스 컬럼 확인
+                  </button>
                 </div>
               </div>
 
