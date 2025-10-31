@@ -9,11 +9,12 @@ import {
     Clock,
     Coffee,
     Heart,
+    LogOut,
     MessageSquare,
     Settings,
     Users
 } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -679,6 +680,18 @@ export default function ProfilePage() {
                     새 질문 작성
                   </button>
                 </Link>
+
+                <button
+                  onClick={() => {
+                    if (confirm('로그아웃 하시겠습니까?')) {
+                      signOut({ callbackUrl: '/auth/login' })
+                    }
+                  }}
+                  className="w-full border border-gray-300 text-gray-600 hover:bg-gray-50 font-medium py-3 px-4 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-5 h-5 inline mr-2" />
+                  로그아웃
+                </button>
               </div>
             </div>
           </div>
